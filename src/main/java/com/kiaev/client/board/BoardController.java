@@ -1,4 +1,4 @@
-﻿package com.kiaev.client.board;
+package com.kiaev.client.board;
 
 import com.kiaev.client.login.Login;
 import jakarta.servlet.http.HttpSession;

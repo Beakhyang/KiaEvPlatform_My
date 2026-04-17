@@ -1,4 +1,4 @@
-﻿package com.kiaev.client.mypage;
+package com.kiaev.client.mypage;
 
 import java.util.List;
 

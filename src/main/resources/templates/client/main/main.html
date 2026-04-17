@@ -115,6 +115,300 @@ body {
 	font-weight: 800;
 	color: #05141f;
 }
+
+.ai-widget-button {
+	position: fixed;
+	right: 32px;
+	bottom: 32px;
+	width: 86px;
+	height: 86px;
+	border: none;
+	border-radius: 28px;
+	background: linear-gradient(135deg, #05141f 0%, #0f6b63 100%);
+	color: #ffffff;
+	box-shadow: 0 18px 40px rgba(5, 20, 31, 0.28);
+	cursor: pointer;
+	z-index: 12000;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 0;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	overflow: hidden;
+}
+
+.ai-widget-button:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 24px 44px rgba(5, 20, 31, 0.34);
+}
+
+.ai-widget-button.has-custom-icon {
+	background: transparent;
+	border: none;
+}
+
+.ai-widget-icon {
+	display: none;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	border-radius: inherit;
+}
+
+.ai-widget-button.has-custom-icon .ai-widget-icon {
+	display: block;
+}
+
+.ai-widget-fallback {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+}
+
+.ai-widget-fallback-strong {
+	font-size: 24px;
+	font-weight: 800;
+	line-height: 1;
+}
+
+.ai-widget-fallback-label {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.ai-widget-button.has-custom-icon .ai-widget-fallback {
+	display: none;
+}
+
+.ai-widget-panel {
+	position: fixed;
+	right: 32px;
+	top: 108px;
+	bottom: 24px;
+	width: min(460px, calc(100vw - 32px));
+	background: #ffffff;
+	border: 1px solid rgba(5, 20, 31, 0.08);
+	border-radius: 28px;
+	box-shadow: 0 28px 70px rgba(5, 20, 31, 0.18);
+	z-index: 11999;
+	display: none;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.ai-widget-panel.open {
+	display: flex;
+}
+
+.ai-widget-header {
+	padding: 18px 20px 14px;
+	background: linear-gradient(135deg, #05141f 0%, #123a5a 58%, #2e7b6f 100%);
+	color: #ffffff;
+}
+
+.ai-widget-header-top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+.ai-widget-title {
+	margin: 0;
+	font-size: 19px;
+	font-weight: 800;
+}
+
+.ai-widget-subtitle {
+	margin: 0;
+	font-size: 12px;
+	line-height: 1.5;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+.ai-widget-close {
+	width: 36px;
+	height: 36px;
+	border: none;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.14);
+	color: #ffffff;
+	font-size: 18px;
+	cursor: pointer;
+}
+
+.ai-widget-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 7px 12px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.12);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.ai-widget-status::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #8bffca;
+	box-shadow: 0 0 0 5px rgba(139, 255, 202, 0.16);
+}
+
+.ai-widget-status.offline::before {
+	background: #ffd36a;
+	box-shadow: 0 0 0 5px rgba(255, 211, 106, 0.16);
+}
+
+.ai-widget-body {
+	display: grid;
+	grid-template-rows: minmax(0, 1fr) auto auto;
+	flex: 1;
+	min-height: 0;
+	background: linear-gradient(180deg, #f6f8fb 0%, #ffffff 22%);
+}
+
+.ai-widget-messages {
+	min-height: 0;
+	padding: 18px 18px 16px;
+	overflow-y: auto;
+	scroll-behavior: smooth;
+}
+
+.ai-message {
+	max-width: 88%;
+	padding: 13px 14px;
+	border-radius: 18px;
+	margin-bottom: 12px;
+	line-height: 1.55;
+	font-size: 14px;
+	white-space: pre-wrap;
+	word-break: keep-all;
+}
+
+.ai-message.assistant {
+	background: #ffffff;
+	border: 1px solid #e3e8ef;
+	color: #13202c;
+	border-top-left-radius: 7px;
+}
+
+.ai-message.user {
+	margin-left: auto;
+	background: #05141f;
+	border: 1px solid #05141f;
+	color: #ffffff;
+	border-top-right-radius: 7px;
+}
+
+.ai-message.typing {
+	color: #607080;
+}
+
+.ai-widget-suggestions {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 8px;
+	padding: 0 18px 10px;
+	overflow-x: auto;
+	scrollbar-width: thin;
+}
+
+.ai-widget-panel.chatting .ai-widget-suggestions {
+	display: none;
+}
+
+.ai-suggestion-chip {
+	flex: 0 0 auto;
+	border: 1px solid #d8e0ea;
+	background: #ffffff;
+	border-radius: 999px;
+	padding: 9px 12px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #123049;
+	cursor: pointer;
+}
+
+.ai-widget-footer {
+	padding: 0 18px 16px;
+}
+
+.ai-widget-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 12px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #0f5b85;
+	text-decoration: none;
+}
+
+.ai-widget-form {
+	display: flex;
+	gap: 10px;
+	padding: 12px;
+	background: #ffffff;
+	border: 1px solid #dfe5ec;
+	border-radius: 20px;
+	box-shadow: 0 10px 25px rgba(5, 20, 31, 0.06);
+}
+
+.ai-widget-input {
+	flex: 1;
+	border: none;
+	outline: none;
+	font-size: 14px;
+	font-family: inherit;
+	background: transparent;
+}
+
+.ai-widget-send {
+	width: 48px;
+	height: 48px;
+	border: none;
+	border-radius: 16px;
+	background: #05141f;
+	color: #ffffff;
+	font-size: 20px;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
+.ai-widget-send:disabled,
+.ai-suggestion-chip:disabled {
+	opacity: 0.55;
+	cursor: default;
+}
+
+@media (max-width: 768px) {
+	.ai-widget-button {
+		right: 16px;
+		bottom: 18px;
+		width: 74px;
+		height: 74px;
+		border-radius: 22px;
+	}
+
+	.ai-widget-panel {
+		right: 12px;
+		left: 12px;
+		top: 96px;
+		bottom: 12px;
+		width: auto;
+		border-radius: 24px;
+	}
+}
 </style>
 </head>
 
@@ -218,6 +512,236 @@ body {
 
 	<!-- 푸터 불러오기 -->
 	<th:block th:replace="~{common/footer :: footer}"></th:block>
+
+	<button id="aiWidgetButton" class="ai-widget-button" type="button" aria-controls="aiWidgetPanel" aria-expanded="false">
+		<img id="aiWidgetIcon" class="ai-widget-icon" th:src="@{/images/chatbot/chatbot-icon.png}" src="/images/chatbot/chatbot-icon.png" alt="AI 상담 아이콘" />
+		<span class="ai-widget-fallback">
+			<span class="ai-widget-fallback-strong">AI</span>
+			<span class="ai-widget-fallback-label">TALK</span>
+		</span>
+	</button>
+
+	<section id="aiWidgetPanel" class="ai-widget-panel" aria-label="AI 상담 위젯">
+		<div class="ai-widget-header">
+			<div class="ai-widget-header-top">
+				<div>
+					<h3 class="ai-widget-title">AI 상담</h3>
+					<p class="ai-widget-subtitle">메인 화면에서 바로 차량 추천, 보조금, 시승 관련 질문을 남겨보세요.</p>
+				</div>
+				<button id="aiWidgetClose" class="ai-widget-close" type="button" aria-label="AI 상담 닫기">×</button>
+			</div>
+			<div id="aiWidgetStatus" class="ai-widget-status">연결 준비 중</div>
+		</div>
+
+		<div class="ai-widget-body">
+			<div id="aiWidgetMessages" class="ai-widget-messages"></div>
+			<div id="aiWidgetSuggestions" class="ai-widget-suggestions"></div>
+			<div class="ai-widget-footer">
+				<a class="ai-widget-link" th:href="@{/chatbot/main}">기존 FAQ 챗봇으로 이동</a>
+				<form id="aiWidgetForm" class="ai-widget-form">
+					<input id="aiWidgetInput" class="ai-widget-input" type="text" placeholder="예: EV6랑 EV9 중 가족용으로 뭐가 좋아?" autocomplete="off" />
+					<button id="aiWidgetSend" class="ai-widget-send" type="submit" aria-label="메시지 보내기">↑</button>
+				</form>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		(() => {
+			const button = document.getElementById('aiWidgetButton');
+			const widgetIcon = document.getElementById('aiWidgetIcon');
+			const panel = document.getElementById('aiWidgetPanel');
+			const closeButton = document.getElementById('aiWidgetClose');
+			const status = document.getElementById('aiWidgetStatus');
+			const messages = document.getElementById('aiWidgetMessages');
+			const suggestions = document.getElementById('aiWidgetSuggestions');
+			const form = document.getElementById('aiWidgetForm');
+			const input = document.getElementById('aiWidgetInput');
+			const sendButton = document.getElementById('aiWidgetSend');
+
+			let initialized = false;
+			let sending = false;
+			let history = [];
+			let typingMessage = null;
+
+			function syncWidgetIconState() {
+				const loaded = widgetIcon && widgetIcon.complete && widgetIcon.naturalWidth > 0;
+				button.classList.toggle('has-custom-icon', loaded);
+			}
+
+			function scrollMessagesToBottom() {
+				window.requestAnimationFrame(() => {
+					messages.scrollTo({
+						top: messages.scrollHeight,
+						behavior: 'smooth'
+					});
+					window.setTimeout(() => {
+						messages.scrollTop = messages.scrollHeight;
+					}, 120);
+				});
+			}
+
+			function updateChatLayout() {
+				const hasConversation = history.length > 0 || messages.children.length > 1;
+				panel.classList.toggle('chatting', hasConversation);
+			}
+
+			function setOpen(isOpen) {
+				panel.classList.toggle('open', isOpen);
+				button.setAttribute('aria-expanded', String(isOpen));
+				if (isOpen) {
+					initWidget();
+					window.setTimeout(() => input.focus(), 120);
+					scrollMessagesToBottom();
+				}
+			}
+
+			function appendMessage(role, text) {
+				const item = document.createElement('div');
+				item.className = `ai-message ${role}`;
+				item.textContent = text;
+				messages.appendChild(item);
+				updateChatLayout();
+				scrollMessagesToBottom();
+				return item;
+			}
+
+			function renderSuggestions(items) {
+				suggestions.innerHTML = '';
+				if (panel.classList.contains('chatting')) {
+					return;
+				}
+				(items || []).slice(0, 4).forEach(question => {
+					const chip = document.createElement('button');
+					chip.type = 'button';
+					chip.className = 'ai-suggestion-chip';
+					chip.textContent = question;
+					chip.disabled = sending;
+					chip.addEventListener('click', () => sendMessage(question));
+					suggestions.appendChild(chip);
+				});
+			}
+
+			function setStatus(text, offline) {
+				status.textContent = text;
+				status.classList.toggle('offline', Boolean(offline));
+			}
+
+			function showTyping() {
+				hideTyping();
+				typingMessage = appendMessage('assistant typing', 'AI 상담사가 답변을 준비하고 있습니다...');
+			}
+
+			function hideTyping() {
+				if (typingMessage) {
+					typingMessage.remove();
+					typingMessage = null;
+					updateChatLayout();
+				}
+			}
+
+			function setSending(next) {
+				sending = next;
+				sendButton.disabled = next;
+				input.disabled = next;
+				Array.from(suggestions.querySelectorAll('button')).forEach(chip => {
+					chip.disabled = next;
+				});
+			}
+
+			async function initWidget() {
+				if (initialized) {
+					return;
+				}
+
+				initialized = true;
+				try {
+					const response = await fetch('/api/v1/chatbot/ai/init');
+					if (!response.ok) {
+						throw new Error('init failed');
+					}
+
+					const data = await response.json();
+					setStatus(data.available ? `${data.provider} 상담 가능` : '환경 설정 확인 필요', !data.available);
+					appendMessage('assistant', data.greeting);
+					renderSuggestions(data.suggestedQuestions);
+				} catch (error) {
+					setStatus('연결 지연', true);
+					appendMessage('assistant', 'AI 상담 준비 중 문제가 발생했습니다. 잠시 후 다시 열어 주세요.');
+				}
+			}
+
+			async function sendMessage(rawMessage) {
+				const message = (rawMessage || '').trim();
+				if (!message || sending) {
+					return;
+				}
+
+				appendMessage('user', message);
+				history.push({ role: 'user', text: message });
+				input.value = '';
+				updateChatLayout();
+				setSending(true);
+				showTyping();
+
+				try {
+					const response = await fetch('/api/v1/chatbot/ai/message', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							message,
+							history: history.slice(-6)
+						})
+					});
+
+					hideTyping();
+
+					if (!response.ok) {
+						throw new Error('message failed');
+					}
+
+					const data = await response.json();
+					appendMessage('assistant', data.answer);
+					history.push({ role: 'assistant', text: data.answer });
+					history = history.slice(-8);
+					renderSuggestions(data.suggestedQuestions);
+					setStatus(data.available ? `${data.provider} 상담 가능` : '환경 설정 확인 필요', !data.available);
+				} catch (error) {
+					hideTyping();
+					appendMessage('assistant', '답변을 가져오는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
+					setStatus('연결 지연', true);
+				} finally {
+					setSending(false);
+					input.focus();
+				}
+			}
+
+			button.addEventListener('click', () => {
+				setOpen(!panel.classList.contains('open'));
+			});
+
+			if (widgetIcon) {
+				widgetIcon.addEventListener('load', syncWidgetIconState);
+				widgetIcon.addEventListener('error', () => {
+					button.classList.remove('has-custom-icon');
+				});
+				syncWidgetIconState();
+			}
+
+			closeButton.addEventListener('click', () => setOpen(false));
+
+			form.addEventListener('submit', event => {
+				event.preventDefault();
+				sendMessage(input.value);
+			});
+
+			document.addEventListener('keydown', event => {
+				if (event.key === 'Escape' && panel.classList.contains('open')) {
+					setOpen(false);
+				}
+			});
+		})();
+	</script>
 
 </body>
 </html>
