@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+
+<!-- =========================================================
+     브라우저 탭 제목
+========================================================= -->
+<title>딜러 로그인</title>
+
+<style>
+/* =========================================================
+   전체 초기화
+========================================================= */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: Arial, "맑은 고딕", sans-serif;
+}
+
+/* =========================================================
+   전체 배경
+========================================================= */
+body {
+	background-color: #f5f5f5;
+	height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* =========================================================
+   로그인 박스
+========================================================= */
+.login-wrap {
+	width: 500px;
+	background: #ffffff;
+	padding: 50px 40px;
+	border-radius: 16px;
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================================
+   제목
+   - 색상만 변경: 푸른색 → 블랙 계열
+========================================================= */
+.title {
+	text-align: center;
+	font-size: 42px;
+	font-weight: 800;
+	color: #111111;
+	margin-bottom: 30px;
+}
+
+/* =========================================================
+   회원 / 딜러 구분 영역
+========================================================= */
+.type-box {
+	display: flex;
+	justify-content: center;
+	gap: 40px;
+	margin-bottom: 25px;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+/* =========================================================
+   구분선
+========================================================= */
+.line {
+	border: none;
+	border-top: 1px solid #dddddd;
+	margin-bottom: 25px;
+}
+
+/* =========================================================
+   입력 영역
+========================================================= */
+.input-box {
+	margin-bottom: 18px;
+}
+
+.input-box input {
+	width: 100%;
+	height: 58px;
+	border: 1px solid #d9d9d9;
+	border-radius: 12px;
+	padding: 0 18px;
+	font-size: 17px;
+	outline: none;
+}
+
+/* =========================================================
+   입력창 포커스
+   - 색상만 변경: 푸른색 → 블랙 계열
+========================================================= */
+.input-box input:focus {
+	border-color: #111111;
+}
+
+/* =========================================================
+   로그인 버튼
+   - 색상만 변경: 푸른색 → 블랙 계열
+========================================================= */
+.login-btn {
+	width: 100%;
+	height: 58px;
+	border: none;
+	border-radius: 12px;
+	background-color: #111111;
+	color: #ffffff;
+	font-size: 28px;
+	font-weight: 800;
+	cursor: pointer;
+	margin-top: 10px;
+}
+
+.login-btn:hover {
+	background-color: #000000;
+}
+
+/* =========================================================
+   하단 링크
+========================================================= */
+.sub-link {
+	margin-top: 18px;
+	text-align: center;
+}
+
+.sub-link a {
+	text-decoration: none;
+	color: #333333;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+.sub-link a:hover {
+	text-decoration: underline;
+}
+
+/* =========================================================
+   오류 메시지
+========================================================= */
+.error-box {
+	background-color: #fdecea;
+	color: #d93025;
+	padding: 12px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 700;
+	margin-bottom: 15px;
+}
+
+/* =========================================================
+   성공 메시지
+   - 색상만 변경: 초록 계열 → 블랙&화이트 계열
+========================================================= */
+.success-box {
+	background-color: #f5f5f5;
+	color: #111111;
+	padding: 14px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 800;
+	margin-bottom: 15px;
+	border: 1px solid #dddddd;
+}
+</style>
+</head>
+<body>
+
+	<div class="login-wrap">
+
+		<!-- =================================================
+		     제목
+		================================================= -->
+		<div class="title">LOGIN</div>
+
+		<!-- =================================================
+		     회원 / 딜러 표시
+		     - 현재는 딜러 로그인 화면
+		     - 기존 기능 유지
+		     - 단순 안내용으로 disabled 처리
+		================================================= -->
+		<div class="type-box">
+			<label> <input type="radio" disabled> 회원
+			</label> <label> <input type="radio" checked disabled> 딜러
+			</label>
+		</div>
+
+		<hr class="line">
+
+		<!-- =================================================
+		     로그인 실패 메시지
+		     - 기존 기능 유지
+		================================================= -->
+		<div th:if="${errorMessage}" class="error-box"
+			th:text="${errorMessage}"></div>
+
+		<!-- =================================================
+		     비밀번호 변경 성공 메시지
+		     - 비밀번호 변경 후 로그인 화면으로 돌아왔을 때 표시
+		     - 기존 기능 유지
+		================================================= -->
+		<div th:if="${successMessage}" id="successMsg" class="success-box">
+			<span th:text="${successMessage}"></span>
+		</div>
+
+		<!-- =================================================
+		     로그인 폼
+		     - 기존 action 유지
+		     - POST /dealer/login
+		================================================= -->
+		<form th:action="@{/dealer/login}" method="post">
+
+			<!-- =============================================
+			     사원번호 입력
+			     - 기존 기능 유지
+			============================================= -->
+			<div class="input-box">
+				<input type="text" name="dealerEmpNo" placeholder="사원번호" required
+					maxlength="30" autocomplete="username">
+			</div>
+
+			<!-- =============================================
+			     비밀번호 입력
+			     - 기존: 6자 이상 12자 이하
+			     - 변경: 4자 이상 6자 이하
+			     - 로그인 기능 자체는 그대로 유지
+			============================================= -->
+			<div class="input-box">
+				<input type="password" name="dealerPw" placeholder="비밀번호" required
+					minlength="4" maxlength="6" autocomplete="current-password">
+			</div>
+
+			<!-- =============================================
+			     로그인 버튼
+			     - 기존 기능 유지
+			============================================= -->
+			<button type="submit" class="login-btn">로그인</button>
+		</form>
+
+		<!-- =================================================
+		     비밀번호 변경 화면 이동 링크
+		     - 기존 기능 유지
+		================================================= -->
+		<div class="sub-link">
+			<a th:href="@{/dealer/password/reset}">비밀번호 변경</a>
+		</div>
+	</div>
+
+	<!-- =====================================================
+	     성공 메시지 3초 후 자동 숨김
+	     - 기존 기능 유지
+	===================================================== -->
+	<script>
+		window.onload = function() {
+			const msg = document.getElementById("successMsg");
+			if (msg) {
+				setTimeout(() => {
+					msg.style.display = "none";
+				}, 3000);
+			}
+		};
+	</script>
+
+</body>
+</html>

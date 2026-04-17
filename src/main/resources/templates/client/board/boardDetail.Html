@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>기아 전기차 - 게시글 상세</title>
+    <style>
+        .container { width: 800px; margin: 120px auto; font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f4f4f4; width: 15%; text-align: center; }
+        .content-area { min-height: 300px; padding: 20px; border: 1px solid #ddd; margin-bottom: 20px; line-height: 1.6; white-space: pre-wrap; }
+        .btn-group { text-align: right; }
+        .btn { display: inline-block; padding: 10px 15px; color: white; text-decoration: none; margin-left: 5px; font-size: 14px; border: none; cursor: pointer; }
+        .btn-edit { background-color: #0d6efd; }
+        .btn-delete { background-color: #dc3545; }
+        .btn-list { background-color: #6c757d; }
+        .inline-form { display: inline; }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{common/header :: header}"></th:block>
+
+<div class="container">
+    <h2>게시글 상세 보기</h2>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>제목</th>
+                <td colspan="3" th:text="${board.title}">게시글 제목</td>
+            </tr>
+            <tr>
+                <th>분류</th>
+                <td th:text="${board.boardType == 'NOTICE' ? '공지사항' : board.boardType == 'INQUIRY' ? '일반문의' : board.boardType == 'EV_INQUIRY' ? '전기차문의' : board.boardType == 'CS_CENTER' ? '고객센터' : board.boardType}">문의글</td>
+                <th>작성일</th>
+                <td th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2026-04-13 16:50</td>
+            </tr>
+            <tr>
+                <th>조회수</th>
+                <td colspan="3" th:text="${board.viewCount}">0</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="content-area" th:text="${board.content}">
+        게시글 내용
+    </div>
+
+    <div class="btn-group">
+        <a th:if="${isAuthor}" th:href="@{/board/edit(boardNo=${board.boardNo})}" class="btn btn-edit">수정</a>
+        <form th:if="${isAuthor}" th:action="@{/board/delete}" method="post" class="inline-form">
+            <input type="hidden" name="boardNo" th:value="${board.boardNo}">
+            <button type="submit" class="btn btn-delete" onclick="return confirm('게시글을 삭제하시겠습니까?');">삭제</button>
+        </form>
+        <a th:href="@{/board/list}" class="btn btn-list">목록으로</a>
+    </div>
+</div>
+<th:block th:replace="~{common/footer :: footer}"></th:block>
+</body>
+</html>

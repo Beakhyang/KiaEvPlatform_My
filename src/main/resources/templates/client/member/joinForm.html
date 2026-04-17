@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>회원가입</title>
+<script src="//t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+    color: #111;
+}
+
+.page-title-row {
+    width: 760px;
+    margin: 20px auto 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.logo-link {
+    text-decoration: none;
+    font-size: 36px;
+    font-weight: 800;
+    color: #001b33;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.logo-link:hover {
+    color: #00264b;
+}
+
+.join-wrap {
+    width: 760px;
+    margin: 0 auto;
+    padding: 10px 0 30px;
+}
+
+.join-title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 800;
+    margin: 20px 0 30px;
+    letter-spacing: -1px;
+}
+
+.join-form {
+    width: 100%;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.form-label {
+    width: 160px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+    flex-shrink: 0;
+}
+
+.form-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-input {
+    width: 100%;
+    height: 52px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-size: 20px;
+    outline: none;
+    background: #fff;
+}
+
+.form-input::placeholder {
+    color: #9a9a9a;
+}
+
+.form-input:focus {
+    border-color: #001b33;
+}
+
+.input-with-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.input-with-btn .form-input {
+    flex: 1;
+}
+
+.btn-side {
+    width: 120px;
+    height: 52px;
+    border: none;
+    border-radius: 12px;
+    background: #001b33;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-side:hover {
+    opacity: 0.95;
+}
+
+.btn-submit {
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: 12px;
+    background: #001b33;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 18px;
+}
+
+.btn-submit:hover {
+    opacity: 0.95;
+}
+
+.msg {
+    margin: -10px 0 18px 170px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.msg.success {
+    color: #156d2f;
+}
+
+.msg.error {
+    color: #e53935;
+}
+
+.bottom-links {
+    margin-top: 26px;
+    padding-top: 24px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    font-size: 16px;
+    color: #999;
+}
+
+.bottom-links a {
+    color: #999;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.bottom-links a:hover {
+    color: #001b33;
+    font-weight: 700;
+}
+
+@media (max-width: 820px) {
+    .join-wrap {
+        width: 92%;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .form-label {
+        width: 100%;
+    }
+
+    .form-field {
+        width: 100%;
+    }
+
+    .msg {
+        margin-left: 0;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="page-title-row">
+    <a href="/main?lang=kr" class="logo-link">KIA EV</a>
+</div>
+
+<div class="join-wrap">
+<h1 class="join-title">회원가입</h1>
+
+    <form th:action="@{/member/join}" method="post" id="joinForm" class="join-form">
+
+        <div class="form-row">
+            <div class="form-label">아이디</div>
+            <div class="form-field">
+                <div class="input-with-btn">
+                    <input type="text" name="loginId" id="loginId" class="form-input" placeholder="아이디 입력" maxlength="20" required>
+                    <button type="button" class="btn-side" onclick="checkDuplicateId()">중복확인</button>
+                </div>
+            </div>
+        </div>
+        <div id="idMsg" class="msg"></div>
+
+        <div class="form-row">
+            <div class="form-label">비밀번호</div>
+            <div class="form-field">
+                <input type="password" name="memberPw" id="memberPw" class="form-input" placeholder="비밀번호 입력" maxlength="20" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">비밀번호 확인</div>
+            <div class="form-field">
+                <input type="password" name="confirmPw" id="confirmPw" class="form-input" placeholder="비밀번호 확인 입력" maxlength="20" required>
+            </div>
+        </div>
+        <div id="pwMsg" class="msg"></div>
+
+        <div class="form-row">
+            <div class="form-label">이름</div>
+            <div class="form-field">
+                <input type="text" name="memberName" class="form-input" placeholder="이름 입력" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">생년월일</div>
+            <div class="form-field">
+                <input type="text" name="birthDate" id="birthDate" class="form-input" placeholder="생년월일 입력" maxlength="10" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">이메일</div>
+            <div class="form-field">
+                <div class="input-with-btn">
+                    <input type="email" name="email" id="email" class="form-input" placeholder="이메일 입력" required>
+                    <button type="button" class="btn-side" onclick="checkEmailDuplicate()">중복확인</button>
+                </div>
+            </div>
+        </div>
+        <div id="emailMsg" class="msg"></div>
+
+        <div class="form-row">
+            <div class="form-label">휴대폰 번호</div>
+            <div class="form-field">
+                <input type="text" name="phone" id="phone" class="form-input" placeholder="휴대폰 번호 입력" maxlength="13" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">우편번호</div>
+            <div class="form-field">
+                <input type="text" name="zipcode" id="zipcode" class="form-input" placeholder="우편번호" readonly required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">주소</div>
+            <div class="form-field">
+                <div class="input-with-btn">
+                    <input type="text" name="address" id="address" class="form-input" placeholder="주소 입력" readonly required>
+                    <button type="button" class="btn-side" onclick="searchPostcode()">우편검색</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-label">상세주소</div>
+            <div class="form-field">
+                <input type="text" name="detailAddress" id="detailAddress" class="form-input" placeholder="상세주소 입력">
+            </div>
+        </div>
+
+        <div th:if="${joinError}" class="msg error" th:text="${joinError}"></div>
+
+        <button type="submit" class="btn-submit">회원가입</button>
+
+        <div class="bottom-links">
+            <a th:href="@{/login}">로그인</a> |
+            <a th:href="@{/client/login/findId}">아이디 찾기</a> |
+            <a th:href="@{/client/login/findPw}">비밀번호 찾기</a>
+        </div>
+    </form>
+</div>
+
+<th:block th:if="${joinSuccess != null}">
+    <script>
+        alert('회원가입이 완료되었습니다.\n로그인을 진행해주세요.');
+        location.href = '/login';
+    </script>
+</th:block>
+
+<script th:inline="javascript">
+    (function() {
+        const originalFetch = window.fetch;
+        const checkIdUrl = /*[[@{/member/checkId}]]*/ '/member/checkId';
+        const checkEmailUrl = /*[[@{/member/checkEmail}]]*/ '/member/checkEmail';
+
+        window.fetch = function(resource, init) {
+            if (typeof resource === 'string') {
+                if (resource.startsWith('/member/checkId')) {
+                    resource = resource.replace('/member/checkId', checkIdUrl);
+                }
+                if (resource.startsWith('/member/checkEmail')) {
+                    resource = resource.replace('/member/checkEmail', checkEmailUrl);
+                }
+            }
+            return originalFetch(resource, init);
+        };
+    })();
+</script>
+
+<script>
+let isIdChecked = false;
+let isIdAvailable = false;
+let isEmailChecked = false;
+let isEmailAvailable = false;
+
+const loginIdInput = document.getElementById('loginId');
+const emailInput = document.getElementById('email');
+const phoneInput = document.getElementById('phone');
+const memberPwInput = document.getElementById('memberPw');
+const confirmPwInput = document.getElementById('confirmPw');
+const birthDateInput = document.getElementById('birthDate');
+
+loginIdInput.addEventListener('input', function () {
+    isIdChecked = false;
+    isIdAvailable = false;
+    document.getElementById('idMsg').textContent = '';
+    document.getElementById('idMsg').className = 'msg';
+});
+
+emailInput.addEventListener('input', function () {
+    isEmailChecked = false;
+    isEmailAvailable = false;
+    document.getElementById('emailMsg').textContent = '';
+    document.getElementById('emailMsg').className = 'msg';
+});
+
+memberPwInput.addEventListener('input', function () {
+    const pwMsg = document.getElementById('pwMsg');
+
+    if (confirmPwInput.value === '') {
+        pwMsg.textContent = '';
+        pwMsg.className = 'msg';
+        return;
+    }
+
+    if (memberPwInput.value === confirmPwInput.value) {
+        pwMsg.textContent = '비밀번호가 일치합니다.';
+        pwMsg.className = 'msg success';
+    } else {
+        pwMsg.textContent = '비밀번호가 일치하지 않습니다.';
+        pwMsg.className = 'msg error';
+    }
+});
+
+confirmPwInput.addEventListener('input', function () {
+    const pwMsg = document.getElementById('pwMsg');
+
+    if (confirmPwInput.value === '') {
+        pwMsg.textContent = '';
+        pwMsg.className = 'msg';
+        return;
+    }
+
+    if (memberPwInput.value === confirmPwInput.value) {
+        pwMsg.textContent = '비밀번호가 일치합니다.';
+        pwMsg.className = 'msg success';
+    } else {
+        pwMsg.textContent = '비밀번호가 일치하지 않습니다.';
+        pwMsg.className = 'msg error';
+    }
+});
+
+phoneInput.addEventListener('input', function () {
+    let value = phoneInput.value.replace(/[^0-9]/g, '');
+
+    if (value.length > 11) {
+        value = value.substring(0, 11);
+    }
+
+    if (value.length < 4) {
+        phoneInput.value = value;
+    } else if (value.length < 8) {
+        phoneInput.value = value.substring(0, 3) + '-' + value.substring(3);
+    } else {
+        phoneInput.value = value.substring(0, 3) + '-' + value.substring(3, 7) + '-' + value.substring(7, 11);
+    }
+});
+
+birthDateInput.addEventListener('input', function () {
+    let value = birthDateInput.value.replace(/[^0-9]/g, '');
+
+    if (value.length > 8) {
+        value = value.substring(0, 8);
+    }
+
+    if (value.length >= 5) {
+        birthDateInput.value = value.substring(0, 4) + '-' + value.substring(4, 6) + '-' + value.substring(6, 8);
+    } else if (value.length >= 3) {
+        birthDateInput.value = value.substring(0, 4) + '-' + value.substring(4, 6);
+    } else {
+        birthDateInput.value = value;
+    }
+});
+
+function checkDuplicateId() {
+    const loginId = loginIdInput.value.trim();
+    const idMsg = document.getElementById('idMsg');
+
+    if (loginId === '') {
+        idMsg.textContent = '아이디를 입력해주세요.';
+        idMsg.className = 'msg error';
+        return;
+    }
+
+    fetch('/member/checkId?loginId=' + encodeURIComponent(loginId), {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        isIdChecked = true;
+        isIdAvailable = !data.duplicate;
+
+        if (data.duplicate) {
+            idMsg.textContent = '이미 사용중인 아이디 입니다.';
+            idMsg.className = 'msg error';
+        } else {
+            idMsg.textContent = '사용 가능한 아이디 입니다.';
+            idMsg.className = 'msg success';
+        }
+    })
+    .catch(() => {
+        idMsg.textContent = '아이디 중복확인 중 오류가 발생했습니다.';
+        idMsg.className = 'msg error';
+    });
+}
+
+function checkEmailDuplicate() {
+    const email = emailInput.value.trim();
+    const emailMsg = document.getElementById('emailMsg');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (email === '') {
+        emailMsg.textContent = '이메일을 입력해주세요.';
+        emailMsg.className = 'msg error';
+        return;
+    }
+
+    if (!emailRegex.test(email)) {
+        emailMsg.textContent = '이메일 형식을 정확히 입력해주세요.';
+        emailMsg.className = 'msg error';
+        return;
+    }
+
+    fetch('/member/checkEmail?email=' + encodeURIComponent(email), {
+        method: 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        isEmailChecked = true;
+        isEmailAvailable = !data.duplicate;
+
+        if (data.duplicate) {
+            emailMsg.textContent = '이미 사용중인 이메일 입니다.';
+            emailMsg.className = 'msg error';
+        } else {
+            emailMsg.textContent = '사용 가능한 이메일 입니다.';
+            emailMsg.className = 'msg success';
+        }
+    })
+    .catch(() => {
+        emailMsg.textContent = '이메일 중복확인 중 오류가 발생했습니다.';
+        emailMsg.className = 'msg error';
+    });
+}
+
+function searchPostcode() {
+    new daum.Postcode({
+        oncomplete: function(data) {
+            let addr = '';
+            let extraAddr = '';
+
+            if (data.userSelectedType === 'R') {
+                addr = data.roadAddress;
+            } else {
+                addr = data.jibunAddress;
+            }
+
+            if (data.userSelectedType === 'R') {
+                if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                    extraAddr += data.bname;
+                }
+                if (data.buildingName !== '' && data.apartment === 'Y') {
+                    extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                }
+                if (extraAddr !== '') {
+                    extraAddr = ' (' + extraAddr + ')';
+                }
+            }
+
+            document.getElementById('zipcode').value = data.zonecode;
+            document.getElementById('address').value = addr + extraAddr;
+            document.getElementById('detailAddress').focus();
+        }
+    }).open();
+}
+
+document.getElementById('joinForm').addEventListener('submit', function (e) {
+    const phone = phoneInput.value.trim();
+    const birthDate = birthDateInput.value.trim();
+
+    if (!isIdChecked || !isIdAvailable) {
+        alert('아이디 중복확인을 완료해주세요.');
+        loginIdInput.focus();
+        e.preventDefault();
+        return;
+    }
+
+    if (!isEmailChecked || !isEmailAvailable) {
+        alert('이메일 중복확인을 완료해주세요.');
+        emailInput.focus();
+        e.preventDefault();
+        return;
+    }
+
+    if (memberPwInput.value !== confirmPwInput.value) {
+        alert('비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+        confirmPwInput.focus();
+        e.preventDefault();
+        return;
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+        alert('생년월일을 YYYY-MM-DD 형식으로 입력해주세요.');
+        birthDateInput.focus();
+        e.preventDefault();
+        return;
+    }
+
+    if (!/^\d{3}-\d{4}-\d{4}$/.test(phone)) {
+        alert('휴대폰 번호를 010-1234-5678 형식으로 입력해주세요.');
+        phoneInput.focus();
+        e.preventDefault();
+        return;
+    }
+});
+</script>
+
+</body>
+</html>

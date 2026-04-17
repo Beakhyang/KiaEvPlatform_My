@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>KIA EV - 회사정보</title>
+</head>
+<body style="margin:0; padding:0;">
+
+    <th:block th:replace="~{common/header :: header}"></th:block>
+
+    <main style="width: 1200px; margin: 0 auto; min-height: 700px; padding: 100px 0;">
+        <h2 style="font-size: 32px; border-bottom: 2px solid #05141f; padding-bottom: 20px; margin-bottom: 40px; color: #05141f; letter-spacing: -1px;">회사정보</h2>
+        
+        <div style="line-height: 2; color: #333; font-size: 16px;">
+            <h3 style="color: #05141f; font-size: 24px; margin-bottom: 15px;">Movement that inspires</h3>
+            
+            <p style="margin-bottom: 30px;">
+                기아는 고객에게 영감을 주는 움직임을 통해 지속 가능한 모빌리티 솔루션을 제공합니다.<br>
+                KIA EV Platform 서비스는 혁신적인 전기차 경험을 웹을 통해 전달하고자 합니다.
+            </p>
+            
+            <div style="margin-top: 50px; background: #f9f9f9; padding: 40px; border-radius: 10px; border: 1px solid #eee;">
+                <p style="margin: 10px 0;">
+                    <b style="color: #05141f; width: 100px; display: inline-block;">주소</b> 
+                    <span>성남대로 1133 메트로칸</span>
+                </p>
+                <p style="margin: 10px 0;">
+                    <b style="color: #05141f; width: 100px; display: inline-block;">대표번호</b> 
+                    <span>000-200-2000</span>
+                </p>
+                <p style="margin: 10px 0;">
+                    <b style="color: #05141f; width: 100px; display: inline-block;">프로젝트팀</b> 
+                    <span>TEAM DAY6</span>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <th:block th:replace="~{common/footer :: footer}"></th:block>
+
+</body>
+</html>

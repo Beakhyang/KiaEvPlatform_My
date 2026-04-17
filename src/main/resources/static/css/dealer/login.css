@@ -1,0 +1,191 @@
+/* ========================================================= 전체 초기화 - 기본 여백 제거 - box-sizing 통일 ========================================================= */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+/* ========================================================= html / body 기본 설정 ========================================================= */
+html, body {
+	width: 100%;
+	height: 100%;
+}
+/* ========================================================= 전체 배경 - 기존 푸른빛 계열 제거 - 블랙&화이트 기반의 밝은 회색 톤 적용 ========================================================= */
+body {
+	font-family: Arial, "Malgun Gothic", "맑은 고딕", sans-serif;
+	background-color: #f3f3f3;
+	color: #111111;
+}
+/* ========================================================= 로그인 페이지 전체 래퍼 - 카드 중앙 정렬 ========================================================= */
+.login-page {
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 24px;
+}
+/* ========================================================= 로그인 카드 박스 - 흰색 배경 - 너무 푸른 느낌 없이 중성 그림자 사용 ========================================================= */
+.login-wrap {
+	width: 100%;
+	max-width: 500px;
+	background-color: #ffffff;
+	padding: 50px 40px;
+	border-radius: 16px;
+	border: 1px solid #e1e1e1;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+}
+/* ========================================================= 제목 - 기존 남색 계열 제거 - 블랙 계열로 변경 ========================================================= */
+.title {
+	text-align: center;
+	font-size: 42px;
+	font-weight: 800;
+	color: #111111;
+	letter-spacing: 1px;
+	margin-bottom: 30px;
+}
+/* ========================================================= 회원 / 딜러 구분 영역 ========================================================= */
+.type-box {
+	display: flex;
+	justify-content: center;
+	gap: 40px;
+	margin-bottom: 25px;
+	font-size: 18px;
+	font-weight: 700;
+	color: #111111;
+}
+/* ========================================================= 라디오 + 텍스트 한 줄 정렬 ========================================================= */
+.type-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	cursor: default;
+}
+/* ========================================================= 라디오 버튼 - 기본 파란색 계열 대신 검정 계열 강조색 적용 ========================================================= */
+.type-label input[type="radio"] {
+	accent-color: #111111;
+	width: 14px;
+	height: 14px;
+}
+/* ========================================================= 구분선 ========================================================= */
+.line {
+	border: none;
+	border-top: 1px solid #dddddd;
+	margin-bottom: 25px;
+}
+/* ========================================================= 입력 영역 ========================================================= */
+.input-box {
+	margin-bottom: 18px;
+}
+/* ========================================================= 입력창 기본 스타일 ========================================================= */
+.input-box input {
+	width: 100%;
+	height: 58px;
+	border: 1px solid #d9d9d9;
+	border-radius: 12px;
+	padding: 0 18px;
+	font-size: 17px;
+	color: #111111;
+	background-color: #ffffff;
+	outline: none;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+/* ========================================================= placeholder 스타일 ========================================================= */
+.input-box input::placeholder {
+	color: #8a8a8a;
+}
+/* ========================================================= 입력창 포커스 - 기존 푸른 테두리 제거 - 검정/회색 포커스로 변경 ========================================================= */
+.input-box input:focus {
+	border-color: #111111;
+	box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+/* ========================================================= 자동완성 배경색 보정 - 브라우저 자동완성 시 푸른/노란 느낌 완화 ========================================================= */
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus,
+	input:-webkit-autofill:active {
+	-webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+	-webkit-text-fill-color: #111111 !important;
+	transition: background-color 9999s ease-in-out 0s;
+}
+/* ========================================================= 로그인 버튼 - 남색 제거 - 블랙 버튼으로 통일 ========================================================= */
+.login-btn {
+	width: 100%;
+	height: 58px;
+	border: none;
+	border-radius: 12px;
+	background-color: #111111;
+	color: #ffffff;
+	font-size: 28px;
+	font-weight: 800;
+	cursor: pointer;
+	margin-top: 10px;
+	transition: background-color 0.2s ease, transform 0.1s ease;
+}
+/* ========================================================= 버튼 hover ========================================================= */
+.login-btn:hover {
+	background-color: #2a2a2a;
+}
+/* ========================================================= 버튼 클릭감 ========================================================= */
+.login-btn:active {
+	transform: scale(0.99);
+}
+/* ========================================================= 하단 링크 영역 ========================================================= */
+.sub-link {
+	margin-top: 18px;
+	text-align: center;
+}
+/* ========================================================= 비밀번호 변경 링크 - 파란 링크 느낌 제거 ========================================================= */
+.sub-link a {
+	text-decoration: none;
+	color: #222222;
+	font-size: 15px;
+	font-weight: 600;
+	transition: color 0.2s ease;
+}
+/* ========================================================= 링크 hover ========================================================= */
+.sub-link a:hover {
+	text-decoration: underline;
+	color: #000000;
+}
+/* ========================================================= 오류 메시지 - 기능 유지 - 너무 강한 색이 아닌 깔끔한 경고 스타일 ========================================================= */
+.error-box {
+	background-color: #fdf1f1;
+	color: #b42318;
+	padding: 12px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 700;
+	margin-bottom: 15px;
+	border: 1px solid #efc7c7;
+}
+/* ========================================================= 성공 메시지 - 기능 유지 - 밝은 중성/자연색 계열 유지 ========================================================= */
+.success-box {
+	background-color: #f4f8f4;
+	color: #1f6b3b;
+	padding: 14px;
+	border-radius: 10px;
+	text-align: center;
+	font-weight: 800;
+	margin-bottom: 15px;
+	border: 1px solid #cfe3d3;
+}
+/* ========================================================= 반응형 ========================================================= */
+@media ( max-width : 768px) {
+	.login-wrap {
+		padding: 36px 24px;
+		border-radius: 14px;
+	}
+	.title {
+		font-size: 34px;
+		margin-bottom: 24px;
+	}
+	.type-box {
+		gap: 24px;
+		font-size: 16px;
+	}
+	.input-box input {
+		height: 54px;
+		font-size: 16px;
+	}
+	.login-btn {
+		height: 54px;
+		font-size: 24px;
+	}
+}

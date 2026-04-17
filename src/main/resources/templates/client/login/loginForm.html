@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>LOGIN</title>
+<style>
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+body {
+   font-family: 'Malgun Gothic', sans-serif;
+   background: #f3f3f3;
+   color: #111;
+}
+
+/* 본문 */
+.login-page {
+   min-height: calc(100vh - 74px);
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   padding: 40px 20px;
+}
+
+.login-box {
+   width: 500px;
+   background: #fff;
+   border-radius: 20px;
+   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+   padding: 56px 44px 38px;
+}
+
+.login-title {
+   text-align: center;
+   font-size: 28px;
+   font-weight: 800;
+   color: #001b36;
+   margin-bottom: 30px;
+}
+
+.login-type {
+   display: flex;
+   justify-content: center;
+   gap: 34px;
+   margin-bottom: 24px;
+   font-size: 16px;
+   font-weight: 600;
+}
+
+.login-type label {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   cursor: pointer;
+}
+
+.line {
+   width: 100%;
+   height: 1px;
+   background: #ececec;
+   margin-bottom: 26px;
+}
+
+.input-group {
+   margin-bottom: 16px;
+}
+
+.input-group input {
+   width: 100%;
+   height: 54px;
+   border: 1px solid #dddddd;
+   border-radius: 10px;
+   padding: 0 16px;
+   font-size: 17px;
+   outline: none;
+   background: #fff;
+}
+
+.input-group input::placeholder {
+   color: #9b9b9b;
+}
+
+.input-group input:focus {
+   border-color: #001b36;
+}
+
+.login-btn {
+   width: 100%;
+   height: 50px;
+   border: none;
+   border-radius: 10px;
+   background: #001b36;
+   color: #fff;
+   font-size: 18px;
+   font-weight: 700;
+   cursor: pointer;
+   margin-top: 12px;
+}
+
+.login-btn:hover {
+   background: #00264b;
+}
+
+.find-links {
+   margin-top: 22px;
+   text-align: center;
+   font-size: 15px;
+   color: #b7b7b7;
+}
+
+.find-links a {
+   text-decoration: none;
+   color: #b7b7b7;
+   margin: 0 10px;
+}
+
+.find-links a:hover {
+   color: #001b36;
+}
+
+.bottom-line {
+   width: 100%;
+   height: 1px;
+   background: #ececec;
+   margin: 34px 0 22px;
+}
+
+.join-area {
+   text-align: center;
+   font-size: 15px;
+   color: #a0a0a0;
+}
+
+.join-area a {
+   margin-left: 6px;
+   text-decoration: none;
+   color: #001b36;
+   font-weight: 700;
+}
+
+.message-box {
+   margin-bottom: 18px;
+   padding: 12px 14px;
+   border-radius: 10px;
+   font-size: 14px;
+   text-align: center;
+}
+
+.error-box {
+   background: #fff1f1;
+   color: #c62828;
+   border: 1px solid #f0c7c7;
+}
+
+.success-box {
+   background: #eef6ff;
+   color: #1565c0;
+   border: 1px solid #c9def7;
+}
+
+/* 회원가입 성공 메시지 모달 */
+.modal-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: rgba(0, 0, 0, 0.45);
+   display: none;
+   justify-content: center;
+   align-items: center;
+   z-index: 9999;
+}
+
+.modal-box {
+   width: 360px;
+   background: #fff;
+   border-radius: 18px;
+   padding: 30px 24px 24px;
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+   text-align: center;
+}
+
+.modal-title {
+   font-size: 22px;
+   font-weight: 800;
+   color: #001b36;
+   margin-bottom: 14px;
+}
+
+.modal-text {
+   font-size: 16px;
+   color: #333;
+   margin-bottom: 24px;
+   line-height: 1.5;
+}
+
+.modal-btn {
+   min-width: 100px;
+   height: 44px;
+   border: none;
+   border-radius: 10px;
+   background: #001b36;
+   color: #fff;
+   font-size: 15px;
+   font-weight: 700;
+   cursor: pointer;
+}
+
+.modal-btn:hover {
+   background: #00264b;
+}
+</style>
+</head>
+<body>
+   <th:block th:replace="~{common/header :: header}"></th:block>
+
+   <section class="login-page">
+      <div class="login-box">
+         <h2 class="login-title">LOGIN</h2>
+
+         <div class="login-type">
+            <label>
+               <input type="radio" name="userType" value="MEMBER" checked onchange="changeLoginType()"> 회원
+            </label>
+            <label>
+               <input type="radio" name="userType" value="DEALER" onchange="changeLoginType()"> 딜러
+            </label>
+         </div>
+
+         <div class="line"></div>
+
+         <div th:if="${loginError}" class="message-box error-box" th:text="${loginError}"></div>
+         <div th:if="${joinSuccess}" class="message-box success-box" th:text="${joinSuccess}"></div>
+         <div th:if="${successMessage}" class="message-box success-box" th:text="${successMessage}"></div>
+         <div th:if="${timeoutMessage}" class="message-box error-box" th:text="${timeoutMessage}"></div>
+
+         <form id="loginForm" th:action="@{/login}" method="post">
+            <div class="input-group">
+               <input type="text" id="loginIdInput" name="loginId" placeholder="아이디" required>
+            </div>
+
+            <div class="input-group">
+               <input type="password" id="passwordInput" name="memberPw" placeholder="비밀번호" required>
+            </div>
+
+            <button type="submit" class="login-btn">로그인</button>
+         </form>
+
+         <div class="find-links">
+            <a id="findIdLink" th:href="@{/client/login/findId}">아이디 찾기</a> |
+            <a id="findPwLink" th:href="@{/client/login/findPw}">비밀번호 찾기</a>
+         </div>
+
+         <div class="bottom-line"></div>
+
+         <div class="join-area">
+            아직 회원이 아니신가요? <a th:href="@{/member/join}">회원가입</a>
+         </div>
+      </div>
+   </section>
+
+   <div id="joinSuccessModal" class="modal-overlay" th:if="${joinSuccess != null}">
+      <div class="modal-box">
+         <div class="modal-title">회원가입 완료</div>
+         <div class="modal-text" th:text="${joinSuccess}"></div>
+         <button type="button" class="modal-btn" onclick="closeJoinSuccessModal()">확인</button>
+      </div>
+   </div>
+
+   <th:block th:replace="~{common/footer :: footer}"></th:block>
+
+   <th:block th:if="${joinSuccess != null}">
+      <script>
+         window.alert = function() {};
+      </script>
+   </th:block>
+
+   <th:block th:if="${joinSuccess != null}">
+      <script>
+         alert('회원가입 성공! 로그인해주세요.');
+      </script>
+   </th:block>
+
+   <script>
+      window.onload = function() {
+         changeLoginType();
+
+         const successBox = document.querySelector(".success-box");
+         if (successBox) {
+            setTimeout(function() {
+               successBox.style.transition = "opacity 0.5s ease";
+               successBox.style.opacity = "0";
+            }, 2500);
+         }
+
+         const modal = document.getElementById("joinSuccessModal");
+         if (modal) {
+            modal.style.display = "flex";
+         }
+      };
+
+      function changeLoginType() {
+         const selectedType = document.querySelector('input[name="userType"]:checked').value;
+         const loginForm = document.getElementById("loginForm");
+         const loginIdInput = document.getElementById("loginIdInput");
+         const passwordInput = document.getElementById("passwordInput");
+         const findIdLink = document.getElementById("findIdLink");
+         const findPwLink = document.getElementById("findPwLink");
+
+         if (selectedType === "DEALER") {
+            loginForm.action = "/dealer/login";
+            loginIdInput.name = "dealerEmpNo";
+            loginIdInput.placeholder = "사원번호";
+            loginIdInput.value = "";
+
+            passwordInput.name = "dealerPw";
+            passwordInput.placeholder = "비밀번호";
+            passwordInput.value = "";
+
+            findIdLink.style.display = "none";
+            findPwLink.href = "/dealer/password/reset";
+            findPwLink.textContent = "비밀번호 재설정";
+         } else {
+            loginForm.action = "/login";
+            loginIdInput.name = "loginId";
+            loginIdInput.placeholder = "아이디";
+            loginIdInput.value = "";
+
+            passwordInput.name = "memberPw";
+            passwordInput.placeholder = "비밀번호";
+            passwordInput.value = "";
+
+            findIdLink.style.display = "inline";
+            findIdLink.href = "/client/login/findId";
+            findIdLink.textContent = "아이디 찾기";
+
+            findPwLink.href = "/client/login/findPw";
+            findPwLink.textContent = "비밀번호 찾기";
+         }
+      }
+
+      function closeJoinSuccessModal() {
+         const modal = document.getElementById("joinSuccessModal");
+         if (modal) {
+            modal.style.display = "none";
+         }
+      }
+   </script>
+</body>
+</html>

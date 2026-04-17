@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>KIA EV - 관심 차량 목록</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+/* 기본 초기화 */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+}
+body { background: #f3f3f3; color: #111; }
+a { text-decoration: none; color: inherit; }
+
+/* [추가] 헤더 고정을 위한 스크롤 설정 */
+html { overflow-y: scroll !important; }
+
+/* [수정] 마이페이지 전체 감싸는 여백 조정 (헤더 높이 고려) */
+.mypage-wrap { 
+    width: 1200px; 
+    margin: 0 auto; 
+    padding: 150px 0 100px; /* 상단 패딩으로 헤더 공간 확보 */
+}
+.mypage-container { display: flex; gap: 24px; align-items: flex-start; }
+
+/* 왼쪽 사이드 메뉴 */
+.side-menu {
+    width: 240px; background: #111111; border-radius: 12px;
+    padding: 40px 25px; min-height: 600px;  position: relative;
+}
+.menu-list { list-style: none; margin-top: 30px; }
+.menu-list li { margin-bottom: 25px; }
+.menu-list li a { color: #fff; font-size: 18px; font-weight: 500; display: block; }
+.menu-list li a:hover { color: #89c541; }
+.logout-box {
+	position: absolute;
+	left: 25px;
+	right: 25px;
+	bottom: 25px;
+	padding-top: 20px;
+	border-top: 1px solid #333;
+	text-align: right;
+}
+.logout-box a { color: #999; font-size: 16px; }
+
+/* 오른쪽 본문 영역 */
+.content-area { flex: 1; }
+.main-card {
+    background: #fff; border-radius: 22px; padding: 45px;
+    min-height: 600px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e7e7e7;
+}
+.section-title {
+    font-size: 24px; font-weight: 700; margin-bottom: 35px; color: #05141f;
+}
+
+/* 차량 리스트 그리드 */
+.car-list { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 30px; 
+}
+
+.car-card {
+    background: #fff; border: 1px solid #eee;
+    border-radius: 16px; 
+    overflow: hidden; 
+    transition: all 0.3s ease;
+    display: flex; flex-direction: column;
+}
+.car-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); }
+
+.car-image-box { 
+    width: 100%; height: 200px; 
+    background: #f9f9f9;
+    overflow: hidden;
+}
+.car-image-box a { display: block; width: 100%; height: 100%; }
+.car-image-box img { 
+    width: 100%; height: 100%; 
+    object-fit: cover; 
+}
+
+.car-content {
+    padding: 20px;
+    display: flex; flex-direction: column;
+    flex-grow: 1;
+}
+
+.car-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px; 
+}
+
+.car-name { 
+    font-size: 20px; font-weight: 800; color: #111; 
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.heart-btn { 
+    border: none; background: none; color: #ff4d4d; 
+    font-size: 24px; cursor: pointer; transition: transform 0.2s;
+    padding: 0; line-height: 1;
+    margin-left: 10px;
+}
+.heart-btn:hover { transform: scale(1.2); }
+
+.car-sub { font-size: 13px; color: #999; margin-bottom: 20px; }
+
+.car-footer {
+    margin-top: auto; 
+    padding-top: 15px; border-top: 1px solid #f5f5f5;
+    display: flex; justify-content: flex-end; 
+}
+.car-price { font-size: 18px; font-weight: 800; color: #05141f; }
+
+.empty-box {
+    width: 100%; height: 300px; border: 2px dashed #e3e3e3; border-radius: 16px;
+    background: #fafafa; display: flex; justify-content: center; align-items: center;
+    color: #999; font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+    <th:block th:replace="~{common/header :: header}"></th:block>
+
+    <div class="mypage-wrap">
+        <div class="mypage-container">
+            <div class="side-menu">
+                <ul class="menu-list">
+                    <li><a th:href="@{/mypage/myinfo}">내 정보 확인</a></li>
+                    <li><a th:href="@{/mypage/consult}">상담내역 조회</a></li>
+                    <li><a th:href="@{/mypage/board}">나의 문의 내역</a></li>
+                    <li><a th:href="@{/mypage/wishlist}" style="color: #89c541; font-weight: 700;">관심 차량 목록</a></li>
+                </ul>
+                <div class="logout-box"><a th:href="@{/logout}">로그아웃</a></div>
+            </div>
+
+            <div class="content-area">
+                <div class="main-card">
+                    <div class="section-title">나의 관심 차량</div>
+
+                    <div class="car-list" th:if="${not #lists.isEmpty(wishList)}">
+                        <div class="car-card" th:each="wish : ${wishList}">
+                            
+                            <div class="car-image-box">
+                                <a th:href="@{/car/detail/{id}(id=${wish.car.carNo})}">
+                                    <img th:src="${wish.car.imagePath}" alt="차량이미지">
+                                </a>
+                            </div>
+
+                            <div class="car-content">
+                                <div class="car-title-row">
+                                    <div class="car-name" th:text="${wish.car.modelName}">모델명</div>
+                                    <button type="button" class="heart-btn" 
+                                            th:onclick="'toggleWish(' + ${wish.car.carNo} + ')'" title="관심차량 삭제">♥</button>
+                                </div>
+                                <div class="car-sub">All-Electric Inspiration</div>
+
+                                <div class="car-footer">
+                                    <div class="car-price">
+                                        <span th:text="${#numbers.formatInteger(wish.car.price, 3, 'COMMA')}">0</span>원
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="empty-box" th:if="${#lists.isEmpty(wishList)}">
+                        등록된 관심 차량이 없습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="~{common/footer :: footer}"></th:block>
+
+    <script th:inline="javascript">
+    function toggleWish(carNo) {
+        if(!confirm("관심 차량에서 삭제하시겠습니까?")) return;
+        
+        fetch('/mypage/wishlist/toggle?carNo=' + carNo, {
+            method: 'POST'
+        })
+        .then(res => {
+            if(res.ok) {
+                location.reload();
+            } else {
+                alert("삭제 처리에 실패했습니다.");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("오류가 발생했습니다.");
+        });
+    }
+    </script>
+</body>
+</html>

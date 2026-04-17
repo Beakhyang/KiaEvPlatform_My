@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>KiaEV Chatbot Test</title>
+    <style>
+        /* 챗봇 버튼 스타일 */
+        #chatbot-btn { position: fixed; bottom: 20px; right: 20px; padding: 15px 25px; background: #000; color: #fff; border: none; border-radius: 50px; cursor: pointer; }
+        /* 챗봇 창 스타일 */
+        #chat-window { position: fixed; bottom: 80px; right: 20px; width: 300px; height: 400px; border: 1px solid #ccc; background: #fff; display: none; flex-direction: column; padding: 15px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; }
+        button#send-btn { background: #e31937; color: white; border: none; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<button id="chatbot-btn">💬 1:1 문의하기</button>
+
+<div id="chat-window">
+    <h3>1:1 문의 접수</h3>
+    <input type="text" id="writer_name" placeholder="이름을 입력하세요">
+    <input type="email" id="writer_email" placeholder="회신받을 이메일">
+    <textarea id="content" rows="5" placeholder="문의 내용을 입력하세요"></textarea>
+    <button id="send-btn">문의 보내기</button>
+</div>
+
+<script>
+    // 챗봇 창 열고 닫기
+    const btn = document.getElementById('chatbot-btn');
+    const windowDiv = document.getElementById('chat-window');
+    btn.onclick = () => windowDiv.style.display = windowDiv.style.display === 'none' ? 'flex' : 'none';
+
+    // 문의 보내기 클릭 시 자바 백엔드로 데이터 전송
+    document.getElementById('send-btn').onclick = function() {
+        const data = {
+            category: "1:1문의",
+            writer_name: document.getElementById('writer_name').value,
+            writer_email: document.getElementById('writer_email').value,
+            content: document.getElementById('content').value
+        };
+
+        fetch('/api/v1/chatbot/inquiry', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.text())
+        .then(msg => {
+            alert(msg);
+            windowDiv.style.display = 'none';
+        })
+        .catch(err => alert("오류 발생!"));
+    };
+</script>
+</body>
+</html>

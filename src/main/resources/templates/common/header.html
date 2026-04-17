@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<header th:fragment="header">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+    <style>
+        /* 1. [필수] 페이지 이동 시 좌우 튕김 방지 및 폰트 강제 적용 */
+        html {
+            overflow-y: scroll !important;
+        }
+
+        .header-wrap * {
+            font-family: 'Pretendard', sans-serif !important;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 2. 헤더 배경색 흰색 고정 및 투명화 방지 */
+        .header-wrap {
+            width: 100% !important;
+            height: 90px;
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e5e5e5 !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999 !important;
+            transition: height 0.3s ease;
+        }
+
+        .header-inner {
+            width: 1200px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 3. 로고 스타일 */
+        .logo a {
+            font-size: 30px;
+            font-weight: 800;
+            color: #000 !important;
+            text-decoration: none !important;
+            letter-spacing: -1px;
+        }
+
+        /* 4. GNB 메뉴 */
+        .gnb ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .gnb ul li {
+            margin: 0 22px;
+            position: relative;
+        }
+
+        .gnb ul li a {
+            text-decoration: none !important;
+            color: #333 !important;
+            font-weight: 600;
+            font-size: 17px;
+            letter-spacing: -0.3px;
+            display: inline-block;
+            padding: 10px 0;
+        }
+
+        .gnb ul li a:hover, .gnb ul li a.active {
+            color: #05141f !important;
+        }
+
+        .gnb ul li a.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #05141f;
+        }
+
+        /* 5. 우측 유틸리티 메뉴 */
+        .util-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .util-menu a {
+            text-decoration: none !important;
+            color: #666 !important;
+            font-size: 14px;
+            font-weight: 500;
+            margin-left: 20px;
+        }
+
+        /* 6. 언어 선택 드롭다운 */
+        .lang-dropdown {
+            position: relative;
+            margin-left: 20px;
+            display: inline-block;
+        }
+
+        .lang-btn {
+            font-size: 14px;
+            color: #444 !important;
+            font-weight: 700;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 10px 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .lang-btn::after {
+            content: "▼";
+            font-size: 8px;
+            margin-left: 4px;
+            color: #ccc;
+        }
+
+        .lang-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffffff;
+            min-width: 65px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid #eeeeee;
+            border-radius: 6px;
+            padding: 5px 0;
+            z-index: 2100;
+        }
+
+        .lang-content a {
+            color: #666 !important;
+            padding: 10px 0;
+            text-decoration: none !important;
+            display: block;
+            text-align: center;
+            font-size: 13px;
+            margin: 0 !important;
+        }
+
+        .lang-content a:hover {
+            background-color: #f8f9fa;
+            color: #000 !important;
+        }
+
+        .lang-dropdown:hover .lang-content {
+            display: block;
+        }
+    </style>
+
+    <div class="header-wrap" id="mainHeader">
+        <div class="header-inner">
+            <div class="logo">
+                <a th:href="@{/main(lang='kr')}">KIA EV</a>
+            </div>
+            <nav class="gnb" th:if="${session.lang != 'en'}">
+                <ul id="navLinks">
+                    <li><a th:href="@{/car/list}">차량조회</a></li>
+                    <li><a th:href="@{/consult/form}">상담신청</a></li>
+                    <li><a th:href="@{/board/list}">문의게시판</a></li>
+                    <li><a th:href="@{/promotion/list}">프로모션</a></li>
+                    <li><a th:href="@{/charging/map}">충전소확인</a></li>
+                    <li><a th:href="@{/chatbot/main}">챗봇상담</a></li>
+                </ul>
+            </nav>
+            <div class="util-menu">
+                <!-- 1. 언어 선택 드롭다운 -->
+                <div class="lang-dropdown">
+                    <button class="lang-btn"
+                        th:text="${session.lang == 'en' ? 'EN' : 'KR'}">KR</button>
+                    <div class="lang-content">
+                        <a th:href="@{/main(lang='kr')}">KR</a> 
+                        <a th:href="@{/main(lang='en')}">EN</a>
+                    </div>
+                </div>
+
+                <!-- 2. 로그인 상태에 따른 메뉴 제어 (한국어 모드일 때만 표시) -->
+                <th:block th:if="${session.lang != 'en'}">
+                    
+                    <!-- [로그인 전] 세션에 loginUser가 없는 경우 -->
+                    <th:block th:if="${session.loginUser == null}">
+                        <a th:href="@{/login}">로그인</a>
+                        <a th:href="@{/member/join}">회원가입</a>
+                    </th:block>
+                    
+                    <!-- [로그인 후] 세션에 loginUser가 있는 경우 -->
+                    <th:block th:if="${session.loginUser != null}">
+                        <!-- 명세서 기반 마이페이지 이동 주소 -->
+                        <a th:href="@{/mypage}">마이페이지</a>
+                        <!-- 명세서 기반 로그아웃 처리 주소 -->
+                        <a th:href="@{/logout}">로그아웃</a>
+                    </th:block>
+                    
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('mainHeader');
+            window.scrollY > 30 ? header.classList.add('shrink') : header.classList.remove('shrink');
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const currentPath = window.location.pathname;
+            const links = document.querySelectorAll('#navLinks a');
+            
+            links.forEach(link => {
+                const linkHref = link.getAttribute('href');
+                if (!linkHref || linkHref.includes('/main')) return; 
+
+                const pureHref = linkHref.split('?')[0]; 
+                
+                if (currentPath.includes(pureHref)) {
+                    link.classList.add('active');
+                }
+                
+                if (currentPath.includes('/car/detail') && pureHref.includes('/car/list')) {
+                    link.classList.add('active');
+                }
+
+                if (currentPath.includes('/promotion/detail') && pureHref.includes('/promotion/list')) {
+                    link.classList.add('active');
+                }
+
+                if (currentPath.includes('/board/detail') && pureHref.includes('/board/list')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</header>
+</html>

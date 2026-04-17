@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>판매 상세</title>
+
+<!-- =====================================================
+     딜러 공통 CSS
+===================================================== -->
+<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+
+<style>
+/* =========================================================
+   판매 상세 화면 전용 스타일
+========================================================= */
+.sales-detail-page .topbar {
+	margin-bottom: 20px;
+}
+
+.empty-detail-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 160px;
+	text-align: center;
+	padding: 24px 16px;
+}
+
+.empty-detail-title {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 800;
+	color: #111;
+}
+
+.empty-detail-desc {
+	margin: 0;
+	font-size: 14px;
+	color: #666;
+	line-height: 1.6;
+}
+
+.sales-detail-summary {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sales-highlight-card {
+	position: relative;
+	overflow: hidden;
+}
+
+.sales-highlight-card::after {
+	content: "";
+	position: absolute;
+	right: -28px;
+	bottom: -28px;
+	width: 110px;
+	height: 110px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.summary-card-label {
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.8px;
+	text-transform: uppercase;
+	opacity: 0.7;
+	margin-bottom: 8px;
+}
+
+.summary-card-title {
+	font-size: 15px;
+	margin-bottom: 10px;
+	font-weight: 700;
+}
+
+.summary-card-value {
+	font-size: 28px;
+	font-weight: 800;
+	line-height: 1.4;
+	letter-spacing: -0.3px;
+	word-break: keep-all;
+}
+
+.summary-card-value-light {
+	color: #111;
+}
+
+.amount-text {
+	white-space: nowrap;
+	word-break: keep-all;
+}
+
+.summary-status-text {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 88px;
+	padding: 8px 14px;
+	border-radius: 999px;
+	font-size: 14px;
+	font-weight: 800;
+	background: rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.14);
+	color: #fff;
+}
+
+.sales-detail-table-wrap {
+	width: 100%;
+	overflow-x: auto;
+	border-radius: 14px;
+}
+
+.sales-detail-table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #fff;
+}
+
+.sales-detail-table th, .sales-detail-table td {
+	border: 1px solid #e5e5e5;
+	padding: 15px 16px;
+	vertical-align: middle;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.sales-detail-table th {
+	width: 180px;
+	background-color: #111;
+	color: #fff;
+	font-weight: 800;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.sales-detail-table td {
+	background-color: #fff;
+	color: #111;
+	text-align: left;
+	word-break: break-word;
+}
+
+.value-strong {
+	font-weight: 700;
+	color: #111;
+}
+
+.value-date {
+	white-space: nowrap;
+	color: #333;
+}
+
+.value-amount {
+	font-weight: 800;
+	white-space: nowrap;
+}
+
+.sales-detail-btn-row {
+	margin-top: 22px;
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.status-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 82px;
+	padding: 7px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: 800;
+	text-align: center;
+	white-space: nowrap;
+}
+
+@media ( max-width : 1024px) {
+	.sales-detail-summary {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media ( max-width : 768px) {
+	.empty-detail-title {
+		font-size: 20px;
+	}
+	.summary-card-value {
+		font-size: 24px;
+	}
+	.sales-detail-table th {
+		width: 130px;
+		font-size: 14px;
+	}
+	.sales-detail-table td {
+		font-size: 14px;
+	}
+	.sales-detail-btn-row {
+		flex-direction: column;
+	}
+	.sales-detail-btn-row .btn {
+		width: 100%;
+	}
+}
+</style>
+</head>
+<body>
+
+	<div class="dealer-layout">
+
+		<!-- =====================================================
+		     상단 고정 헤더
+		     - 현재 페이지: 판매 관리 active
+		===================================================== -->
+		<header class="top-fixed-header">
+			<div class="top-header-left">
+				<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
+
+				<nav class="top-nav">
+					<a th:href="@{/dealer/main}">대시보드</a> <a
+						th:href="@{/dealer/consult/list}">상담관리</a> <a
+						th:href="@{/dealer/sales/list}" class="active">판매관리</a> <a
+						th:href="@{/dealer/sales/register}">판매등록</a> <a
+						th:href="@{/dealer/statistics}">통계</a> <a
+						th:href="@{/dealer/logout}">로그아웃</a>
+				</nav>
+			</div>
+
+			<div class="top-header-right">
+				<div class="top-user-box">
+					<span class="top-user-label">접속 사용자</span> <strong
+						class="top-user-name"
+						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">딜러</strong>
+				</div>
+			</div>
+		</header>
+
+		<main class="content sales-detail-page">
+			<div class="dashboard-container">
+
+				<header class="topbar">
+					<h1>판매 상세</h1>
+				</header>
+
+				<section class="panel" th:if="${sales == null}">
+					<div class="empty-detail-box">
+						<h2 class="empty-detail-title">판매 상세 정보를 찾을 수 없습니다.</h2>
+						<p class="empty-detail-desc">선택한 판매 데이터가 없거나 접근 가능한 판매 정보가
+							아닙니다.</p>
+					</div>
+
+					<div class="btn-row">
+						<a th:href="@{/dealer/sales/list}" class="btn">판매 관리</a>
+					</div>
+				</section>
+
+				<section th:if="${sales != null}">
+
+					<div class="panel">
+						<div class="panel-header">
+							<div>
+								<h2 class="section-title">등록된 판매 상세 정보</h2>
+								<p class="section-desc">판매 상태, 판매 금액, 차량번호와 주요 판매 정보를 확인할 수
+									있습니다.</p>
+							</div>
+						</div>
+
+						<div class="summary-grid sales-detail-summary">
+
+							<div class="summary-card summary-card-dark sales-highlight-card">
+								<div class="summary-card-label">Sales Status</div>
+								<div class="summary-card-title">판매 상태</div>
+								<div class="summary-card-value">
+									<span
+										th:if="${sales.salesStatus == '완료' or sales.salesStatus == 'COMPLETED'}"
+										class="summary-status-text">완료</span> <span
+										th:if="${sales.salesStatus == '진행중' or sales.salesStatus == 'IN_PROGRESS'}"
+										class="summary-status-text">진행중</span> <span
+										th:if="${sales.salesStatus == '대기' or sales.salesStatus == 'WAITING'}"
+										class="summary-status-text">대기</span> <span
+										th:if="${sales.salesStatus == null}">-</span>
+								</div>
+							</div>
+
+							<div class="summary-card summary-card-dark sales-highlight-card">
+								<div class="summary-card-label">Sales Amount</div>
+								<div class="summary-card-title">판매 금액</div>
+								<div class="summary-card-value amount-text"
+									th:text="${sales.salesAmount != null ? #numbers.formatInteger(sales.salesAmount, 3, 'COMMA') + '원' : '-'}">50,000,000원</div>
+							</div>
+
+							<div class="summary-card">
+								<div class="summary-card-label">Car Number</div>
+								<div class="summary-card-title">차량번호</div>
+								<div class="summary-card-value summary-card-value-light"
+									th:text="${sales.carNo != null ? sales.carNo : '-'}">123가1111</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="panel">
+						<div class="panel-header">
+							<div>
+								<h2 class="section-title">판매 상세 내역</h2>
+								<p class="section-desc">판매번호, 상담번호, 회원번호, 판매일시, 판매금액, 판매상태를
+									확인할 수 있습니다.</p>
+							</div>
+						</div>
+
+						<div class="sales-detail-table-wrap">
+							<table class="sales-detail-table">
+								<tbody>
+									<tr>
+										<th>판매번호</th>
+										<td class="value-strong"
+											th:text="${sales.salesNo != null ? sales.salesNo : '-'}">1</td>
+									</tr>
+									<tr>
+										<th>상담번호</th>
+										<td class="value-strong"
+											th:text="${sales.consultNo != null ? sales.consultNo : '-'}">1</td>
+									</tr>
+									<tr>
+										<th>회원번호</th>
+										<td class="value-strong"
+											th:text="${sales.memberNo != null ? sales.memberNo : '-'}">20260401</td>
+									</tr>
+									<tr>
+										<th>차량번호</th>
+										<td class="value-strong"
+											th:text="${sales.carNo != null ? sales.carNo : '-'}">123가1111</td>
+									</tr>
+									<tr>
+										<th>딜러번호</th>
+										<td class="value-strong"
+											th:text="${sales.dealerNo != null ? sales.dealerNo : '-'}">1</td>
+									</tr>
+									<tr>
+										<th>판매일시</th>
+										<td class="value-date"
+											th:text="${sales.salesDate != null ? #temporals.format(sales.salesDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-02
+											11:55</td>
+									</tr>
+									<tr>
+										<th>판매금액</th>
+										<td class="value-amount"
+											th:text="${sales.salesAmount != null ? #numbers.formatInteger(sales.salesAmount, 3, 'COMMA') + '원' : '-'}">50,000,000원</td>
+									</tr>
+									<tr>
+										<th>판매상태</th>
+										<td><span
+											th:if="${sales.salesStatus == '완료' or sales.salesStatus == 'COMPLETED'}"
+											class="status-badge status-completed">완료</span> <span
+											th:if="${sales.salesStatus == '진행중' or sales.salesStatus == 'IN_PROGRESS'}"
+											class="status-badge status-progress">진행중</span> <span
+											th:if="${sales.salesStatus == '대기' or sales.salesStatus == 'WAITING'}"
+											class="status-badge status-waiting">대기</span> <span
+											th:if="${sales.salesStatus == null}">-</span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="sales-detail-btn-row">
+							<a th:href="@{/dealer/sales/list}" class="btn">판매 관리</a> <a
+								th:href="@{/dealer/sales/register}" class="btn btn-secondary">판매
+								등록</a>
+						</div>
+					</div>
+				</section>
+
+			</div>
+
+			<footer class="dealer-footer">
+				<p>© 2026 KIA EV Project Team DAY6.</p>
+			</footer>
+		</main>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<footer th:fragment="footer">
+    <style>
+        .footer-wrap { 
+            width: 100%;
+            background-color: #f8f8f8 !important; 
+            border-top: 1px solid #eeeeee; 
+            /* [수정 1] 상하 여백을 20px로 (기존 25와 15의 중간) */
+            padding: 20px 0;    
+            /* [수정 2] 본문과의 간격을 40px로 (기존 50과 30의 중간) */
+            margin-top: 40px;   
+            clear: both;        
+        }
+
+        .footer-inner { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            text-align: center; 
+        }
+
+        .f-links { 
+            /* [수정 3] 메뉴와 카피라이트 사이 간격을 6px로 조절 */
+            margin-bottom: 6px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .f-links a { 
+            text-decoration: none; 
+            color: #444 !important; 
+            font-weight: 600;   
+            /* 글자 크기는 너무 작지 않게 14px 유지 */
+            font-size: 14px;    
+            transition: 0.2s;
+        }
+
+        .f-links a:hover { color: #000; }
+        
+        .f-links a:not(:last-child)::after {
+            content: "";
+            display: inline-block;
+            width: 1px;        
+            height: 11px;      
+            background-color: #ccc; 
+            /* 선 사이 간격도 18px로 적당히 조절 */
+            margin: 0 18px;    
+            vertical-align: middle; 
+        }
+
+        .f-copy { 
+            color: #999;       
+            font-size: 13px;   
+            letter-spacing: 0.25px;
+            line-height: 1.2;
+        }
+    </style>
+    
+    <div class="footer-wrap">
+        <div class="footer-inner">
+            <div class="f-links">
+                <a th:href="@{/company}">회사정보</a>
+                <a th:href="@{/terms}">이용약관</a>
+                <a th:href="@{/privacy}">개인정보처리방침</a>
+            </div>
+            
+            <div class="f-copy">
+                © 2026 KIA EV Project Team DAY6. All rights reserved.
+            </div>
+        </div>
+    </div>
+</footer>
+</html>

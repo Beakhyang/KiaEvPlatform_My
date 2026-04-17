@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>기아 전기차 - 문의글 수정</title>
+    <style>
+        .container { width: 800px; margin: 120px auto 50px; font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f4f4f4; width: 15%; text-align: center; }
+        input[type="text"] { width: 90%; padding: 8px; border: 1px solid #ccc; }
+        textarea { width: 90%; height: 200px; padding: 8px; border: 1px solid #ccc; resize: none; }
+        .field-error { display: none; margin-top: 8px; color: #dc3545; font-size: 14px; font-weight: 600; }
+        .field-error.is-visible { display: block; }
+        .is-invalid { border-color: #dc3545 !important; }
+        .btn-group { text-align: center; margin-top: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; color: white; text-decoration: none; border: none; cursor: pointer; font-size: 14px; margin: 0 5px; }
+        .btn-submit { background-color: #0d6efd; }
+        .btn-cancel { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{common/header :: header}"></th:block>
+
+<div class="container">
+    <h2>문의글 수정하기</h2>
+
+    <form th:action="@{/board/update}" method="post" id="boardEditForm" novalidate>
+        <input type="hidden" name="boardNo" th:value="${board.boardNo}">
+        <input type="hidden" name="boardType" value="문의글">
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>분류</th>
+                    <td>문의글</td>
+                </tr>
+                <tr>
+                    <th>제목</th>
+                    <td>
+                        <input type="text" name="title" id="editTitle" th:value="${board.title}" th:data-original-title="${board.title}" required>
+                        <div class="field-error" id="editTitleError">제목을 입력해주세요.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>내용</th>
+                    <td>
+                        <textarea name="content" id="editContent" th:data-original-content="${board.content}" required th:text="${board.content}"></textarea>
+                        <div class="field-error" id="editContentError">내용을 입력해주세요.</div>
+                        <div class="field-error" id="editFormError">수정된 내용이 없습니다.</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-submit">수정완료</button>
+            <a th:href="@{/board/detail(boardNo=${board.boardNo})}" class="btn btn-cancel">취소</a>
+        </div>
+    </form>
+</div>
+<th:block th:replace="~{common/footer :: footer}"></th:block>
+<script>
+    const editForm = document.getElementById('boardEditForm');
+    const editTitle = document.getElementById('editTitle');
+    const editContent = document.getElementById('editContent');
+    const editTitleError = document.getElementById('editTitleError');
+    const editContentError = document.getElementById('editContentError');
+    const editFormError = document.getElementById('editFormError');
+    const originalTitle = (editTitle.dataset.originalTitle || '').trim();
+    const originalContent = (editContent.dataset.originalContent || '').trim();
+
+    function toggleEditFieldError(field, errorEl, message) {
+        const isEmpty = !field.value.trim();
+        errorEl.textContent = message;
+        errorEl.classList.toggle('is-visible', isEmpty);
+        field.classList.toggle('is-invalid', isEmpty);
+        return isEmpty;
+    }
+
+    function hideNoChangeError() {
+        editFormError.classList.remove('is-visible');
+    }
+
+    editTitle.addEventListener('input', function () {
+        toggleEditFieldError(editTitle, editTitleError, '제목을 입력해주세요.');
+        hideNoChangeError();
+    });
+
+    editContent.addEventListener('input', function () {
+        toggleEditFieldError(editContent, editContentError, '내용을 입력해주세요.');
+        hideNoChangeError();
+    });
+
+    editForm.addEventListener('submit', function (event) {
+        const hasTitleError = toggleEditFieldError(editTitle, editTitleError, '제목을 입력해주세요.');
+        const hasContentError = toggleEditFieldError(editContent, editContentError, '내용을 입력해주세요.');
+
+        if (hasTitleError || hasContentError) {
+            editFormError.classList.remove('is-visible');
+            event.preventDefault();
+            return;
+        }
+
+        const titleUnchanged = editTitle.value.trim() === originalTitle;
+        const contentUnchanged = editContent.value.trim() === originalContent;
+
+        if (titleUnchanged && contentUnchanged) {
+            editFormError.classList.add('is-visible');
+            event.preventDefault();
+        } else {
+            editFormError.classList.remove('is-visible');
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>비밀번호 찾기</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Malgun Gothic', sans-serif;
+    background: #f3f3f3;
+}
+.page-wrap {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+.find-box {
+    width: 500px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    padding: 56px 44px 38px;
+}
+.find-title {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    color: #001b36;
+    margin-bottom: 30px;
+}
+.line {
+    width: 100%;
+    height: 1px;
+    background: #ececec;
+    margin-bottom: 26px;
+}
+.input-group {
+    margin-bottom: 16px;
+}
+.input-group input {
+    width: 100%;
+    height: 54px;
+    border: 1px solid #dddddd;
+    border-radius: 10px;
+    padding: 0 16px;
+    font-size: 17px;
+    outline: none;
+}
+.find-btn {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    background: #001b36;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+}
+.error-text {
+    margin-top: 18px;
+    text-align: center;
+    color: red;
+    font-size: 14px;
+}
+.success-text {
+    margin-top: 18px;
+    text-align: center;
+    color: blue;
+    font-size: 14px;
+}
+.bottom-links {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 14px;
+}
+.bottom-links a {
+    color: #001b36;
+    text-decoration: none;
+    margin: 0 8px;
+}
+</style>
+</head>
+<body>
+<section class="page-wrap">
+    <div class="find-box">
+        <h2 class="find-title">비밀번호 찾기</h2>
+
+        <div class="line"></div>
+
+        <!-- 1차 본인확인 -->
+        <form th:if="${verified == null}" th:action="@{/client/login/findPw}" method="post">
+            <div class="input-group">
+                <input type="text" name="loginId" placeholder="아이디" required>
+            </div>
+
+            <div class="input-group">
+                <input type="text" name="memberName" placeholder="이름" required>
+            </div>
+
+            <div class="input-group">
+                <input type="email" name="email" placeholder="이메일" required>
+            </div>
+
+            <button type="submit" class="find-btn">확인</button>
+        </form>
+
+        <!-- 2차 새 비밀번호 입력 -->
+        <form th:if="${verified != null}" th:action="@{/client/login/resetPw}" method="post">
+            <input type="hidden" name="loginId" th:value="${loginId}">
+
+            <div class="input-group">
+                <input type="password" name="newPassword" placeholder="새 비밀번호" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="confirmPassword" placeholder="새 비밀번호 확인" required>
+            </div>
+
+            <button type="submit" class="find-btn">비밀번호 변경</button>
+        </form>
+
+        <div class="error-text" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+        <div class="error-text" th:if="${resetError}" th:text="${resetError}"></div>
+        <div class="success-text" th:if="${resetSuccess}" th:text="${resetSuccess}"></div>
+
+        <div class="bottom-links">
+            <a th:href="@{/login}">로그인으로 돌아가기</a> |
+            <a th:href="@{/client/login/findId}">아이디 찾기</a>
+        </div>
+    </div>
+</section>
+
+<script th:if="${resetSuccess != null}">
+    alert('비밀번호가 변경되었습니다.');
+    location.href = '/login';
+</script>
+</body>
+</html>

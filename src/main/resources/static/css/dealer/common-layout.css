@@ -1,0 +1,414 @@
+@charset "UTF-8";
+
+/* =========================
+   기본 초기화
+========================= */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: "Malgun Gothic", "맑은 고딕", Arial, sans-serif;
+	background-color: #ffffff;
+	color: #111111;
+}
+
+/* =========================
+   전체 레이아웃
+========================= */
+.dealer-layout {
+	min-height: 100vh;
+	background-color: #ffffff;
+}
+
+/* =========================
+   상단바
+========================= */
+.topbar {
+	height: 70px;
+	background-color: #000000;
+	color: #ffffff;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0 28px;
+	border-bottom: 1px solid #222222;
+}
+
+.topbar-left {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.logo-box {
+	width: 42px;
+	height: 42px;
+	border-radius: 12px;
+	background-color: #ffffff;
+	color: #000000;
+	font-size: 20px;
+	font-weight: bold;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.system-subtitle {
+	font-size: 12px;
+	color: #cccccc;
+	margin-bottom: 2px;
+}
+
+.system-title {
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.topbar-right {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.dealer-info {
+	text-align: right;
+}
+
+.dealer-info-label {
+	font-size: 12px;
+	color: #cccccc;
+}
+
+.dealer-info-name {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 2px;
+}
+
+.dealer-avatar {
+	width: 42px;
+	height: 42px;
+	border-radius: 50%;
+	border: 1px solid #444444;
+	background-color: #111111;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-weight: bold;
+}
+
+/* =========================
+   본문 영역
+========================= */
+.layout-body {
+	display: flex;
+	min-height: calc(100vh - 70px);
+}
+
+/* =========================
+   좌측 메뉴
+========================= */
+.sidebar {
+	width: 260px;
+	background-color: #f7f7f7;
+	border-right: 1px solid #e5e5e5;
+	padding: 20px 16px;
+}
+
+.sidebar-summary {
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 18px;
+	padding: 18px;
+	margin-bottom: 20px;
+}
+
+.sidebar-summary h2 {
+	font-size: 20px;
+	margin: 6px 0 10px;
+}
+
+.sidebar-summary p {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #555555;
+}
+
+.sidebar-small-text {
+	font-size: 12px !important;
+	color: #888888 !important;
+}
+
+.menu-list {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.menu-item {
+	display: block;
+	text-decoration: none;
+	color: #222222;
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 14px;
+	padding: 14px 16px;
+	font-size: 15px;
+	font-weight: 600;
+	transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+	border-color: #000000;
+	color: #000000;
+}
+
+.menu-item.active {
+	background-color: #000000;
+	color: #ffffff;
+	border-color: #000000;
+}
+
+/* =========================
+   메인 콘텐츠
+========================= */
+.content {
+	flex: 1;
+	padding: 24px;
+	background-color: #ffffff;
+}
+
+/* =========================
+   요약 카드
+========================= */
+.card-row {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 24px;
+}
+
+.summary-card {
+	flex: 1;
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 20px;
+	padding: 22px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.black-card {
+	background-color: #000000;
+	border-color: #000000;
+}
+
+.card-label {
+	font-size: 14px;
+	color: #666666;
+	margin-bottom: 10px;
+}
+
+.card-value {
+	font-size: 32px;
+	font-weight: bold;
+}
+
+.white-text {
+	color: #ffffff;
+}
+
+/* =========================
+   하단 박스 2단
+========================= */
+.content-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
+.content-box {
+	background-color: #ffffff;
+	border: 1px solid #e5e5e5;
+	border-radius: 20px;
+	padding: 20px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.content-box-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 18px;
+}
+
+.content-box-header h3 {
+	font-size: 20px;
+	margin-bottom: 4px;
+}
+
+.content-box-header p {
+	font-size: 13px;
+	color: #777777;
+}
+
+/* =========================
+   버튼
+========================= */
+.outline-btn, .black-btn {
+	text-decoration: none;
+	display: inline-block;
+	border-radius: 12px;
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.outline-btn {
+	background-color: #ffffff;
+	color: #000000;
+	border: 1px solid #000000;
+}
+
+.outline-btn:hover {
+	background-color: #000000;
+	color: #ffffff;
+}
+
+.black-btn {
+	background-color: #000000;
+	color: #ffffff;
+	border: 1px solid #000000;
+}
+
+.black-btn:hover {
+	opacity: 0.9;
+}
+
+/* =========================
+   테이블
+========================= */
+.table-wrap {
+	overflow: hidden;
+	border: 1px solid #e5e5e5;
+	border-radius: 16px;
+}
+
+.dealer-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.dealer-table thead {
+	background-color: #f3f3f3;
+}
+
+.dealer-table th {
+	text-align: left;
+	padding: 14px;
+	font-size: 14px;
+	color: #444444;
+}
+
+.dealer-table td {
+	padding: 14px;
+	border-top: 1px solid #eeeeee;
+	font-size: 14px;
+}
+
+/* =========================
+   상태 뱃지
+========================= */
+.status-badge {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.status-badge.waiting {
+	background-color: #eeeeee;
+	color: #333333;
+}
+
+.status-badge.progress {
+	background-color: #000000;
+	color: #ffffff;
+}
+
+.status-badge.done {
+	background-color: #ffffff;
+	color: #000000;
+	border: 1px solid #444444;
+}
+
+/* =========================
+   판매 카드
+========================= */
+.sales-card-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.sales-card {
+	background-color: #f8f8f8;
+	border: 1px solid #e5e5e5;
+	border-radius: 16px;
+	padding: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+}
+
+.sales-title {
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.sales-desc {
+	font-size: 14px;
+	color: #666666;
+}
+
+.sales-date {
+	font-size: 12px;
+	color: #555555;
+	border: 1px solid #cccccc;
+	border-radius: 999px;
+	padding: 6px 10px;
+	background-color: #ffffff;
+}
+
+/* =========================
+   반응형
+========================= */
+@media ( max-width : 1100px) {
+	.content-grid {
+		grid-template-columns: 1fr;
+	}
+	.card-row {
+		flex-direction: column;
+	}
+}
+
+@media ( max-width : 768px) {
+	.layout-body {
+		flex-direction: column;
+	}
+	.sidebar {
+		width: 100%;
+		border-right: none;
+		border-bottom: 1px solid #e5e5e5;
+	}
+	.topbar {
+		padding: 0 16px;
+	}
+	.content {
+		padding: 16px;
+	}
+}

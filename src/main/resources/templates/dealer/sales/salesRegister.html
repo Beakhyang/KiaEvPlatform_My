@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>판매 등록</title>
+
+<!-- =====================================================
+     딜러 공통 CSS
+===================================================== -->
+<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+
+<style>
+/* =========================================================
+   판매 등록 화면 전용 스타일
+========================================================= */
+.selected-row td {
+	background-color: #f8f8f8 !important;
+}
+
+.selected-row td:first-child {
+	border-left: 4px solid #111;
+}
+
+.register-select-panel {
+	margin-bottom: 18px;
+}
+
+.register-form-panel {
+	margin-bottom: 0;
+}
+
+.register-consult-table tbody td {
+	font-weight: 500;
+}
+
+.register-consult-table .td-number, .register-consult-table .td-carno {
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.register-form-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.register-detail-table {
+	width: 100%;
+	border-collapse: collapse;
+	background: #fff;
+	border-radius: 14px;
+	overflow: hidden;
+}
+
+.register-detail-table th, .register-detail-table td {
+	border: 1px solid #e5e5e5;
+	padding: 15px 16px;
+	vertical-align: middle;
+}
+
+.register-detail-table th {
+	width: 180px;
+	background: #111;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 800;
+	text-align: center;
+	white-space: nowrap;
+}
+
+.register-detail-table td {
+	background: #fff;
+	text-align: left;
+}
+
+.register-detail-table input[type="text"], .register-detail-table input[type="number"]
+	{
+	width: 100%;
+	padding: 11px 12px;
+	border: 1px solid #d8d8d8;
+	border-radius: 10px;
+	box-sizing: border-box;
+	background-color: #fff;
+	font-size: 14px;
+	color: #111;
+	outline: none;
+}
+
+.register-detail-table input[type="text"]:focus, .register-detail-table input[type="number"]:focus
+	{
+	border-color: #111;
+}
+
+.register-detail-table input[readonly] {
+	background-color: #f5f5f5;
+	color: #333;
+}
+
+.info-text {
+	margin-top: 8px;
+	font-size: 12px;
+	color: #777;
+	line-height: 1.5;
+}
+
+.help-text {
+	margin-top: 14px;
+	padding: 14px 16px;
+	font-size: 14px;
+	color: #555;
+	line-height: 1.6;
+	background: #fafafa;
+	border: 1px solid #e5e5e5;
+	border-radius: 12px;
+}
+
+.empty-register-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 28px 16px;
+	min-height: 120px;
+}
+
+.empty-register-title {
+	font-size: 17px;
+	font-weight: 800;
+	color: #111;
+	margin: 0;
+}
+
+.empty-register-desc {
+	font-size: 14px;
+	color: #666;
+	line-height: 1.6;
+	margin: 0;
+	text-align: center;
+}
+
+.select-btn {
+	min-width: 72px;
+}
+
+.save-btn {
+	min-width: 90px;
+}
+
+.btn-row {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-top: 18px;
+}
+
+@media ( max-width : 768px) {
+	.register-detail-table th {
+		width: 130px;
+		font-size: 14px;
+	}
+	.register-detail-table td {
+		padding: 12px;
+	}
+	.save-btn, .select-btn {
+		width: 100%;
+	}
+	.btn-row {
+		flex-direction: column;
+	}
+}
+</style>
+</head>
+<body>
+
+	<div class="dealer-layout">
+
+		<!-- =====================================================
+		     상단 고정 헤더
+		     - 현재 페이지: 판매 등록 active
+		===================================================== -->
+		<header class="top-fixed-header">
+			<div class="top-header-left">
+				<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
+
+				<nav class="top-nav">
+					<a th:href="@{/dealer/main}">대시보드</a> <a
+						th:href="@{/dealer/consult/list}">상담관리</a> <a
+						th:href="@{/dealer/sales/list}">판매관리</a> <a
+						th:href="@{/dealer/sales/register}" class="active">판매등록</a> <a
+						th:href="@{/dealer/statistics}">통계</a> <a
+						th:href="@{/dealer/logout}">로그아웃</a>
+				</nav>
+			</div>
+
+			<div class="top-header-right">
+				<div class="top-user-box">
+					<span class="top-user-label">접속 사용자</span> <strong
+						class="top-user-name"
+						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">홍길동
+						딜러</strong>
+				</div>
+			</div>
+		</header>
+
+		<!-- =====================================================
+		     메인 컨텐츠
+		     - 기존 판매 등록 기능 유지
+		     - 수정 사항:
+		       1) 완료 상태 상담만 목록에 내려오도록 Service에서 제어
+		       2) 빈 상태 문구도 완료 기준으로 수정
+		===================================================== -->
+		<main class="content register-page">
+			<div class="dashboard-container">
+
+				<header class="page-header">
+					<h1 class="page-title">판매 등록</h1>
+				</header>
+
+				<div th:if="${successMessage != null}"
+					class="message-box message-success">
+					<p th:text="${successMessage}">판매 등록이 완료되었습니다.</p>
+				</div>
+
+				<div th:if="${errorMessage != null}"
+					class="message-box message-error">
+					<p th:text="${errorMessage}">에러 메시지</p>
+				</div>
+
+				<section class="panel register-select-panel">
+					<div class="panel-header">
+						<div>
+							<h2 class="section-title">상담 선택</h2>
+						</div>
+					</div>
+
+					<div class="table-wrap">
+						<table class="dealer-table register-consult-table">
+							<thead>
+								<tr>
+									<th>상담번호</th>
+									<th>회원번호</th>
+									<th>차량번호</th>
+									<th>상담상태</th>
+									<th>선택</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(completedConsultList)}">
+									<td colspan="5" class="empty-message">
+										<div class="empty-register-box">
+											<div class="empty-register-title">판매 등록 가능한 완료 상담이
+												없습니다.</div>
+											<div class="empty-register-desc">
+												상담 상태가 <strong>완료</strong>인 상담만 이 영역에서 선택할 수 있습니다.
+											</div>
+										</div>
+									</td>
+								</tr>
+
+								<tr th:each="consult : ${completedConsultList}"
+									th:classappend="${selectedConsultNo != null and selectedConsultNo == consult.consultNo} ? 'selected-row' : ''">
+
+									<td class="td-number" th:text="${consult.consultNo}">1</td>
+									<td th:text="${consult.memberNo}">20260401</td>
+									<td class="td-carno" th:text="${consult.carNo}">123가1111</td>
+
+									<td><span
+										th:if="${consult.consultStatus == 'WAITING' or consult.consultStatus == '대기'}"
+										class="status-badge status-waiting">대기</span> <span
+										th:if="${consult.consultStatus == 'IN_PROGRESS' or consult.consultStatus == '진행중'}"
+										class="status-badge status-progress">진행중</span> <span
+										th:if="${consult.consultStatus == 'COMPLETED' or consult.consultStatus == '완료'}"
+										class="status-badge status-completed">완료</span> <span
+										th:if="${consult.consultStatus != 'WAITING'
+												and consult.consultStatus != '대기'
+												and consult.consultStatus != 'IN_PROGRESS'
+												and consult.consultStatus != '진행중'
+												and consult.consultStatus != 'COMPLETED'
+												and consult.consultStatus != '완료'}"
+										class="status-badge status-waiting"
+										th:text="${consult.consultStatus}">상태</span></td>
+
+									<td><a
+										th:href="@{/dealer/sales/register/select(consultNo=${consult.consultNo})}"
+										class="btn btn-sm select-btn">선택</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+
+				<section class="panel register-form-panel">
+					<div class="panel-header">
+						<div>
+							<h2 class="section-title">판매 정보 입력</h2>
+						</div>
+					</div>
+
+					<div class="register-form-wrap">
+						<form th:action="@{/dealer/sales/register}" method="post"
+							th:object="${sales}">
+							<input type="hidden" th:field="*{consultNo}">
+
+							<table class="register-detail-table">
+								<tbody>
+									<tr>
+										<th>상담번호</th>
+										<td><input type="text" th:value="*{consultNo}" readonly></td>
+									</tr>
+									<tr>
+										<th>회원번호</th>
+										<td><input type="text" th:value="*{memberNo}" readonly></td>
+									</tr>
+									<tr>
+										<th>차량번호</th>
+										<td><input type="text" th:value="*{carNo}" readonly></td>
+									</tr>
+									<tr>
+										<th>딜러번호</th>
+										<td><input type="text" th:value="*{dealerNo}" readonly></td>
+									</tr>
+									<tr>
+										<th>판매일시</th>
+										<td><input type="text"
+											th:value="${sales != null and sales.salesDate != null ? #temporals.format(sales.salesDate, 'yyyy-MM-dd HH:mm:ss') : ''}"
+											readonly></td>
+									</tr>
+									<tr>
+										<th>판매금액</th>
+										<td><input type="number" th:field="*{salesAmount}"
+											placeholder="판매금액 입력" min="1" required>
+											<div class="info-text">예: 45000000</div></td>
+									</tr>
+									<tr>
+										<th>판매상태</th>
+										<td><input type="text" th:value="*{salesStatus}" readonly></td>
+									</tr>
+								</tbody>
+							</table>
+
+							<p th:if="${sales == null or sales.consultNo == null}"
+								class="help-text">
+								상단의 <strong>완료된 상담 목록</strong>에서 먼저 <strong>선택</strong> 버튼을 누른 뒤
+								판매 등록을 진행해주세요.
+							</p>
+
+							<div class="btn-row">
+								<button type="submit" class="btn save-btn"
+									th:disabled="${sales == null or sales.consultNo == null}">
+									저장</button>
+
+								<a th:href="@{/dealer/sales/list}" class="btn btn-secondary">
+									판매 관리 </a>
+							</div>
+						</form>
+					</div>
+				</section>
+
+			</div>
+
+			<footer class="dealer-footer">
+				<p>© 2026 KIA EV Project Team DAY6.</p>
+			</footer>
+		</main>
+	</div>
+
+</body>
+</html>

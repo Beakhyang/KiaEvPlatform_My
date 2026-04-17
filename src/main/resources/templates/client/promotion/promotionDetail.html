@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>기아 전기차 - 프로모션 상세</title>
+<style>
+.promotion-container {
+	max-width: 800px;
+	margin: 120px auto 50px;
+	padding: 20px;
+	font-family: sans-serif;
+}
+
+.promo-header {
+	border-bottom: 2px solid #05141f;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+}
+
+.promo-title {
+	font-size: 2em;
+	font-weight: bold;
+	color: #05141f;
+	margin-bottom: 10px;
+}
+
+.promo-meta {
+	color: #666;
+	font-size: 0.95em;
+}
+
+.promo-discount {
+	display: inline-block;
+	background-color: #e2231a;
+	color: white;
+	padding: 5px 10px;
+	border-radius: 4px;
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+/* 추가: 배너 이미지를 위한 스타일 */
+.promo-banner {
+	width: 100%;
+	margin: 40px 0; /* 위아래 간격을 넉넉히 줌 */
+	text-align: center;
+}
+
+/* 2. 이미지 크기 최적화 */
+.promo-banner img {
+	width: 100%; /* 🌟 부모 너비에 꽉 채움 */
+	max-width: 100%; /* 이미지가 원래 크기보다 더 커져서 깨지는 것 방지 */
+	height: auto; /* 비율 유지 */
+	border-radius: 15px; /* 큰 이미지일수록 모서리가 더 둥글어야 예쁨 */
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); /* 🌟 큰 이미지에 깊이감 추가 */
+}
+
+.promo-content {
+	line-height: 1.6;
+	font-size: 1.1em;
+	color: #333;
+	min-height: 200px;
+	padding: 20px 0;
+	white-space: pre-wrap;
+}
+
+.btn-list {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #05141f;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 4px;
+	font-weight: bold;
+}
+
+.btn-list:hover {
+	background-color: #333;
+}
+
+.button-group {
+	text-align: center;
+	margin-top: 30px;
+	border-top: 1px solid #ddd;
+	padding-top: 20px;
+}
+
+.promo-content {
+	line-height: 1.6;
+	font-size: 1.1em;
+	color: #333;
+	min-height: 200px;
+	padding: 20px 0;
+	white-space: pre-wrap;
+}
+
+.btn-list {
+	display: inline-block;
+	padding: 10px 20px;
+	background-color: #05141f;
+	color: #fff;
+	text-decoration: none;
+	border-radius: 4px;
+	font-weight: bold;
+}
+
+.btn-list:hover {
+	background-color: #333;
+}
+
+.button-group {
+	text-align: center;
+	margin-top: 30px;
+	border-top: 1px solid #ddd;
+	padding-top: 20px;
+}
+</style>
+</head>
+<body>
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<div class="promotion-container">
+		<div class="promo-header">
+			<div class="promo-title" th:text="${promotion.title}">프로모션 제목</div>
+			<div class="promo-meta">
+				<strong>진행 기간:</strong> <span
+					th:text="${#temporals.format(promotion.startDate, 'yyyy-MM-dd')}"></span>
+				~ <span
+					th:text="${#temporals.format(promotion.endDate, 'yyyy-MM-dd')}"></span>
+			</div>
+		</div>
+
+		<div class="promo-banner" th:if="${promotion.bannerImageUrl != null}">
+			<img th:src="${promotion.bannerImageUrl}" alt="프로모션 메인 이미지">
+		</div>
+
+		<div class="promo-content" style="white-space: pre-wrap;"
+			th:text="${promotion.content}">여기에 상세 내용이 출력됩니다.</div>
+
+		<div class="button-group">
+			<a th:href="@{/promotion/list}" class="btn-list">목록으로 돌아가기</a>
+		</div>
+	</div>
+
+	<th:block th:replace="~{common/footer :: footer}"></th:block>
+</body>
+</html>

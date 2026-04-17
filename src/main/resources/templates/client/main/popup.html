@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>EV 소식 및 혜택</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 기본 레이아웃 */
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        body { font-family: 'Pretendard', -apple-system, sans-serif; background: #fff; color: #111; }
+
+        .popup-container { display: flex; flex-direction: column; height: 100vh; }
+        
+        /* 헤더: 다크 네이비 */
+        .popup-header { background: #05141f; color: #fff; padding: 18px; text-align: center; }
+        .popup-header h2 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0.5px; }
+        
+        /* 본문 영역 */
+        .popup-body { padding: 20px; flex: 1; overflow-y: auto; background: #fcfcfc; }
+
+        /* 섹션 타이틀 */
+        .section-title { font-size: 10px; font-weight: 800; letter-spacing: 1.5px; margin-bottom: 12px; display: block; }
+        .notice-title { color: #999; }
+        
+        /* 프로모션 타이틀 색상 */
+        .promo-title { color: #f5b11e; margin-top: 22px; }
+
+        /* 카드형 리스트 디자인 */
+        .benefit-box { 
+            background: #fff; padding: 15px 18px; border-radius: 10px; margin-bottom: 10px; 
+            border: 1px solid #eee; display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s ease; cursor: pointer;
+        }
+        .benefit-box:hover { background: #f9f9f9; border-color: #05141f; transform: translateX(3px); }
+        
+        .info-area { flex: 1; overflow: hidden; }
+        .info-area strong { color: #05141f; display: block; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .info-area i { margin-right: 10px; width: 18px; text-align: center; }
+        
+        /* [수정] 프로모션 소제목 스타일 */
+        .sub-text { font-size: 12px; color: #f5b11e; font-weight: 600; margin-top: 2px; }
+
+        /* 화살표 아이콘 */
+        .arrow-icon { color: #ddd; font-size: 12px; margin-left: 10px; }
+        
+        /* [수정] 프로모션 박스 스타일 (왼쪽 선 제거 및 배경색 조정) */
+        .promo-box { border: 1px solid #eee; background: #fffefb; }
+        .promo-box:hover { background: #fffcf0 !important; border-color: #f5b11e !important; }
+        
+        /* [수정] 프로모션 영역 아이콘/화살표 색상 */
+        .promo-box .info-area strong i,
+        .promo-box .arrow-icon {
+            color: #f5b11e !important;
+        }
+
+        /* 하단 푸터 */
+        .popup-footer { 
+            background: #f4f4f4; padding: 12px 20px; display: flex; 
+            justify-content: space-between; align-items: center; border-top: 1px solid #ddd;
+        }
+        .popup-footer label { font-size: 12.5px; color: #666; cursor: pointer; display: flex; align-items: center; }
+        .popup-footer input { margin-right: 8px; }
+        
+        .btn-close { border: none; background: none; cursor: pointer; font-weight: 700; color: #05141f; font-size: 13px; }
+
+        /* 빈 상태 */
+        .empty-state { text-align: center; color: #bbb; padding-top: 80px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="popup-container">
+        <div class="popup-header">
+            <h2>KIA EV NOTICE & EVENT</h2>
+        </div>
+        
+        <div class="popup-body">
+            <div th:if="${not #lists.isEmpty(noticeList)}">
+                <span class="section-title notice-title">NOTICE</span>
+                <div class="benefit-box" th:each="notice : ${noticeList}" 
+                     th:onclick="|moveParent('/board/detail?boardNo=' + ${notice.boardNo})|">
+                    <div class="info-area">
+                        <strong><i class="fa-solid fa-bullhorn"></i> [[${notice.title}]]</strong>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(promoList)}">
+                <span class="section-title promo-title">SPECIAL PROMOTION</span>
+                <div class="benefit-box promo-box" th:each="promo : ${promoList}" 
+                     th:onclick="|moveParent('/promotion/detail?id=' + ${promo.id})|">
+                    <div class="info-area">
+                        <strong><i class="fa-solid fa-gift"></i> [[${promo.title}]]</strong>
+                        <div th:if="${promo.subTitle != null}" th:text="${promo.subTitle}" class="sub-text"></div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right arrow-icon"></i>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(noticeList) and #lists.isEmpty(promoList)}" class="empty-state">
+                <p>진행 중인 소식이 없습니다.</p>
+            </div>
+        </div>
+
+        <div class="popup-footer">
+            <label><input type="checkbox" id="todayCheck"> 오늘 하루 보지 않기</label>
+            <button onclick="window.close()" class="btn-close">닫기</button>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = name + "=" + value + ";expires=" + date.toUTCString() + ";path=/";
+        }
+
+        function moveParent(url) {
+            if (window.opener && !window.opener.closed) {
+                window.opener.location.href = url;
+                window.close();
+            } else {
+                location.href = url;
+            }
+        }
+
+        window.onbeforeunload = function() {
+            if (document.getElementById('todayCheck').checked) {
+                setCookie("hidePopup", "true", 1);
+            }
+        };
+    </script>
+</body>
+</html>

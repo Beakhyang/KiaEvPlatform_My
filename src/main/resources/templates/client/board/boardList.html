@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>기아 전기차 - 문의게시판</title>
+<style>
+/* 화면을 조금 예쁘게 보이게 해주는 간단한 CSS 입니다 */
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 10px;
+	text-align: center;
+}
+
+th {
+	background-color: #f4f4f4;
+}
+
+.title-td {
+	text-align: left;
+}
+
+a {
+	text-decoration: none;
+	color: #333;
+}
+
+a:hover {
+	text-decoration: underline;
+	color: #007bff;
+}
+
+.btn {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 10px 15px;
+	background-color: #000;
+	color: #fff;
+	text-decoration: none;
+}
+</style>
+</head>
+<body>
+	<th:block th:replace="~{common/header :: header}"></th:block>
+	<div style="width: 800px; margin: 120px auto 50px;">
+		<h2> 문의 게시판</h2>
+
+		<table>
+			<thead>
+				<tr>
+					<th width="10%">번호</th>
+					<th width="15%">분류</th>
+					<th width="45%">제목</th>
+					<th width="10%">조회수</th>
+					<th width="20%">작성일</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="board : ${boardList}">
+					<td th:text="${board.boardNo}">1</td>
+					<td th:text="${board.boardType == 'NOTICE' ? '공지사항' : board.boardType == 'INQUIRY' ? '일반문의' : board.boardType == 'EV_INQUIRY' ? '전기차문의' : board.boardType == 'CS_CENTER' ? '고객센터' : board.boardType}">문의글</td>
+					<td class="title-td"><a
+						th:href="@{/board/detail(boardNo=${board.boardNo})}"
+						th:text="${board.title}">게시글 제목입니다.</a></td>
+					<td th:text="${board.viewCount}">0</td>
+					<td
+						th:text="${#temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm')}">2026-03-26</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- 페이지 네비게이션 -->
+		<div style="text-align: center; margin-top: 20px;">
+			<!-- 이전 페이지 -->
+			<span th:if="${boardPage.hasPrevious()}"> <a
+				th:href="@{|/board/list?page=${boardPage.number - 1}&size=${boardPage.size}|}">이전</a>
+			</span>
+
+			<!-- 페이지 번호 -->
+			<span th:each="i : ${#numbers.sequence(0, boardPage.totalPages - 1)}">
+				<a th:href="@{|/board/list?page=${i}&size=${boardPage.size}|}"
+				th:text="${i + 1}">1</a>
+			</span>
+
+			<!-- 다음 페이지 -->
+			<span th:if="${boardPage.hasNext()}"> <a
+				th:href="@{|/board/list?page=${boardPage.number + 1}&size=${boardPage.size}|}">다음</a>
+			</span>
+		</div>
+
+		<div style="text-align: right;">
+			<a th:href="@{/board/write}" class="btn">글쓰기</a>
+		</div>
+	</div>
+	<th:block th:replace="~{common/footer :: footer}"></th:block>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>딜러 메인페이지</title>
+
+<!-- =====================================================
+     딜러 공통 CSS 연결
+===================================================== -->
+<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+
+<style>
+/* =====================================================
+   대시보드 전용 스타일
+   - 기존 기능 유지
+   - 현재 페이지에서만 필요한 여백 / 카드 효과만 보정
+===================================================== */
+
+/* 대시보드 전체 컨테이너 */
+.dashboard-container {
+	padding: 24px 6px 20px 6px;
+}
+
+/* 환영 배너 */
+.hero-panel {
+	margin-bottom: 24px;
+	padding: 26px 28px;
+	border-radius: 22px;
+	background: linear-gradient(90deg, #050505 0%, #2d2d2d 100%);
+	color: #fff;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.hero-left h2 {
+	margin: 0 0 12px 0;
+	font-size: 22px;
+	font-weight: 800;
+	line-height: 1.4;
+	color: #fff;
+}
+
+.hero-left p {
+	margin: 0;
+	font-size: 15px;
+	color: #f2f2f2;
+}
+
+/* 요약 카드 그리드 */
+.summary-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 18px;
+	margin-bottom: 24px;
+}
+
+/* 카드 링크 */
+.summary-card-link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+}
+
+/* 카드 hover */
+.summary-card {
+	background: #fff;
+	border: 1px solid #e3e3e3;
+	border-radius: 18px;
+	padding: 26px 20px;
+	min-height: 110px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+	transition: all 0.2s ease;
+	cursor: pointer;
+}
+
+.summary-card:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 12px 24px rgba(0, 0, 0, 0.10);
+	border-color: #111;
+}
+
+.summary-card-title {
+	font-size: 15px;
+	font-weight: 700;
+	color: #555;
+	margin-bottom: 16px;
+}
+
+.summary-card-value {
+	font-size: 22px;
+	font-weight: 800;
+	color: #111;
+	line-height: 1.3;
+}
+
+/* 상태 현황 패널 */
+.dashboard-panel {
+	padding: 24px;
+	border-radius: 20px;
+}
+
+.section-title {
+	margin-bottom: 16px;
+	font-size: 18px;
+	font-weight: 800;
+	color: #111;
+}
+
+/* 표 상단 여백 */
+.table-wrap {
+	margin-top: 4px;
+}
+
+/* 반응형 */
+@media ( max-width : 992px) {
+	.summary-grid {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+</head>
+<body>
+
+	<div class="dealer-layout">
+
+		<!-- =====================================================
+		     기존 좌측 사이드바
+		     - 공통 CSS에서 숨김 처리됨
+		     - 구조 보존용
+		===================================================== -->
+		<aside class="sidebar">
+			<a th:href="@{/dealer/main}" class="logo">KIA EV Dealer</a>
+
+			<nav class="menu">
+				<a th:href="@{/dealer/main}" class="active">대시보드</a> <a
+					th:href="@{/dealer/consult/list}">상담 관리</a> <a
+					th:href="@{/dealer/sales/list}">판매 관리</a> <a
+					th:href="@{/dealer/sales/register}">판매 등록</a> <a
+					th:href="@{/dealer/statistics}">통계</a>
+			</nav>
+
+			<div class="logout-area">
+				<a th:href="@{/dealer/logout}" class="logout-btn">로그아웃</a>
+			</div>
+		</aside>
+
+		<main class="content">
+
+			<!-- =====================================================
+			     공통 상단 고정 헤더
+			     - 현재 페이지는 대시보드 active
+			===================================================== -->
+			<header class="top-fixed-header">
+				<div class="top-header-left">
+					<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
+
+					<nav class="top-nav">
+						<a th:href="@{/dealer/main}" class="active">대시보드</a> <a
+							th:href="@{/dealer/consult/list}">상담관리</a> <a
+							th:href="@{/dealer/sales/list}">판매관리</a> <a
+							th:href="@{/dealer/sales/register}">판매등록</a> <a
+							th:href="@{/dealer/statistics}">통계</a> <a
+							th:href="@{/dealer/logout}">로그아웃</a>
+					</nav>
+				</div>
+
+				<div class="top-header-right">
+					<div class="top-user-box">
+						<span class="top-user-label">접속 사용자</span> <strong
+							class="top-user-name"
+							th:text="${dashboard != null ? dashboard.dealerName + ' 딜러' : '딜러'}">딜러</strong>
+					</div>
+				</div>
+			</header>
+
+			<div class="dashboard-container">
+
+				<!-- 환영 영역 -->
+				<section class="hero-panel">
+					<div class="hero-left">
+						<h2>
+							<span th:if="${dashboard != null}"
+								th:text="${dashboard.dealerName}">딜러명</span> <span
+								th:if="${dashboard == null}">딜러</span> 님, 반갑습니다.
+						</h2>
+
+						<p>
+							딜러번호 : <strong th:if="${dashboard != null}"
+								th:text="${dashboard.dealerNo}">1</strong> <strong
+								th:if="${dashboard == null}">0</strong>
+						</p>
+					</div>
+				</section>
+
+				<!-- 요약 카드 -->
+				<section class="summary-grid">
+
+					<a th:href="@{/dealer/consult/list}" class="summary-card-link">
+						<div class="summary-card">
+							<div class="summary-card-title">전체 상담 건수</div>
+							<div class="summary-card-value"
+								th:text="${dashboard != null ? dashboard.totalConsultCount : 0}">0</div>
+						</div>
+					</a> <a th:href="@{/dealer/sales/list}" class="summary-card-link">
+						<div class="summary-card">
+							<div class="summary-card-title">전체 판매 건수</div>
+							<div class="summary-card-value"
+								th:text="${dashboard != null ? dashboard.totalSalesCount : 0}">0</div>
+						</div>
+					</a> <a th:href="@{/dealer/statistics}" class="summary-card-link">
+						<div class="summary-card">
+							<div class="summary-card-title">총 판매 금액</div>
+							<div class="summary-card-value"
+								th:text="${dashboard != null and dashboard.totalSalesAmount != null ? #numbers.formatInteger(dashboard.totalSalesAmount, 3, 'COMMA') + '원' : '0원'}">0원</div>
+						</div>
+					</a>
+				</section>
+
+				<!-- 상담 상태 현황 -->
+				<section class="panel dashboard-panel">
+					<div class="section-title">상담 상태 현황</div>
+
+					<div class="table-wrap">
+						<table class="dealer-table">
+							<thead>
+								<tr>
+									<th>대기</th>
+									<th>진행중</th>
+									<th>완료</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td
+										th:text="${dashboard != null ? dashboard.waitingConsultCount : 0}">0</td>
+									<td
+										th:text="${dashboard != null ? dashboard.inProgressConsultCount : 0}">0</td>
+									<td
+										th:text="${dashboard != null ? dashboard.completedConsultCount : 0}">0</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+
+			</div>
+
+			<!-- 공통 푸터 -->
+			<footer class="dealer-footer">
+				<p>© 2026 KIA EV Project Team DAY6.</p>
+			</footer>
+
+		</main>
+	</div>
+
+</body>
+</html>

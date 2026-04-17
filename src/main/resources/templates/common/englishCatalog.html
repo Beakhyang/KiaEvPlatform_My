@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>KIA EV | Catalog</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #f4f7f9; 
+            color: #05141f;
+        }
+
+        .container {
+            width: 1200px;
+            margin: 0 auto;
+            padding: 160px 0 100px;
+        }
+
+        /* 1. 타이틀 영역 */
+        .catalog-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .catalog-header h1 {
+            font-size: 56px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin: 0;
+            color: #05141f;
+        }
+
+        /* 2. 그리드 배치 */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+        }
+
+        /* 3. 카드 디자인 */
+        .catalog-item {
+            position: relative;
+            background: #fff;
+            border-radius: 24px; /* 곡률을 더 주어 부드럽게 */
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .catalog-item:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+
+        /* [핵심] 썸네일 박스 및 이미지 비율 조정 */
+        .thumb-box {
+            position: relative;
+            width: 100%;
+            height: 260px; /* 높이 고정 */
+            background: #fdfdfd;
+            overflow: hidden;
+        }
+
+        .thumb-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 이미지가 찌그러지지 않고 영역을 꽉 채움 */
+            transition: transform 0.6s ease;
+        }
+
+        /* 호버 시 어두워지는 효과 */
+        .thumb-box::after {
+            content: "View Catalog ↗";
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(5, 20, 31, 0.7); /* 기아 브랜드 컬러 느낌 */
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .catalog-item:hover .thumb-box::after {
+            opacity: 1;
+        }
+
+        .catalog-item:hover .thumb-box img {
+            transform: scale(1.1); /* 이미지 살짝 확대 */
+        }
+
+        /* 4. 카드 하단 차 이름 */
+        .item-info {
+            padding: 30px 20px;
+            background: #fff;
+            text-align: center;
+        }
+
+        .item-info h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        footer {
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 -->
+    <header th:replace="~{common/header :: header}"></header>
+
+    <main class="container">
+        <!-- 타이틀 -->
+        <section class="catalog-header">
+            <h1>Catalog</h1>
+        </section>
+
+        <!-- 카탈로그 그리드 -->
+        <div class="catalog-grid">
+            
+            <!-- 카드 1: Ray EV -->
+            <div class="catalog-item" onclick="window.open('/pdf/Ray_EV_Catalog_EN.pdf', '_blank')">
+                <div class="thumb-box">
+                    <img th:src="@{/images/cars/rayev_1.jpg}" alt="Ray EV">
+                </div>
+                <div class="item-info">
+                    <h3>Ray EV</h3>
+                </div>
+            </div>
+
+            <!-- 카드 2: EV6 -->
+            <div class="catalog-item" onclick="window.open('/pdf/EV6_Catalog_EN.pdf', '_blank')">
+                <div class="thumb-box">
+                    <img th:src="@{/images/cars/ev6_1.jpg}" alt="EV6">
+                </div>
+                <div class="item-info">
+                    <h3>EV6</h3>
+                </div>
+            </div>
+
+            <!-- 카드 3: EV9 -->
+            <div class="catalog-item" onclick="window.open('/pdf/EV9_Catalog_EN.pdf', '_blank')">
+                <div class="thumb-box">
+                    <img th:src="@{/images/cars/ev9_1.jpg}" alt="EV9">
+                </div>
+                <div class="item-info">
+                    <h3>EV9</h3>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 푸터 -->
+    <footer th:replace="~{common/footer :: footer}"></footer>
+
+</body>
+</html>

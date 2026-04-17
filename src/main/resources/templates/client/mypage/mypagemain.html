@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>마이페이지 메인</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+}
+
+body {
+	background: #f3f3f3;
+	color: #111;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+html {
+	overflow-y: scroll !important;
+}
+
+/* 위시리스트 스타일 기준 */
+.mypage-wrap {
+	width: 1200px;
+	margin: 0 auto;
+	padding: 150px 0 100px;
+}
+
+.mypage-container {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+/* 왼쪽 사이드 메뉴 */
+.side-menu {
+	width: 240px;
+	background: #111111;
+	border-radius: 12px;
+	padding: 40px 25px;
+	min-height: 600px;
+	position: relative;
+}
+
+.menu-list {
+	list-style: none;
+	margin-top: 30px;
+}
+
+.menu-list li {
+	margin-bottom: 25px;
+}
+
+.menu-list li a {
+	color: #fff;
+	font-size: 18px;
+	font-weight: 500;
+	display: block;
+}
+
+.menu-list li a:hover {
+	color: #89c541;
+}
+
+/* 현재 페이지 강조 */
+.menu-list li a.active {
+	color: #89c541;
+	font-weight: 700;
+}
+
+/* 로그아웃 */
+.logout-box {
+	position: absolute;
+	left: 25px;
+	right: 25px;
+	bottom: 25px;
+	padding-top: 20px;
+	border-top: 1px solid #333;
+	text-align: right;
+}
+
+.logout-box a {
+	color: #999;
+	font-size: 16px;
+}
+
+.logout-box a:hover {
+	color: #fff;
+}
+
+/* 오른쪽 본문 */
+.content-area {
+	flex: 1;
+}
+
+.main-card {
+	background: #fff;
+	border-radius: 22px;
+	padding: 45px;
+	min-height: 600px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	border: 1px solid #e7e7e7;
+}
+
+.welcome-text {
+	font-size: 30px;
+	font-weight: 700;
+	margin-bottom: 35px;
+	color: #05141f;
+}
+
+.section-title {
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 35px;
+	color: #05141f;
+}
+
+/* 차량 리스트 */
+.car-list {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 30px;
+}
+
+.car-card {
+	background: #fff;
+	border: 1px solid #eee;
+	border-radius: 16px;
+	overflow: hidden;
+	transition: all 0.3s ease;
+	display: flex;
+	flex-direction: column;
+}
+
+.car-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.car-image-box {
+	width: 100%;
+	height: 200px;
+	background: #f9f9f9;
+	overflow: hidden;
+}
+
+.car-image-box a {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.car-image-box img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.car-content {
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
+.car-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 5px;
+}
+
+.car-name {
+	font-size: 20px;
+	font-weight: 800;
+	color: #111;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.top-badge {
+	background: #05141f;
+	color: #fff;
+	font-size: 11px;
+	padding: 4px 8px;
+	border-radius: 10px;
+}
+
+.car-sub {
+	font-size: 13px;
+	color: #999;
+	margin-bottom: 20px;
+}
+
+.car-info {
+	font-size: 13px;
+	color: #555;
+	line-height: 1.8;
+	margin-bottom: 18px;
+}
+
+.car-footer {
+	margin-top: auto;
+	padding-top: 15px;
+	border-top: 1px solid #f5f5f5;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.heart-btn {
+	border: none;
+	background: none;
+	color: #ff4d4d;
+	font-size: 24px;
+	cursor: pointer;
+	transition: transform 0.2s;
+	padding: 0;
+	line-height: 1;
+}
+
+.heart-btn:hover {
+	transform: scale(1.2);
+}
+
+.car-price {
+	font-size: 18px;
+	font-weight: 800;
+	color: #05141f;
+	margin-left: auto;
+}
+
+.empty-box {
+	width: 100%;
+	height: 300px;
+	border: 2px dashed #e3e3e3;
+	border-radius: 16px;
+	background: #fafafa;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #999;
+	font-size: 18px;
+}
+
+@media (max-width: 1000px) {
+	.mypage-wrap {
+		width: 95%;
+		padding: 120px 0 60px;
+	}
+
+	.mypage-container {
+		flex-direction: column;
+	}
+
+	.side-menu {
+		width: 100%;
+		min-height: auto;
+		padding-bottom: 80px;
+	}
+
+	.car-list {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+</head>
+<body>
+
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<div class="mypage-wrap">
+		<div class="mypage-container">
+
+			<!-- 왼쪽 메뉴 -->
+			<div class="side-menu">
+				<ul class="menu-list">
+					<li><a th:href="@{/mypage/myinfo}">내 정보 확인</a></li>
+					<li><a th:href="@{/mypage/consult}">상담내역 조회</a></li>
+					<li><a th:href="@{/mypage/board}">나의 문의 내역</a></li>
+					<li><a th:href="@{/mypage/wishist}" class="active">관심 차량 목록</a></li>
+				</ul>
+
+				<div class="logout-box">
+					<a th:href="@{/logout}">로그아웃</a>
+				</div>
+			</div>
+
+			<!-- 오른쪽 본문 -->
+			<div class="content-area">
+				<div class="main-card">
+
+					<div class="welcome-text" th:if="${loginUser != null}">
+						안녕하세요, <span th:text="${loginUser.memberName}">홍길동</span>님
+					</div>
+
+					<div class="welcome-text" th:if="${loginUser == null}">
+						안녕하세요, 회원님
+					</div>
+
+					<div class="section-title">나의 관심 차량</div>
+
+					<div class="car-list"
+						th:if="${favoriteCars != null and !#lists.isEmpty(favoriteCars)}">
+						<div class="car-card" th:each="car, stat : ${favoriteCars}">
+
+							<div class="car-image-box">
+								<a th:href="@{/car/detail(carNo=${car.carNo})}">
+									<img th:src="${car.carImage}" alt="차량이미지">
+								</a>
+							</div>
+
+							<div class="car-content">
+								<div class="car-title-row">
+									<div class="car-name" th:text="${car.carName}">The new Niro</div>
+									<div class="top-badge">
+										TOP <span th:text="${stat.count}">1</span>
+									</div>
+								</div>
+
+								<div class="car-sub">All-Electric Inspiration</div>
+
+								<div class="car-info">
+									출시일 2026-02-02<br>
+									배터리 용량 81.4 kWh<br>
+									최고 출력 215 kW / 292 ps<br>
+									외장 컬러 세라믹 그레이<br>
+									옵션 빌트인 캠 2
+								</div>
+
+								<div class="car-footer">
+									<form th:action="@{/mypage/favorite/delete}" method="post">
+										<input type="hidden" name="carNo" th:value="${car.carNo}">
+										<button type="submit" class="heart-btn">♥</button>
+									</form>
+
+									<div class="car-price">
+										<span th:text="${#numbers.formatInteger(car.carPrice, 3, 'COMMA')}">31,460,000</span>원
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+					<div class="empty-box"
+						th:if="${favoriteCars == null or #lists.isEmpty(favoriteCars)}">
+						등록된 관심 차량이 없습니다.
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상담 신청 완료</title>
+    <style>
+        body {
+            margin: 0;
+            background: #eef4ff;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .container {
+            width: 700px;
+            margin: 100px auto;
+            background: #ffffff;
+            padding: 60px 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0 0 24px;
+            font-size: 32px;
+            color: #111;
+            font-weight: 700;
+        }
+
+        .message {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .sub-message {
+            font-size: 15px;
+            color: #666;
+            margin-bottom: 42px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        button {
+            width: 170px;
+            padding: 14px 0;
+            border-radius: 999px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .main-btn {
+            background: #111;
+            color: white;
+        }
+
+        .list-btn {
+            background: #f1f5f9;
+            color: #111;
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>상담 신청 완료</h2>
+
+    <div class="message">
+        상담 신청이 완료되었습니다.<br>
+        담당 딜러가 등록된 연락처로 안내드릴 예정입니다.
+    </div>
+
+    <div class="sub-message">
+        상담 접수 후 순차적으로 확인하여 빠르게 도와드리겠습니다.
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="main-btn" onclick="location.href='/main'">메인으로</button>
+        <button type="button" class="list-btn" onclick="location.href='/mypage/consult'">상담목록</button>
+    </div>
+</div>
+
+</body>
+</html>

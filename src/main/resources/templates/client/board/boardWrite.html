@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>기아 전기차 - 문의글 작성</title>
+    <style>
+        .container { width: 800px; margin: 120px auto 50px; font-family: sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; }
+        th { background-color: #f4f4f4; width: 15%; text-align: center; }
+        input[type="text"] { width: 90%; padding: 8px; border: 1px solid #ccc; }
+        textarea { width: 90%; height: 200px; padding: 8px; border: 1px solid #ccc; resize: none; }
+        .field-error { display: none; margin-top: 8px; color: #dc3545; font-size: 14px; font-weight: 600; }
+        .field-error.is-visible { display: block; }
+        .is-invalid { border-color: #dc3545 !important; }
+        .btn-group { text-align: center; margin-top: 20px; }
+        .btn { display: inline-block; padding: 10px 20px; color: white; text-decoration: none; border: none; cursor: pointer; font-size: 14px; margin: 0 5px; }
+        .btn-submit { background-color: #000; }
+        .btn-cancel { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{common/header :: header}"></th:block>
+
+<div class="container">
+    <h2>문의글 작성하기</h2>
+
+    <form th:action="@{/board/write}" method="post" id="boardWriteForm" novalidate>
+        <input type="hidden" name="boardType" value="문의글">
+        <table>
+            <tbody>
+                <tr>
+                    <th>분류</th>
+                    <td>문의글</td>
+                </tr>
+                <tr>
+                    <th>제목</th>
+                    <td>
+                        <input type="text" name="title" id="title" required placeholder="제목을 입력하세요">
+                        <div class="field-error" id="titleError">제목을 입력해주세요.</div>
+                    </td>
+                </tr>
+                <tr>
+                    <th>내용</th>
+                    <td>
+                        <textarea name="content" id="content" required placeholder="내용을 입력하세요"></textarea>
+                        <div class="field-error" id="contentError">내용을 입력해주세요.</div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-submit">등록하기</button>
+            <a th:href="@{/board/list}" class="btn btn-cancel">취소</a>
+        </div>
+    </form>
+</div>
+<th:block th:replace="~{common/footer :: footer}"></th:block>
+<script>
+    const writeForm = document.getElementById('boardWriteForm');
+    const writeTitle = document.getElementById('title');
+    const writeContent = document.getElementById('content');
+    const writeTitleError = document.getElementById('titleError');
+    const writeContentError = document.getElementById('contentError');
+
+    function toggleFieldError(field, errorEl, message) {
+        const isEmpty = !field.value.trim();
+        errorEl.textContent = message;
+        errorEl.classList.toggle('is-visible', isEmpty);
+        field.classList.toggle('is-invalid', isEmpty);
+        return isEmpty;
+    }
+
+    writeTitle.addEventListener('input', function () {
+        toggleFieldError(writeTitle, writeTitleError, '제목을 입력해주세요.');
+    });
+
+    writeContent.addEventListener('input', function () {
+        toggleFieldError(writeContent, writeContentError, '내용을 입력해주세요.');
+    });
+
+    writeForm.addEventListener('submit', function (event) {
+        const hasTitleError = toggleFieldError(writeTitle, writeTitleError, '제목을 입력해주세요.');
+        const hasContentError = toggleFieldError(writeContent, writeContentError, '내용을 입력해주세요.');
+
+        if (hasTitleError || hasContentError) {
+            event.preventDefault();
+        }
+    });
+</script>
+</body>
+</html>

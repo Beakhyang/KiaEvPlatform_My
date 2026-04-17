@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>기아 전기차 - 현재 진행 중인 프로모션</title>
+<style>
+.promotion-container {
+	max-width: 900px;
+	margin: 120px auto 50px;
+	padding: 20px;
+	font-family: 'Kia Signature Fix', sans-serif; /* 기아 전용 폰트가 있다면 적용 */
+}
+
+.page-header {
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 15px;
+	margin-bottom: 40px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.page-title {
+	font-size: 1.8em;
+	color: #05141f; /* Kia Navy */
+	font-weight: bold;
+	margin: 0;
+}
+
+.empty-message {
+	text-align: center;
+	color: #999;
+	padding: 80px 0;
+	font-size: 1.1em;
+	background-color: #f8f9fa;
+	border-radius: 12px;
+}
+
+/* 🌟 1. 카드 디자인 업그레이드 (그림자 삭제, 부드러운 구분선) */
+.promotion-card {
+	/* 맑고 깨끗한 파스텔 노란색 */
+	background-color: #fff9db;
+	/* 테두리도 배경에 어울리는 차분한 골드 블루 톤 */
+	border: 2px solid #f1e1a8;
+	border-radius: 12px;
+	padding: 25px;
+	margin-bottom: 25px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+	transition: all 0.3s ease;
+	cursor: pointer;
+}
+
+/* 4. [마우스 호버] 상태 */
+.promotion-card:hover {
+	background-color: #0056b3;
+	border-color: #05141f;
+}
+
+/* 🌟 2. 호버 시 텍스트 컬러 일괄 변경 (날짜 포함) */
+.promotion-card:hover .promotion-title, .promotion-card:hover .promotion-content-preview,
+	.promotion-card:hover .promotion-date, .promotion-card:hover .benefit-text
+	{
+	color: #ffffff !important;
+}
+
+/* 🌟 3. [중요] 호버 시 혜택 박스 디자인 변경 (글씨 실종 방지) */
+.promotion-card:hover .promotion-benefit-card {
+	/* 배경을 아예 투명하게 만들거나, 아주 살짝만 밝은 파랑으로 변경 */
+	background-color: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* 1. '기간:' 글자와 날짜 숫자 모두 흰색으로 변경 */
+.promotion-card:hover .promotion-date, .promotion-card:hover .promotion-date strong,
+	.promotion-card:hover .promotion-date span {
+	color: #ffffff !important;
+}
+
+/* 혜택 박스 안의 글자들도 하얗게! */
+.promotion-card:hover .benefit-text, .promotion-card:hover .benefit-text span
+	{
+	color: #ffffff !important;
+}
+
+/* '특별 혜택' 라벨은 파란 배경에서 가장 잘 보이는 노란색 유지 */
+.promotion-card:hover .benefit-label {
+	color: #ffda00;
+}
+
+/* 3. [EV 전용] 뱃지도 검은색 글자로 유지 */
+.promotion-card:hover .badge-model {
+	background-color: #ffffff;
+	color: #000000 !important;
+	font-weight: 800;
+}
+
+/* 2. [자세히 보기] 버튼: 검은색 글자 + 더 두껍게(Extra Bold) */
+.promotion-card:hover .detail-btn {
+	background-color: #ffffff;
+	color: #000000 !important;
+	/* font-weight를 800으로 설정해서 아주 묵직하게 만듭니다 */
+	font-weight: 800;
+	border: none;
+	/* 버튼 크기가 너무 작아 보인다면 패딩을 살짝 조절해도 좋습니다 */
+	padding: 10px 25px;
+}
+
+/* 🌟 2. 세련된 태그 배지 스타일 */
+.badge-group {
+	margin-bottom: 10px;
+	display: flex;
+	gap: 5px;
+}
+
+.badge-model {
+	color: #05141f; /* 아주 진한 네이비 */
+	font-size: 0.85em;
+	padding: 4px 12px;
+	background-color: #ffffff; /* 배경을 흰색으로 해서 더 돋보이게 */
+	border: 1px solid #b3d7ff;
+	border-radius: 20px;
+	font-weight: 800; /* 글자를 더 두껍게 */
+}
+
+/* 마감/인기 배지는 배경색 없이 테두리와 폰트로만 세련되게 */
+.badge-status {
+	font-size: 0.8em;
+	padding: 3px 9px;
+	border-radius: 20px;
+	font-weight: bold;
+}
+
+/* 마감/오늘 마감 (Kia Red 포인트) */
+.badge-urgent {
+	color: #e2231a;
+	border: 1px solid #ffc9c9;
+	background-color: #fff5f5;
+}
+
+/* 인기 혜택 (Kia Navy 포인트) */
+.badge-popular {
+	color: #05141f;
+	border: 1px solid #d0ebff;
+	background-color: #e7f5ff;
+}
+
+/* 🌟 3. 제목 및 내용 (타이포그래피 정돈, 이모지 삭제) */
+.promotion-title-group {
+	margin-bottom: 12px;
+}
+
+.promotion-title {
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #05141f;
+	display: flex;
+	align-items: center;
+	gap: 8px; /* 아이콘과 제목 사이 */
+}
+
+/* 거대한 이모지 대신, 작고 세련된 아이콘을 원한다면 SVG 등을 사용 (여기선 텍스트만) */
+.promotion-content-preview {
+	color: #666;
+	font-size: 0.95em;
+	line-height: 1.6;
+	margin-top: 5px;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* 🌟 4. 전면 개편된 혜택 박스 (투박한 라인 삭제) */
+.promotion-benefit-card {
+	background-color: #f8f9fa;
+	border-radius: 8px;
+	padding: 15px 20px;
+	margin-bottom: 20px;
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	border: 1px solid #eaeaea;
+}
+
+.benefit-label {
+	color: #e2231a; /* Kia Red */
+	font-weight: bold;
+	font-size: 1.1em;
+	white-space: nowrap;
+}
+
+.benefit-text {
+	color: #05141f;
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+/* 🌟 5. 하단 날짜 및 세련된 버튼 */
+.card-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid #f1f3f5;
+	padding-top: 15px;
+}
+
+/* 2. [평상시] 날짜 및 기간 텍스트: 회색에서 블랙/네이비 톤으로 변경 */
+.promotion-date {
+	color: #333333; /* 기존 #999에서 훨씬 진한 색으로 변경 */
+	font-size: 0.95em;
+	font-weight: 600;
+}
+
+.promotion-date strong {
+	color: #05141f; /* '기간:' 글자는 더 진하게 */
+	margin-right: 5px;
+}
+
+/* 3. [공통] 자세히 보기 버튼: 크기 고정 (중요!) */
+.detail-btn {
+	display: inline-block;
+	min-width: 110px; /* 🌟 버튼 가로 길이를 고정해서 들쑥날쑥 방지 */
+	text-align: center;
+	padding: 10px 20px;
+	background-color: #e2231a; /* 기아 레드 */
+	color: #fff;
+	text-decoration: none;
+	border-radius: 25px;
+	font-size: 0.9em;
+	font-weight: 800; /* 평상시에도 두껍게 유지 */
+	transition: all 0.2s ease;
+	border: 2px solid transparent; /* 호버 시 테두리 생겨도 크기 안 변하게 미리 설정 */
+}
+
+.detail-btn:hover {
+	background-color: #c91f1a;
+}
+</style>
+</head>
+<body>
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<div class="promotion-container">
+		<div class="page-header">
+			<div class="page-title">현재 진행 중인 프로모션</div>
+		</div>
+
+		<div th:if="${#lists.isEmpty(promotions)}" class="empty-message">
+			<p>현재 진행 중인 프로모션이 없습니다.</p>
+		</div>
+
+		<div th:unless="${#lists.isEmpty(promotions)}">
+			<div class="promotion-card" th:each="promo : ${promotions}"
+				th:onclick="|location.href='@{/promotion/detail(id=${promo.id})}'|">
+
+				<div class="badge-group">
+					<span class="badge-model" th:if="${promo.targetModel != null}"
+						th:text="'[' + ${promo.targetModel} + ' 전용]'"></span> <span
+						class="badge-status badge-urgent"
+						th:if="${promo.remainDays > 0 and promo.remainDays <= 7}"
+						th:text="'🔥 마감 D-' + ${promo.remainDays}"></span> <span
+						class="badge-status badge-urgent" th:if="${promo.remainDays == 0}">🔥
+						오늘 마감!</span> <span class="badge-status badge-popular"
+						th:if="${promo.remainDays > 7 and (promo.type == 'DISCOUNT' or promo.type == 'GIFT' or promo.type == 'PACKAGE')}">
+						✨ 인기 혜택 </span>
+				</div>
+
+				<div class="promotion-title-group">
+					<div class="promotion-title" th:text="${promo.title}">프로모션 제목</div>
+					<div class="promotion-content-preview" th:text="${promo.content}">
+						프로모션 상세 내용 미리보기</div>
+				</div>
+
+				<div class="promotion-benefit-card">
+					<span class="benefit-label">특별 혜택</span> <span class="benefit-text">
+						<span
+						th:if="${promo.type == 'DISCOUNT' and promo.discountAmount != null}">
+							최대 <span
+							th:text="${#numbers.formatInteger(promo.discountAmount, 3, 'COMMA')}"></span>원
+							할인
+					</span> <span th:if="${promo.type == 'PACKAGE' or promo.type == 'GIFT'}">프리미엄
+							차량 케어 패키지 무상 제공</span> <span th:if="${promo.type == 'VOUCHER'}">전기차
+							충전 크레딧 이용권 증정</span> <span th:if="${promo.type == 'EVENT'}">특별
+							이벤트 참여 시 사은품 증정</span> <span
+						th:unless="${promo.type == 'DISCOUNT' or promo.type == 'PACKAGE' or promo.type == 'GIFT' or promo.type == 'VOUCHER' or promo.type == 'EVENT'}">
+							상세 혜택을 확인해 보세요! </span>
+					</span>
+				</div>
+
+				<div class="card-footer">
+					<div class="promotion-date">
+						<strong style="color: #555;">기간:</strong> <span
+							th:text="${#temporals.format(promo.startDate, 'yyyy.MM.dd')}"></span>
+						~ <span
+							th:text="${#temporals.format(promo.endDate, 'yyyy.MM.dd')}"></span>
+					</div>
+					<a th:href="@{/promotion/detail(id=${promo.id})}"
+						class="detail-btn" onclick="event.stopPropagation();">자세히 보기</a>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<th:block th:replace="~{common/footer :: footer}"></th:block>
+</body>
+</html>

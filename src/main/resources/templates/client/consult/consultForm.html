@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상담 신청</title>
+<style>
+body {
+   margin: 0;
+   background: #eef4ff;
+   font-family: 'Noto Sans KR', sans-serif;
+}
+
+.container {
+   width: 700px;
+   margin: 140px auto 80px;
+   background: white;
+   padding: 40px;
+   border-radius: 12px;
+   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+   text-align: center;
+   margin-bottom: 40px;
+   color: #111;
+   font-weight: 700;
+}
+
+.form-row {
+   display: flex;
+   align-items: center;
+   margin-bottom: 18px;
+}
+
+.form-row label {
+   width: 150px;
+   text-align: right;
+   margin-right: 20px;
+   font-weight: 500;
+   color: #333;
+}
+
+.form-row input, .form-row textarea, .form-row select {
+   width: 380px;
+   padding: 10px;
+   border: 1px solid #e2e8f0;
+   border-radius: 8px;
+   background: #f8fafc;
+   font-size: 14px;
+   box-sizing: border-box;
+}
+
+textarea {
+   height: 120px;
+   resize: none;
+}
+
+.btn-group {
+   margin-top: 35px;
+   display: flex;
+   justify-content: center;
+   gap: 20px;
+}
+
+button {
+   width: 140px;
+   padding: 12px;
+   border-radius: 999px;
+   border: none;
+   font-size: 15px;
+   cursor: pointer;
+   font-weight: 600;
+   transition: background 0.2s ease;
+}
+
+.submit-btn {
+   background: #111;
+   color: white;
+}
+
+.cancel-btn {
+   background: #f1f5f9;
+   color: #111;
+   border: 1px solid #e2e8f0;
+}
+
+.submit-btn:hover {
+   background: #000;
+}
+
+.cancel-btn:hover {
+   background: #e2e8f0;
+}
+</style>
+</head>
+<body>
+
+   <div th:replace="~{common/header :: header}"></div>
+
+   <div class="container">
+      <h2>상담 신청</h2>
+
+      <form id="consultForm" th:action="@{/consult/register}" method="post"
+         onsubmit="return submitConsult()">
+
+         <input type="hidden" name="memberNo" id="memberNo" value="">
+         <input type="hidden" name="dealerNo" id="dealerNo">
+         <input type="hidden" name="consultStatus" id="consultStatus" value="대기">
+         <input type="hidden" name="consultMemo" id="consultMemo" value="">
+
+         <div class="form-row">
+            <label for="carNo">관심차량</label>
+            <select id="carNo" name="carNo">
+               <option value="">차량을 선택해주세요</option>
+
+               <!-- 관심차량을 상단에 먼저 표시 -->
+               <option th:each="car : ${favoriteCarList}"
+                       th:value="${car.carNo}"
+                       th:text="|♥ ${car.modelName}|"
+                       th:selected="${selectedCarNo != null and selectedCarNo == car.carNo}">
+               </option>
+
+               <!-- 관심차량이 있을 때 구분선 -->
+               <option th:if="${favoriteCarList != null and !favoriteCarList.isEmpty()}" disabled>
+                  ──────────
+               </option>
+
+               <!-- 전체 차량 목록 표시 (관심차량은 중복 제외) -->
+               <option th:each="car : ${allCarList}"
+                       th:if="${!favoriteCarNoSet.contains(car.carNo)}"
+                       th:value="${car.carNo}"
+                       th:text="${car.modelName}"
+                       th:selected="${selectedCarNo != null and selectedCarNo == car.carNo}">
+               </option>
+            </select>
+         </div>
+
+         <div class="form-row">
+            <label for="budgetAmount">대략 예산금액</label>
+            <input type="text" name="budgetAmount" id="budgetAmount" placeholder="숫자만 입력하세요">
+         </div>
+
+         <div class="form-row">
+            <label for="usePurpose">이용용도</label>
+            <select id="usePurpose" name="usePurpose">
+               <option value="">용도를 선택해주세요</option>
+               <option value="출퇴근용">출퇴근용</option>
+               <option value="가족용">가족용</option>
+               <option value="캠핑용">캠핑용</option>
+               <option value="장거리 주행용">장거리 주행용</option>
+            </select>
+         </div>
+
+         <div class="form-row">
+            <label for="mainRangeKm">주요 주행거리</label>
+            <select id="mainRangeKm" name="mainRangeKm">
+               <option value="">주행거리를 선택해주세요</option>
+               <option value="단거리">단거리</option>
+               <option value="장거리">장거리</option>
+            </select>
+         </div>
+
+         <div class="form-row">
+            <label for="fellowData">동승자 정보</label>
+            <select id="fellowData" name="fellowData">
+               <option value="">동승자를 선택해주세요</option>
+               <option value="없음">없음</option>
+               <option value="영유아">영유아</option>
+               <option value="반려동물">반려동물</option>
+               <option value="성인">성인</option>
+               <option value="기타">기타</option>
+            </select>
+         </div>
+
+         <div class="form-row">
+            <label for="consultContent">상담 내용</label>
+            <textarea name="consultContent" id="consultContent"
+               placeholder="추가 문의내용을 입력해주세요"></textarea>
+         </div>
+
+         <div class="btn-group">
+            <button type="submit" class="submit-btn">신청하기</button>
+            <button type="button" class="cancel-btn" onclick="confirmCancel()">취소하기</button>
+         </div>
+      </form>
+   </div>
+
+   <div th:replace="~{common/footer :: footer}"></div>
+
+   <script>
+      function confirmCancel() {
+         if (confirm("상담 신청을 취소하시겠습니까?")) {
+            location.href = "/main";
+         }
+      }
+
+      const budgetInput = document.getElementById('budgetAmount');
+
+      budgetInput.addEventListener('blur', function() {
+         let value = this.value.replace(/[^0-9]/g, '');
+         if (value) {
+            this.value = value + " 만 원";
+         }
+      });
+
+      budgetInput.addEventListener('focus', function() {
+         this.value = this.value.replace(" 만 원", "");
+      });
+
+      function submitConsult() {
+         const carNo = document.getElementById('carNo').value;
+         const mainRangeKm = document.getElementById('mainRangeKm').value;
+
+         budgetInput.value = budgetInput.value.replace(/[^0-9]/g, '');
+
+         if (!carNo) {
+            alert("관심차량을 선택해주세요.");
+            return false;
+         }
+
+         if (!mainRangeKm) {
+            alert("주요 주행거리를 선택해주세요.");
+            return false;
+         }
+
+         if (!confirm("상담을 신청하시겠습니까?")) {
+            return false;
+         }
+
+         return true;
+      }
+   </script>
+
+</body>
+</html>

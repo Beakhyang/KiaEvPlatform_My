@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상담 상세 조회</title>
+    <style>
+        body {
+            margin: 0;
+            background: #eef4ff;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        .container {
+            width: 820px;
+            margin: 140px auto 80px;
+            background: #ffffff;
+            padding: 50px 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #111;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .section-title {
+            margin: 32px 0 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .detail-row {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 0;
+        }
+
+        .detail-label {
+            width: 180px;
+            font-weight: 700;
+            color: #222;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #444;
+            line-height: 1.7;
+            word-break: break-word;
+        }
+
+        .btn-group {
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        button {
+            width: 160px;
+            padding: 14px 0;
+            border-radius: 999px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .main-btn {
+            background: #111;
+            color: white;
+        }
+
+        .main-btn:hover {
+            background: #000;
+        }
+
+        .list-btn {
+            background: #f1f5f9;
+            color: #111;
+            border: 1px solid #e2e8f0;
+        }
+
+        .list-btn:hover {
+            background: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{common/header :: header}"></div>
+
+<div class="container">
+    <h2>상담 상세 조회</h2>
+
+    <div class="section-title">신청자 정보</div>
+
+    <div class="detail-row">
+        <div class="detail-label">이름</div>
+        <div class="detail-value" th:text="${member.memberName}">홍길동</div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">연락처</div>
+        <div class="detail-value" th:text="${member.phone}">010-0000-0000</div>
+    </div>
+
+    <div class="section-title">상담 신청 정보</div>
+
+    <div class="detail-row">
+        <div class="detail-label">차량번호 / 차량명</div>
+        <div class="detail-value">
+            <span th:text="${consult.carNo}">1</span>
+            <span> / </span>
+
+            <span th:switch="${consult.carNo}">
+                <span th:case="1">EV3</span>
+                <span th:case="2">EV3-GT</span>
+                <span th:case="3">EV4</span>
+                <span th:case="4">EV4-GT</span>
+                <span th:case="5">EV5</span>
+                <span th:case="6">EV5-GT</span>
+                <span th:case="7">EV6</span>
+                <span th:case="8">EV6-GT</span>
+                <span th:case="9">EV9</span>
+                <span th:case="10">EV9-GT</span>
+                <span th:case="11">RAY EV</span>
+                <span th:case="*">알 수 없는 차량</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">예산금액</div>
+        <div class="detail-value"
+             th:text="${consult.budgetAmount != null ? consult.budgetAmount + ' 만 원' : '미입력'}">
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">이용용도</div>
+        <div class="detail-value"
+             th:text="${consult.usePurpose != null ? consult.usePurpose : '미선택'}">
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">주행거리</div>
+        <div class="detail-value"
+             th:text="${consult.mainRangeKm != null ? consult.mainRangeKm : '미선택'}">
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">동승자 정보</div>
+        <div class="detail-value"
+             th:text="${consult.fellowData != null ? consult.fellowData : '미선택'}">
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">상담 내용</div>
+        <div class="detail-value"
+             th:text="${consult.consultContent != null && !#strings.isEmpty(consult.consultContent) ? consult.consultContent : '내용 없음'}">
+        </div>
+    </div>
+
+    <div class="detail-row">
+        <div class="detail-label">신청일시</div>
+        <div class="detail-value"
+             th:text="${consult.requestDate != null ? consult.requestDate : '없음'}">
+        </div>
+    </div>
+
+    <div th:if="${memberStatus == 'ADMIN' or memberStatus == 'DEALER' or memberStatus == '관리자' or memberStatus == '딜러'}">
+        <div class="section-title">관리 정보</div>
+
+        <div class="detail-row">
+            <div class="detail-label">회원번호</div>
+            <div class="detail-value" th:text="${consult.memberNo}">1</div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">딜러번호</div>
+            <div class="detail-value"
+                 th:text="${consult.dealerNo != null ? consult.dealerNo : '미배정'}">
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">상담상태</div>
+            <div class="detail-value"
+                 th:text="${consult.consultStatus != null ? consult.consultStatus : '대기'}">
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">배정일시</div>
+            <div class="detail-value"
+                 th:text="${consult.assignedDate != null ? consult.assignedDate : '미배정'}">
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">완료일시</div>
+            <div class="detail-value"
+                 th:text="${consult.completedDate != null ? consult.completedDate : '미완료'}">
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">상담 메모</div>
+            <div class="detail-value"
+                 th:text="${consult.consultMemo != null && !#strings.isEmpty(consult.consultMemo) ? consult.consultMemo : '메모 없음'}">
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <div class="detail-label">수정일시</div>
+            <div class="detail-value"
+                 th:text="${consult.updatedDate != null ? consult.updatedDate : '수정 이력 없음'}">
+            </div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button type="button" class="main-btn" onclick="location.href='/main'">메인으로</button>
+        <button type="button" class="list-btn" onclick="location.href='/mypage/consult'">상담목록</button>
+    </div>
+</div>
+
+<div th:replace="~{common/footer :: footer}"></div>
+
+</body>
+</html>

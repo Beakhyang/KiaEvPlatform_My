@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>내 정보 조회</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+}
+
+body {
+	background: #f3f3f3;
+	color: #111;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+html {
+	overflow-y: scroll !important;
+}
+
+.mypage-wrap {
+	width: 1200px;
+	margin: 0 auto;
+	padding: 150px 0 100px;
+}
+
+.mypage-container {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.side-menu {
+	width: 240px;
+	background: #111111;
+	border-radius: 12px;
+	padding: 40px 25px;
+	min-height: 740px;
+	position: relative;
+}
+
+.menu-list {
+	list-style: none;
+	margin-top: 30px;
+}
+
+.menu-list li {
+	margin-bottom: 25px;
+}
+
+.menu-list li a {
+	color: #fff;
+	font-size: 18px;
+	font-weight: 500;
+	display: block;
+}
+
+.menu-list li a:hover,
+.menu-list li a.active {
+	color: #89c541;
+	font-weight: 700;
+}
+
+.logout-box {
+	position: absolute;
+	left: 25px;
+	right: 25px;
+	bottom: 25px;
+	padding-top: 20px;
+	border-top: 1px solid #333;
+	text-align: right;
+}
+
+.logout-box a {
+	color: #999;
+	font-size: 16px;
+}
+
+.content-box {
+	flex: 1;
+	background: #fff;
+	border-radius: 22px;
+	padding: 45px;
+	min-height: 740px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	border: 1px solid #e7e7e7;
+}
+
+.content-box h2 {
+	margin: 0 0 30px 0;
+	font-size: 24px;
+	font-weight: 700;
+	color: #05141f;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 16px;
+	font-weight: 700;
+	color: #111;
+}
+
+.form-control {
+	width: 100%;
+	height: 56px;
+	border: 1px solid #dcdcdc;
+	border-radius: 10px;
+	padding: 0 16px;
+	font-size: 16px;
+	background: #fff;
+	box-sizing: border-box;
+}
+
+.bottom-btn {
+	margin-top: 30px;
+}
+
+.btn-edit {
+	background: #05141f;
+	color: white;
+	border: none;
+	padding: 14px 26px;
+	border-radius: 10px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.btn-edit:hover {
+	background: #0b3258;
+}
+</style>
+</head>
+<body>
+
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<div class="mypage-wrap">
+		<div class="mypage-container">
+			<div class="side-menu">
+				<ul class="menu-list">
+					<li><a th:href="@{/mypage/myinfo}" class="active">내 정보 확인</a></li>
+					<li><a th:href="@{/mypage/consult}">상담 내역 조회</a></li>
+					<li><a th:href="@{/mypage/board}">문의 내역 조회</a></li>
+					<li><a th:href="@{/mypage/wishlist}">관심 차량 목록</a></li>
+				</ul>
+
+				<div class="logout-box">
+					<a th:href="@{/logout}">로그아웃</a>
+				</div>
+			</div>
+
+			<div class="content-box">
+				<h2>내 정보 조회</h2>
+
+				<div class="form-group">
+					<label for="loginId">아이디</label>
+					<input id="loginId" type="text" class="form-control" th:value="${loginUser.loginId}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="memberName">이름</label>
+					<input id="memberName" type="text" class="form-control" th:value="${loginUser.memberName}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="email">이메일</label>
+					<input id="email" type="text" class="form-control" th:value="${loginUser.email}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="phone">전화번호</label>
+					<input id="phone" type="text" class="form-control" th:value="${loginUser.phone}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="address">주소</label>
+					<input id="address" type="text" class="form-control" th:value="${loginUser.address}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="detailAddress">상세주소</label>
+					<input id="detailAddress" type="text" class="form-control" th:value="${loginUser.detailAddress}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="zipcode">우편번호</label>
+					<input id="zipcode" type="text" class="form-control" th:value="${loginUser.zipcode}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="memberStatus">회원상태</label>
+					<input id="memberStatus" type="text" class="form-control" th:value="${loginUser.memberStatus}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="joinDate">가입일</label>
+					<input id="joinDate" type="text" class="form-control" th:value="${loginUser.joinDate}" readonly>
+				</div>
+
+				<div class="form-group">
+					<label for="memberNo">회원번호</label>
+					<input id="memberNo" type="text" class="form-control" th:value="${loginUser.memberNo}" readonly>
+				</div>
+
+				<div class="bottom-btn">
+					<button type="button" class="btn-edit" onclick="location.href='/mypage/update'">정보 수정</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

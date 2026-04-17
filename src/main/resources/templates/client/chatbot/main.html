@@ -1,0 +1,197 @@
+﻿<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>KIA EV 챗봇 상담</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <style>
+        * { box-sizing: border-box; font-family: 'Pretendard', 'Malgun Gothic', sans-serif; }
+        body { margin: 0; background: #f3f3f3; color: #111; }
+        .page { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 130px 0 60px; }
+        .hero { margin-bottom: 24px; padding: 36px; border-radius: 24px; background: #111111; color: #fff; border: 1px solid #1f1f1f; }
+        .hero h1 { margin: 0 0 10px; font-size: 34px; }
+        .hero p { margin: 0; font-size: 16px; line-height: 1.6; color: rgba(255,255,255,.82); }
+        .layout { display: grid; grid-template-columns: 1.4fr .9fr; gap: 24px; }
+        .panel { background: #ffffff; border: 1px solid #e7e7e7; border-radius: 24px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+        .chat-shell { padding: 22px; }
+        .section-title { margin: 0 0 14px; font-size: 18px; font-weight: 800; color: #05141f; }
+        .category-row, .quick-row, .car-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+        .chip { border: 1px solid #dcdcdc; background: #ffffff; color: #111; border-radius: 999px; padding: 10px 14px; font-size: 14px; cursor: pointer; transition: .2s ease; }
+        .chip:hover { background: #111111; border-color: #111111; color: #ffffff; }
+        .chip.active { background: #111111; border-color: #111111; color: #ffffff; }
+        .messages { min-height: 420px; max-height: 620px; overflow-y: auto; padding: 16px; border-radius: 18px; background: #f8f8f8; border: 1px solid #e5e5e5; }
+        .bubble { max-width: 88%; padding: 14px 16px; border-radius: 18px; margin-bottom: 12px; line-height: 1.6; white-space: pre-wrap; }
+        .bot { background: #ffffff; border: 1px solid #e3e3e3; color: #111; border-top-left-radius: 6px; }
+        .user { margin-left: auto; background: #111111; color: #ffffff; border: 1px solid #111111; border-top-right-radius: 6px; }
+        .side { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
+        .info-box { padding: 18px; border-radius: 18px; background: #f8f8f8; border: 1px solid #e5e5e5; }
+        .info-box p { margin: 0; line-height: 1.6; color: #555; font-size: 14px; }
+        .consult-card { padding: 24px; border-radius: 22px; background: linear-gradient(180deg, #fafafa 0%, #f2f2f2 100%); border: 1px solid #e4e4e4; }
+        .consult-card h3 { margin: 0 0 10px; font-size: 22px; color: #05141f; }
+        .consult-card p { margin: 0 0 18px; line-height: 1.7; color: #555; font-size: 14px; }
+        .consult-link { display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; border-radius: 16px; background: #111111; color: #ffffff; font-size: 16px; font-weight: 800; text-decoration: none; transition: background .2s ease; }
+        .consult-link:hover { background: #222222; }
+        @media (max-width: 960px) {
+            .layout { grid-template-columns: 1fr; }
+            .page { width: min(100% - 24px, 1180px); padding-top: 110px; }
+            .hero { padding: 28px; }
+            .hero h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+<th:block th:replace="~{common/header :: header}"></th:block>
+
+<div class="page">
+    <section class="hero">
+        <h1>KIA EV 챗봇 상담</h1>
+        <p>FAQ와 추천 질문으로 빠르게 답변을 확인하고, 추가 상담이 필요하면 상담신청으로 바로 연결되는 화면입니다.</p>
+    </section>
+
+    <div class="layout">
+        <section class="panel chat-shell">
+            <h2 class="section-title">빠른 질문 선택</h2>
+            <div id="categoryRow" class="category-row"></div>
+            <div id="quickRow" class="quick-row"></div>
+
+            <h2 class="section-title">추천 차량</h2>
+            <div id="carRow" class="car-row"></div>
+
+            <div id="messages" class="messages"></div>
+        </section>
+
+        <aside class="panel side">
+            <div class="info-box">
+                <p>로그인하지 않아도 챗봇은 이용할 수 있습니다. 추가 상담이 필요하시면 상담신청 버튼을 눌러 진행해 주세요.</p>
+            </div>
+
+            <div class="consult-card">
+                <h3>상담신청</h3>
+                <p>상세한 차량 상담이나 시승, 구매 관련 문의는 상담신청 페이지에서 접수할 수 있습니다. 비로그인 상태라면 먼저 로그인 화면으로 이동합니다.</p>
+                <a class="consult-link" th:href="@{/consult/form}">상담신청 하러 가기</a>
+            </div>
+        </aside>
+    </div>
+</div>
+
+<th:block th:replace="~{common/footer :: footer}"></th:block>
+
+<script>
+    const messagesEl = document.getElementById('messages');
+    const categoryRowEl = document.getElementById('categoryRow');
+    const quickRowEl = document.getElementById('quickRow');
+    const carRowEl = document.getElementById('carRow');
+    let initData = null;
+    let activeCategoryChip = null;
+    let activeQuickChip = null;
+    let activeCarChip = null;
+
+    function addMessage(text, type) {
+        const bubble = document.createElement('div');
+        bubble.className = `bubble ${type}`;
+        bubble.textContent = text;
+        messagesEl.appendChild(bubble);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function clearMessages() {
+        messagesEl.innerHTML = '';
+    }
+
+    function setActiveChip(chip, group) {
+        if (group === 'category') {
+            if (activeCategoryChip) activeCategoryChip.classList.remove('active');
+            activeCategoryChip = chip;
+        }
+
+        if (group === 'quick') {
+            if (activeQuickChip) activeQuickChip.classList.remove('active');
+            activeQuickChip = chip;
+        }
+
+        if (group === 'car') {
+            if (activeCarChip) activeCarChip.classList.remove('active');
+            activeCarChip = chip;
+        }
+
+        if (chip) chip.classList.add('active');
+    }
+
+    function createChip(label, onClick) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'chip';
+        button.textContent = label;
+        button.addEventListener('click', onClick);
+        return button;
+    }
+
+    async function requestAnswer(question, category = '', options = {}) {
+        if (options.replaceMessages) {
+            clearMessages();
+        }
+
+        addMessage(question, 'user');
+
+        const response = await fetch('/api/v1/chatbot/answer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question, category })
+        });
+
+        if (!response.ok) {
+            addMessage('답변을 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.', 'bot');
+            return;
+        }
+
+        const data = await response.json();
+        addMessage(data.answer, 'bot');
+    }
+
+    async function initChatbot() {
+        const response = await fetch('/api/v1/chatbot/init');
+        initData = await response.json();
+
+        addMessage(initData.greeting, 'bot');
+
+        const mappedQuestions = {
+            '구매 상담': '차량 추천을 받고 싶어요',
+            '가격/혜택': '보조금 안내를 받고 싶어요',
+            '출고/계약': '출고 기간이 궁금해요',
+            '충전': '충전 관련 문의를 하고 싶어요',
+            '차량 안내': 'EV6 주행거리가 궁금해요'
+        };
+
+        categoryRowEl.innerHTML = '';
+        initData.categories.forEach(category => {
+            const chip = createChip(category, () => {
+                setActiveChip(chip, 'category');
+                requestAnswer(mappedQuestions[category] || '차량 추천을 받고 싶어요', category, { source: 'FAQ' });
+            });
+            categoryRowEl.appendChild(chip);
+        });
+
+        quickRowEl.innerHTML = '';
+        initData.recommendedQuestions.forEach(question => {
+            const chip = createChip(question, () => {
+                setActiveChip(chip, 'quick');
+                requestAnswer(question, '', { source: '추천질문' });
+            });
+            quickRowEl.appendChild(chip);
+        });
+
+        carRowEl.innerHTML = '';
+        initData.cars.forEach(car => {
+            const chip = createChip(car.modelName, () => {
+                setActiveChip(chip, 'car');
+                requestAnswer(`${car.modelName} 정보가 궁금해요`, '차량 안내', { replaceMessages: true, source: 'FAQ' });
+            });
+            carRowEl.appendChild(chip);
+        });
+    }
+
+    initChatbot();
+</script>
+</body>
+</html>

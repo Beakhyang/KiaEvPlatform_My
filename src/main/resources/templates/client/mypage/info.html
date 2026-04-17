@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>내 정보 수정</title>
+
+<style>
+body {
+    background: #f3f3f3;
+    font-family: 'Malgun Gothic';
+}
+
+.mypage-container {
+    display: flex;
+    gap: 30px;
+    width: 1200px;
+    margin: 50px auto;
+}
+
+.side-menu {
+    width: 200px;
+    background: #071b2f;
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.side-menu a {
+    color: white;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.content {
+    flex: 1;
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+}
+
+input {
+    width: 100%;
+    height: 45px;
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-main {
+    background: #071b2f;
+    color: white;
+}
+
+.btn-danger {
+    background: red;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="mypage-container">
+
+    <div class="side-menu">
+        <a href="/mypage/info">내 정보 확인</a>
+        <a href="/mypage/consult">상담내역 조회</a>
+        <a href="/mypage/board">나의 문의 내역</a>
+        <a href="/logout">로그아웃</a>
+    </div>
+
+    <div class="content">
+        <h2>내 정보 수정하기</h2>
+
+        <form action="/mypage/update" method="post">
+            아이디
+            <input type="text" th:value="${memberInfo.loginId}" readonly>
+
+            비밀번호
+            <br>
+            ********
+            <button type="button" class="btn btn-main">비밀번호 변경</button>
+            <br><br>
+
+            이메일
+            <input type="text" name="email" th:value="${memberInfo.email}">
+
+            전화번호
+            <input type="text" name="phone" th:value="${memberInfo.phone}">
+
+            주소
+            <input type="text" name="address" th:value="${memberInfo.address}">
+
+            <button class="btn btn-main">수정 완료</button>
+            <button type="button" class="btn btn-danger">회원 탈퇴</button>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

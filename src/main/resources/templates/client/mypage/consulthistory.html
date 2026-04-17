@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상담내역 조회</title>
+
+<link rel="stylesheet"
+   href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+<style>
+* {
+   margin: 0;
+   padding: 0;
+   box-sizing: border-box;
+   font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+}
+
+body {
+   background: #f3f3f3;
+   color: #111;
+}
+
+a {
+   text-decoration: none;
+   color: inherit;
+}
+
+html {
+   overflow-y: scroll !important;
+}
+
+.mypage-wrap {
+   width: 1200px;
+   margin: 0 auto;
+   padding: 150px 0 100px;
+}
+
+.mypage-container {
+   display: flex;
+   gap: 24px;
+   align-items: flex-start;
+}
+
+/* 왼쪽 사이드 메뉴 */
+.side-menu {
+   width: 240px;
+   background: #111111;
+   border-radius: 12px;
+   padding: 40px 25px;
+   min-height: 600px;
+   position: relative;
+}
+
+.menu-list {
+   list-style: none;
+   margin-top: 30px;
+}
+
+.menu-list li {
+   margin-bottom: 25px;
+}
+
+.menu-list li a {
+   color: #fff;
+   font-size: 18px;
+   font-weight: 500;
+   display: block;
+}
+
+.menu-list li a:hover {
+   color: #89c541;
+}
+
+.logout-box {
+   position: absolute;
+   left: 25px;
+   right: 25px;
+   bottom: 25px;
+   padding-top: 20px;
+   border-top: 1px solid #333;
+   text-align: right;
+}
+
+.logout-box a {
+   color: #999;
+   font-size: 16px;
+}
+
+/* 오른쪽 본문 */
+.content-area {
+   flex: 1;
+}
+
+.consult-card {
+   background: #fff;
+   border-radius: 22px;
+   padding: 45px;
+   min-height: 600px;
+   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+   border: 1px solid #e7e7e7;
+}
+
+.page-title {
+   text-align: center;
+   font-size: 24px;
+   font-weight: 700;
+   margin-bottom: 35px;
+   color: #05141f;
+}
+
+.table-wrap {
+   width: 100%;
+   overflow-x: auto;
+}
+
+table {
+   width: 100%;
+   border-collapse: collapse;
+   background: #fff;
+}
+
+th {
+   background: #05141f;
+   color: #fff;
+   font-size: 16px;
+   padding: 16px 10px;
+   border: 1px solid #d9d9d9;
+   text-align: center;
+}
+
+td {
+   padding: 16px 10px;
+   border: 1px solid #d9d9d9;
+   text-align: center;
+   font-size: 16px;
+   color: #222;
+}
+
+tr:hover td {
+   background: #fafafa;
+}
+
+.status-badge {
+   display: inline-block;
+   min-width: 90px;
+   padding: 8px 14px;
+   border-radius: 10px;
+   color: #fff;
+   font-size: 14px;
+   font-weight: 700;
+   text-align: center;
+}
+
+.status-waiting {
+   background: #d92323;
+}
+
+.status-progress {
+   background: #f59e0b;
+}
+
+.status-done {
+   background: #2f5f96;
+}
+
+.detail-btn {
+   display: inline-block;
+   min-width: 95px;
+   padding: 10px 14px;
+   border-radius: 10px;
+   background: #05141f;
+   color: #fff;
+   font-size: 14px;
+   font-weight: 700;
+   border: none;
+   cursor: pointer;
+}
+
+.detail-btn:hover {
+   background: #0b3258;
+}
+
+.status-form {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   gap: 8px;
+}
+
+.status-select {
+   min-width: 110px;
+   padding: 8px 10px;
+   border: 1px solid #d9d9d9;
+   border-radius: 8px;
+   font-size: 14px;
+   background: #fff;
+}
+
+.status-save-btn {
+   padding: 8px 12px;
+   border: none;
+   border-radius: 8px;
+   background: #111;
+   color: #fff;
+   font-size: 13px;
+   font-weight: 600;
+   cursor: pointer;
+}
+
+.status-save-btn:hover {
+   background: #333;
+}
+
+.empty-box {
+   width: 100%;
+   height: 300px;
+   border: 2px dashed #e3e3e3;
+   border-radius: 16px;
+   background: #fafafa;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   color: #999;
+   font-size: 18px;
+}
+</style>
+</head>
+<body>
+
+   <th:block th:replace="~{common/header :: header}"></th:block>
+
+   <div class="mypage-wrap">
+      <div class="mypage-container">
+
+         <div class="side-menu">
+            <ul class="menu-list">
+               <li><a th:href="@{/mypage/myinfo}">내 정보 확인</a></li>
+               <li><a th:href="@{/mypage/consult}" style="color: #89c541; font-weight: 700;">상담내역 조회</a></li>
+               <li><a th:href="@{/mypage/board}">나의 문의 내역</a></li>
+               <li><a th:href="@{/mypage/wishlist}" class="active">관심 차량 목록</a></li>
+            </ul>
+
+            <div class="logout-box">
+               <a th:href="@{/logout}">로그아웃</a>
+            </div>
+         </div>
+
+         <div class="content-area">
+            <div class="consult-card">
+               <div class="page-title">상담내역 조회</div>
+
+               <div class="table-wrap" th:if="${consultList != null and !#lists.isEmpty(consultList)}">
+                  <table>
+                     <thead>
+                        <tr>
+                           <th>상담 번호</th>
+                           <th>상담 차량</th>
+                           <th>상담 신청 날짜</th>
+                           <th>상담 상태</th>
+                           <th>상세 확인</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        <tr th:each="consult : ${consultList}">
+                           <td th:text="${consult.consultNo}">0001</td>
+                           <td>
+                              <span th:switch="${consult.carNo}">
+                                 <span th:case="1">EV3</span>
+                                 <span th:case="2">EV3-GT</span>
+                                 <span th:case="3">EV4</span>
+                                 <span th:case="4">EV4-GT</span>
+                                 <span th:case="5">EV5</span>
+                                 <span th:case="6">EV5-GT</span>
+                                 <span th:case="7">EV6</span>
+                                 <span th:case="8">EV6-GT</span>
+                                 <span th:case="9">EV9</span>
+                                 <span th:case="10">EV9-GT</span>
+                                 <span th:case="11">RAY EV</span>
+                                 <span th:case="*">알 수 없음</span>
+                              </span>
+                           </td>
+                           <td th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd') : '-'}">2026-02-01</td>
+                           <td>
+                              <!-- 딜러/관리자만 상태 변경 가능 -->
+                              <th:block th:if="${session.loginUser != null and (session.loginUser.memberStatus == 'ADMIN'
+                                                        or session.loginUser.memberStatus == 'DEALER'
+                                                        or session.loginUser.memberStatus == '관리자'
+                                                        or session.loginUser.memberStatus == '딜러')}">
+                                 <form th:action="@{/consult/updateStatus}" method="post" class="status-form">
+                                    <input type="hidden" name="consultNo" th:value="${consult.consultNo}">
+                                    <select name="consultStatus" class="status-select">
+                                       <option value="대기" th:selected="${consult.consultStatus == '대기'}">대기</option>
+                                       <option value="진행중" th:selected="${consult.consultStatus == '진행중'}">진행중</option>
+                                       <option value="완료" th:selected="${consult.consultStatus == '완료'}">완료</option>
+                                    </select>
+                                    <button type="submit" class="status-save-btn">변경</button>
+                                 </form>
+                              </th:block>
+
+                              <!-- 일반 회원은 상태만 조회 -->
+                              <th:block th:if="${session.loginUser == null or !(session.loginUser.memberStatus == 'ADMIN'
+                                                        or session.loginUser.memberStatus == 'DEALER'
+                                                        or session.loginUser.memberStatus == '관리자'
+                                                        or session.loginUser.memberStatus == '딜러')}">
+                                 <span th:if="${consult.consultStatus == '대기'}" class="status-badge status-waiting">대기</span>
+                                 <span th:if="${consult.consultStatus == '진행중'}" class="status-badge status-progress">진행중</span>
+                                 <span th:if="${consult.consultStatus == '완료'}" class="status-badge status-done">완료</span>
+                              </th:block>
+                           </td>
+                           <td>
+                              <a th:href="@{/consult/detail(id=${consult.consultNo})}" class="detail-btn">상세 확인</a>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </div>
+
+               <div class="empty-box" th:if="${consultList == null or #lists.isEmpty(consultList)}">
+                  등록된 상담 내역이 없습니다.
+               </div>
+            </div>
+         </div>
+
+      </div>
+   </div>
+
+</body>
+</html>

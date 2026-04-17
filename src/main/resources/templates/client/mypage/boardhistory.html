@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>문의내역 조회</title>
+
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+}
+
+body {
+	background: #f3f3f3;
+	color: #111;
+}
+
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+html {
+	overflow-y: scroll !important;
+}
+
+.mypage-wrap {
+	width: 1200px;
+	margin: 0 auto;
+	padding: 150px 0 100px;
+}
+
+.mypage-container {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+/* 왼쪽 사이드 메뉴 */
+.side-menu {
+	width: 240px;
+	background: #111111;
+	border-radius: 12px;
+	padding: 40px 25px;
+	min-height: 600px;
+	position: relative;
+}
+
+.menu-list {
+	list-style: none;
+	margin-top: 30px;
+}
+
+.menu-list li {
+	margin-bottom: 25px;
+}
+
+.menu-list li a {
+	color: #fff;
+	font-size: 18px;
+	font-weight: 500;
+	display: block;
+}
+
+.menu-list li a:hover {
+	color: #89c541;
+}
+
+.logout-box {
+	position: absolute;
+	left: 25px;
+	right: 25px;
+	bottom: 25px;
+	padding-top: 20px;
+	border-top: 1px solid #333;
+	text-align: right;
+}
+
+.logout-box a {
+	color: #999;
+	font-size: 16px;
+}
+
+/* 오른쪽 본문 */
+.wrap {
+	flex: 1;
+	background: #fff;
+	border-radius: 22px;
+	padding: 45px;
+	min-height: 600px;
+	box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+	border: 1px solid #e7e7e7;
+}
+
+h1 {
+	text-align: center;
+	color: #05141f;
+	font-size: 24px;
+	font-weight: 700;
+	margin-bottom: 35px;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background: #fff;
+}
+
+th, td {
+	border: 1px solid #e2e6ea;
+	padding: 16px;
+	text-align: center;
+}
+
+th {
+	background: #05141f;
+	color: #fff;
+}
+
+.badge {
+	display: inline-block;
+	min-width: 90px;
+	padding: 8px 14px;
+	border-radius: 10px;
+	color: white;
+	font-weight: 700;
+	font-size: 14px;
+}
+
+.wait {
+	background: #9aa4af;
+}
+
+.done {
+	background: #89c541;
+}
+
+.empty-message {
+	padding: 50px 16px;
+	color: #666;
+	font-size: 16px;
+	text-align: center;
+}
+
+/* 추가: 상세확인 버튼 */
+.detail-btn {
+	display: inline-block;
+	padding: 8px 14px;
+	background: #05141f;
+	color: #fff !important;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+.detail-btn:hover {
+	background: #89c541;
+	color: #fff !important;
+}
+</style>
+</head>
+<body>
+
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<div class="mypage-wrap">
+		<div class="mypage-container">
+
+			<div class="side-menu">
+				<ul class="menu-list">
+					<li><a th:href="@{/mypage/myinfo}">내 정보 확인</a></li>
+					<li><a th:href="@{/mypage/consult}">상담내역 조회</a></li>
+					<li><a th:href="@{/mypage/board}" style="color: #89c541; font-weight: 700;">나의 문의 내역</a></li>
+					<li><a th:href="@{/mypage/wishlist}" class="active">관심 차량 목록</a></li>
+				</ul>
+
+				<div class="logout-box">
+					<a th:href="@{/logout}">로그아웃</a>
+				</div>
+			</div>
+
+			<div class="wrap">
+				<h1>문의내역 조회</h1>
+
+				<table>
+					<thead>
+						<tr>
+							<th>제목</th>
+							<th>등록 일자</th>
+							<th>문의 상태</th>
+							<th>상세</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="board : ${boardList}">
+							<td th:text="${board.boardTitle}"></td>
+							<td th:text="${board.boardDate}"></td>
+							<td>
+								<span th:if="${board.boardStatus == '답변대기'}" class="badge wait" th:text="${board.boardStatus}"></span>
+								<span th:if="${board.boardStatus == '답변완료'}" class="badge done" th:text="${board.boardStatus}"></span>
+								<span th:if="${board.boardStatus == null or board.boardStatus == ''}" class="badge wait">답변대기</span>
+							</td>
+							<td>
+								<a th:href="@{/board/detail(boardNo=${board.boardNo})}" class="detail-btn">상세확인</a>
+							</td>
+						</tr>
+
+						<tr th:if="${boardList == null or #lists.isEmpty(boardList)}">
+							<td colspan="4" class="empty-message">현재 문의 내역이 없습니다.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+	</div>
+
+</body>
+</html>

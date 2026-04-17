@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>KIA EV - 차량조회</title>
+<style>
+/* 기존 스타일 유지 */
+body {
+	margin: 0;
+	padding: 0;
+	font-family: 'Pretendard', sans-serif;
+	background-color: #f8f9fa;
+	color: #111;
+}
+
+.container {
+	width: 1200px;
+	margin: 0 auto;
+	padding: 130px 0 80px;
+	box-sizing: border-box;
+}
+
+.page-title {
+	margin-bottom: 40px;
+}
+
+.page-title h2 {
+	font-size: 32px;
+	color: #05141f;
+	margin: 0;
+	font-weight: 700;
+}
+
+.page-title p {
+	color: #666;
+	margin-top: 10px;
+	font-size: 16px;
+}
+
+/* 검색 및 필터 영역 */
+.search-wrapper {
+	background: #fff;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	display: flex;
+	gap: 15px;
+	margin-bottom: 60px;
+	align-items: center;
+}
+
+.search-input {
+	flex: 2; 
+	padding: 15px 20px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 16px;
+	outline: none;
+}
+
+.filter-select {
+	flex: 0.5;
+	padding: 15px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	font-size: 15px;
+	color: #333;
+	outline: none;
+	cursor: pointer;
+	background-color: #fff;
+}
+
+.btn-search {
+	padding: 15px 40px;
+	background: #05141f;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 16px;
+	transition: 0.2s;
+}
+
+.btn-search:hover {
+	background: #1a2a3a;
+}
+
+/* 그리드 및 카드 스타일 */
+.car-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 30px;
+	align-items: stretch;
+}
+
+.car-card {
+	background: #fff;
+	border-radius: 15px;
+	overflow: hidden;
+	text-decoration: none;
+	color: inherit;
+	display: flex;
+	flex-direction: column;
+	transition: all 0.3s ease;
+	border: 1px solid #eee;
+	height: 100%;
+}
+
+.car-card:hover {
+	transform: translateY(-10px);
+	box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+	border-color: #05141f;
+}
+
+.car-img-area {
+	width: 100%;
+	height: 220px;
+	background: #f4f4f4;
+	overflow: hidden;
+}
+
+.car-img-area img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* [중요] 하트 배치를 위한 영역 설정 */
+.car-content {
+	padding: 25px;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	position: relative; /* 하트 absolute 위치의 기준 */
+}
+
+.status-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: bold;
+	margin-bottom: 15px;
+	width: fit-content;
+}
+
+.status-active {
+	background: #eef9f1;
+	color: #28a745;
+}
+
+/* 모델명 영역 (하트와 겹치지 않게 여백 추가) */
+.car-model-name {
+	font-size: 24px;
+	font-weight: 700;
+	color: #05141f;
+	margin-bottom: 20px;
+	padding-right: 40px; 
+}
+
+/* 하트 버튼 스타일 (모델명 우측 배치) */
+.heart-btn {
+	position: absolute;
+	right: 25px;
+	top: 55px; /* 판매중 배지 아래, 모델명과 같은 라인 */
+	background: none;
+	border: none;
+	font-size: 26px;
+	color: #ddd; /* 비활성: 회색 */
+	cursor: pointer;
+	transition: 0.2s;
+	padding: 0;
+	line-height: 1;
+	z-index: 10;
+}
+
+.heart-btn.active {
+	color: #ff4d4d; /* 활성: 빨간색 */
+}
+
+.heart-btn:hover {
+	transform: scale(1.1);
+}
+
+.spec-summary {
+	display: flex;
+	justify-content: space-between;
+	padding: 15px 0;
+	border-top: 1px solid #f4f4f4;
+	margin-bottom: 15px;
+}
+
+.spec-item {
+	flex: 1;
+	text-align: center;
+}
+
+.spec-item .label {
+	display: block;
+	font-size: 12px;
+	color: #999;
+	margin-bottom: 4px;
+}
+
+.spec-item .val {
+	font-size: 15px;
+	font-weight: 600;
+	color: #333;
+}
+
+.price-area {
+	text-align: right;
+	margin-top: auto;
+}
+
+.price-area small {
+	color: #888;
+	font-size: 13px;
+	margin-right: 5px;
+}
+
+.price-area span {
+	font-size: 19px;
+	font-weight: 700;
+	color: #05141f;
+}
+</style>
+</head>
+<body>
+
+	<th:block th:replace="~{common/header :: header}"></th:block>
+
+	<main class="container">
+		<div class="page-title">
+			<h2>차량조회</h2>
+			<p>기아의 혁신적인 EV 라인업을 만나보세요.</p>
+		</div>
+
+		<form th:action="@{/car/list}" method="get" class="search-wrapper">
+			<input type="text" name="keyword" th:value="${keyword}" class="search-input" placeholder="모델명을 입력하세요">
+			<select name="carType" class="filter-select" onchange="this.form.submit()">
+				<option value="" th:selected="${carType == null || carType == ''}">전체 차종</option>
+				<option value="세단" th:selected="${carType == '세단'}">세단</option>
+				<option value="SUV" th:selected="${carType == 'SUV'}">SUV</option>
+				<option value="경형" th:selected="${carType == '경형'}">경형</option>
+			</select>
+			<select name="sort" class="filter-select" onchange="this.form.submit()">
+				<option value="nameAsc" th:selected="${sort == 'nameAsc' || sort == null || sort == ''}">모델명순</option>
+				<option value="latest" th:selected="${sort == 'latest'}">최신 등록순</option>
+				<option value="priceAsc" th:selected="${sort == 'priceAsc'}">가격 낮은순</option>
+				<option value="priceDesc" th:selected="${sort == 'priceDesc'}">가격 높은순</option>
+				<option value="rangeDesc" th:selected="${sort == 'rangeDesc'}">주행거리순</option>
+			</select>
+			<button type="submit" class="btn-search">검색하기</button>
+		</form>
+
+		<div class="car-grid">
+			<div th:each="car : ${cars}" class="car-card">
+				
+				<a th:href="@{/car/detail/{carNo}(carNo=${car.carNo})}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; height: 100%;">
+					<div class="car-img-area">
+						<img th:src="${car.imagePath}" alt="차량 이미지">
+					</div>
+					
+					<div class="car-content">
+						<span class="status-badge status-active" th:text="${car.saleStatus}">판매중</span>
+						
+						<div class="car-model-name" th:text="${car.modelName}">모델명</div>
+						
+						<button type="button" class="heart-btn" 
+								th:classappend="${#sets.contains(wishCarNos, car.carNo)} ? 'active' : ''"
+								th:onclick="'toggleWish(event, this, ' + ${car.carNo} + ')'">
+							♥
+						</button>
+
+						<div class="spec-summary">
+							<div class="spec-item">
+								<span class="label">주행거리</span> 
+								<span class="val" th:text="${car.drivingRangeKm} + 'km'">-</span>
+							</div>
+							<div class="spec-item" style="border-left: 1px solid #f4f4f4;">
+								<span class="label">배터리</span> 
+								<span class="val" th:text="${car.batteryCapacity}">-</span>
+							</div>
+						</div>
+						
+						<div class="price-area">
+							<small>판매가</small> 
+							<span th:text="${car.price != null} ? ${#numbers.formatInteger(car.price, 3, 'COMMA')} + '원~' : '0원'"></span>
+						</div>
+					</div>
+				</a>
+			</div>
+		</div>
+
+		<div th:if="${#lists.isEmpty(cars)}" style="text-align: center; padding: 100px 0;">
+			<p style="color: #999;">검색 결과에 맞는 차량 정보가 없습니다.</p>
+		</div>
+	</main>
+
+	<th:block th:replace="~{common/footer :: footer}"></th:block>
+
+	<script th:inline="javascript">
+	function toggleWish(event, element, carNo) {
+		// 부모 <a> 태그의 클릭 이벤트(상세페이지 이동) 차단
+		event.preventDefault();
+		event.stopPropagation();
+
+		fetch('/mypage/wishlist/toggle?carNo=' + carNo, {
+			method: 'POST'
+		})
+		.then(response => {
+			if (response.status === 401) {
+				if (confirm("로그인이 필요한 서비스입니다.\n로그인 페이지로 이동하시겠습니까?")) {
+					location.href = "/login";
+				}
+				return;
+			}
+			return response.text();
+		})
+		.then(result => {
+			if (result === "added") {
+				element.classList.add('active');
+			} else if (result === "removed") {
+				element.classList.remove('active');
+			}
+		})
+		.catch(error => {
+			console.error('Error:', error);
+		});
+	}
+	</script>
+</body>
+</html>
