@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChatbotClientRestController {
 
     private final ChatbotClientService chatbotClientService;
+    private final ChatbotAiService chatbotAiService;
 
     @GetMapping("/init")
     public ResponseEntity<ChatbotInitResponse> init(HttpSession session) {
@@ -23,6 +24,18 @@ public class ChatbotClientRestController {
     @PostMapping("/answer")
     public ResponseEntity<ChatbotAnswerResponse> answer(@RequestBody ChatbotAnswerRequest request) {
         return ResponseEntity.ok(chatbotClientService.answer(request));
+    }
+
+    @GetMapping("/ai/init")
+    public ResponseEntity<ChatbotAiInitResponse> initAi(HttpSession session) {
+        Login loginUser = (Login) session.getAttribute("loginUser");
+        return ResponseEntity.ok(chatbotAiService.getInitialData(loginUser));
+    }
+
+    @PostMapping("/ai/message")
+    public ResponseEntity<ChatbotAiResponse> answerAi(@RequestBody ChatbotAiRequest request, HttpSession session) {
+        Login loginUser = (Login) session.getAttribute("loginUser");
+        return ResponseEntity.ok(chatbotAiService.answer(request, loginUser));
     }
 
     @PostMapping("/inquiry")
