@@ -4,17 +4,9 @@
 <meta charset="UTF-8">
 <title>상담 상세 조회</title>
 
-<!-- =====================================================
-     딜러 공통 CSS
-===================================================== -->
 <link rel="stylesheet" th:href="@{/css/dealer-common.css}">
 
 <style>
-/* =========================================================
-   상담 상세 화면 전용 스타일
-========================================================= */
-
-/* 전체 상세 카드 */
 .detail-card {
 	background: #fff;
 	border: 1px solid #e8e8e8;
@@ -24,7 +16,6 @@
 	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-/* 카드 상단 제목 영역 */
 .detail-card-header {
 	display: flex;
 	justify-content: space-between;
@@ -32,12 +23,6 @@
 	gap: 12px;
 	flex-wrap: wrap;
 	margin-bottom: 20px;
-}
-
-.detail-title-wrap {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
 }
 
 .detail-title {
@@ -49,7 +34,44 @@
 	letter-spacing: -0.3px;
 }
 
-/* 상세 테이블 */
+.detail-desc {
+	margin: 8px 0 0 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: #666;
+}
+
+.summary-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 14px;
+	margin-bottom: 22px;
+}
+
+.summary-card {
+	padding: 18px 16px;
+	border-radius: 16px;
+	border: 1px solid #ececec;
+	background: #fafafa;
+}
+
+.summary-label {
+	margin-bottom: 8px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.8px;
+	text-transform: uppercase;
+	color: #777;
+}
+
+.summary-value {
+	font-size: 22px;
+	font-weight: 800;
+	line-height: 1.35;
+	color: #111;
+	word-break: keep-all;
+}
+
 .detail-table-wrap {
 	width: 100%;
 	overflow-x: auto;
@@ -62,7 +84,8 @@
 	background: #fff;
 }
 
-.detail-table th, .detail-table td {
+.detail-table th,
+.detail-table td {
 	border-bottom: 1px solid #ececec;
 	padding: 15px 16px;
 	text-align: left;
@@ -85,122 +108,27 @@
 	word-break: break-word;
 }
 
-/* 가독성 */
-.value-strong {
-	font-weight: 700;
-	color: #111;
-}
-
-.value-amount {
-	font-weight: 800;
-	white-space: nowrap;
-}
-
-.value-date {
-	white-space: nowrap;
-	color: #333;
-}
-
-/* 여러 줄 표시 */
-.multiline-value {
-	white-space: pre-wrap;
-	word-break: break-word;
-	line-height: 1.7;
-	vertical-align: top;
-}
-
-.memo-row th, .memo-row td {
-	vertical-align: top;
-}
-
-/* 상담내용 박스 */
-.content-box {
+.content-box,
+.memo-box {
 	background: #ffffff;
 	border: 1px solid #e6e6e6;
 	border-radius: 12px;
 	padding: 14px 16px;
 	min-height: 84px;
 	line-height: 1.8;
-}
-
-/* 메모 박스 */
-.memo-box {
-	background: linear-gradient(180deg, #fcfcfc 0%, #f8f8f8 100%);
-	border: 1px solid #e2e2e2;
-	border-radius: 14px;
-	padding: 16px 18px;
-	min-height: 110px;
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-}
-
-.memo-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 10px;
-	padding-bottom: 10px;
-	border-bottom: 1px solid #e9e9e9;
-}
-
-.memo-title {
-	font-size: 14px;
-	font-weight: 800;
-	color: #111;
-	margin: 0;
-}
-
-.memo-body {
-	font-size: 14px;
-	color: #222;
-	line-height: 1.8;
 	white-space: pre-wrap;
 	word-break: break-word;
-	min-height: 56px;
+}
+
+.memo-box {
+	background: linear-gradient(180deg, #fcfcfc 0%, #f8f8f8 100%);
+	min-height: 96px;
 }
 
 .memo-empty {
 	color: #888;
 }
 
-/* 상태 배지 */
-.status-badge {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 7px 14px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: 800;
-	text-align: center;
-	min-width: 78px;
-	white-space: nowrap;
-}
-
-.status-waiting {
-	background: #f3f3f3;
-	color: #111;
-	border: 1px solid #d8d8d8;
-}
-
-.status-progress {
-	background: #111;
-	color: #fff;
-	border: 1px solid #111;
-}
-
-.status-completed {
-	background: #e9e9e9;
-	color: #111;
-	border: 1px solid #bdbdbd;
-}
-
-.status-unknown {
-	background: #f8f8f8;
-	color: #555;
-	border: 1px solid #d9d9d9;
-}
-
-/* 상태 변경 박스 */
 .status-change-box {
 	margin-top: 24px;
 	padding: 20px;
@@ -216,6 +144,13 @@
 	color: #111;
 }
 
+.status-change-desc {
+	margin: 0 0 14px 0;
+	font-size: 14px;
+	line-height: 1.6;
+	color: #666;
+}
+
 .status-form {
 	display: flex;
 	gap: 10px;
@@ -224,7 +159,7 @@
 }
 
 .status-form select {
-	width: 220px;
+	width: 240px;
 	max-width: 100%;
 	padding: 11px 12px;
 	border: 1px solid #d8d8d8;
@@ -239,7 +174,6 @@
 	border-color: #111;
 }
 
-/* 버튼 영역 */
 .btn-area {
 	display: flex;
 	gap: 10px;
@@ -247,20 +181,24 @@
 	margin-top: 22px;
 }
 
-.gray-btn {
+.gray-btn,
+.dark-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: #f5f5f5;
-	color: #111;
-	border: 1px solid #d4d4d4;
 	padding: 11px 18px;
 	border-radius: 10px;
 	font-weight: 700;
 	text-decoration: none;
-	cursor: pointer;
-	transition: background-color 0.2s ease, transform 0.2s ease;
 	min-height: 42px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gray-btn {
+	background: #f5f5f5;
+	color: #111;
+	border: 1px solid #d4d4d4;
 }
 
 .gray-btn:hover {
@@ -269,19 +207,9 @@
 }
 
 .dark-btn {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
 	background: #111;
 	color: #fff;
 	border: 1px solid #111;
-	padding: 11px 18px;
-	border-radius: 10px;
-	font-weight: 700;
-	cursor: pointer;
-	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow
-		0.2s ease;
-	min-height: 42px;
 }
 
 .dark-btn:hover {
@@ -290,7 +218,6 @@
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
-/* 상담 없음 */
 .empty-detail-box {
 	text-align: center;
 	padding: 28px 16px 12px 16px;
@@ -310,34 +237,43 @@
 	margin: 0;
 }
 
-/* 반응형 */
+@media ( max-width : 1024px) {
+	.summary-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
 @media ( max-width : 768px) {
 	.detail-card {
 		padding: 18px;
 	}
+
 	.detail-title {
 		font-size: 22px;
 	}
+
 	.detail-table th {
 		width: 140px;
 		font-size: 14px;
 	}
+
 	.detail-table td {
 		font-size: 14px;
 	}
+
 	.status-form {
 		flex-direction: column;
 		align-items: stretch;
 	}
-	.status-form select, .dark-btn, .gray-btn {
+
+	.status-form select,
+	.dark-btn,
+	.gray-btn {
 		width: 100%;
 	}
+
 	.btn-area {
 		flex-direction: column;
-	}
-	.memo-box {
-		padding: 14px 14px;
-		min-height: 96px;
 	}
 }
 </style>
@@ -346,30 +282,25 @@
 
 	<div class="dealer-layout">
 
-		<!-- =====================================================
-		     상단 고정 헤더
-		     - 현재 페이지: 상담 관리 active
-		===================================================== -->
 		<header class="top-fixed-header">
 			<div class="top-header-left">
 				<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
 
 				<nav class="top-nav">
-					<a th:href="@{/dealer/main}">대시보드</a> <a
-						th:href="@{/dealer/consult/list}" class="active">상담관리</a> <a
-						th:href="@{/dealer/sales/list}">판매관리</a> <a
-						th:href="@{/dealer/sales/register}">판매등록</a> <a
-						th:href="@{/dealer/statistics}">통계</a> <a
-						th:href="@{/dealer/logout}">로그아웃</a>
+					<a th:href="@{/dealer/main}">대시보드</a>
+					<a th:href="@{/dealer/consult/list}" class="active">상담관리</a>
+					<a th:href="@{/dealer/sales/list}">판매관리</a>
+					<a th:href="@{/dealer/sales/register}">판매등록</a>
+					<a th:href="@{/dealer/statistics}">통계</a>
+					<a th:href="@{/dealer/logout}">로그아웃</a>
 				</nav>
 			</div>
 
 			<div class="top-header-right">
 				<div class="top-user-box">
-					<span class="top-user-label">접속 사용자</span> <strong
-						class="top-user-name"
-						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">홍길동
-						딜러</strong>
+					<span class="top-user-label">접속 사용자</span>
+					<strong class="top-user-name"
+						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">딜러</strong>
 				</div>
 			</div>
 		</header>
@@ -381,10 +312,18 @@
 					<h1>상담 상세 조회</h1>
 				</header>
 
+				<div th:if="${successMessage != null}" class="message-box message-success">
+					<p th:text="${successMessage}">상담 상태가 변경되었습니다.</p>
+				</div>
+
+				<div th:if="${errorMessage != null}" class="message-box message-error">
+					<p th:text="${errorMessage}">상담 상태 변경에 실패했습니다.</p>
+				</div>
+
 				<section class="detail-card" th:if="${consult == null}">
 					<div class="empty-detail-box">
 						<h2 class="empty-detail-title">상담 정보를 찾을 수 없습니다.</h2>
-						<p class="empty-detail-desc">선택한 상담 데이터가 없거나 접근 가능한 상담이 아닙니다.</p>
+						<p class="empty-detail-desc">선택한 상담이 없거나 현재 딜러가 조회할 수 없는 상담입니다.</p>
 					</div>
 
 					<div class="btn-area">
@@ -393,10 +332,29 @@
 				</section>
 
 				<section class="detail-card" th:if="${consult != null}">
-
 					<div class="detail-card-header">
-						<div class="detail-title-wrap">
-							<h2 class="detail-title">상담 상세 정보</h2>
+						<div>
+							<h2 class="detail-title">고객 상담 상세 정보</h2>
+							<p class="detail-desc">
+								요구사항 기준으로 고객 정보, 상담 차량, 상담 내용, 상태 변경 기능을 한 화면에서 확인할 수 있도록 구성했습니다.
+							</p>
+						</div>
+					</div>
+
+					<div class="summary-grid">
+						<div class="summary-card">
+							<div class="summary-label">Customer</div>
+							<div class="summary-value" th:text="${consult.customerNameDisplay}">홍길동</div>
+						</div>
+
+						<div class="summary-card">
+							<div class="summary-label">Car</div>
+							<div class="summary-value" th:text="${consult.carModelNameDisplay}">EV6</div>
+						</div>
+
+						<div class="summary-card">
+							<div class="summary-label">Status</div>
+							<div class="summary-value" th:text="${consult.consultStatusLabel}">신규 상담신청</div>
 						</div>
 					</div>
 
@@ -404,115 +362,96 @@
 						<table class="detail-table">
 							<tr>
 								<th>상담번호</th>
-								<td class="value-strong" th:text="${consult.consultNo}">1</td>
+								<td th:text="${consult.consultNo}">1</td>
 							</tr>
 							<tr>
-								<th>회원번호</th>
-								<td class="value-strong" th:text="${consult.memberNo}">20260401</td>
+								<th>고객이름</th>
+								<td th:text="${consult.customerNameDisplay}">홍길동</td>
 							</tr>
 							<tr>
-								<th>차량번호</th>
-								<td class="value-strong" th:text="${consult.carNo}">123가1111</td>
+								<th>연락처</th>
+								<td th:text="${consult.customerPhoneDisplay}">010-1234-5678</td>
 							</tr>
 							<tr>
-								<th>딜러번호</th>
-								<td class="value-strong" th:text="${consult.dealerNo}">1</td>
+								<th>이메일</th>
+								<td th:text="${consult.customerEmailDisplay}">test@example.com</td>
 							</tr>
 							<tr>
-								<th>예산금액</th>
-								<td class="value-amount"
-									th:text="${consult.budgetAmount != null ? #numbers.formatInteger(consult.budgetAmount, 3, 'COMMA') + '원' : '-'}">45,000,000원</td>
+								<th>상담차량</th>
+								<td th:text="${consult.carModelNameDisplay}">EV6</td>
 							</tr>
-							<tr>
-								<th>사용목적</th>
-								<td
-									th:text="${consult.usePurpose != null ? consult.usePurpose : '-'}">출퇴근</td>
-							</tr>
-							<tr>
-								<th>주행거리 정보</th>
-								<td
-									th:text="${consult.mainRangeKm != null ? consult.mainRangeKm : '-'}">장거리</td>
-							</tr>
-							<tr>
-								<th>동승자/가족 정보</th>
-								<td
-									th:text="${consult.fellowData != null ? consult.fellowData : '-'}">4인가족</td>
-							</tr>
-
-							<tr class="memo-row">
-								<th>상담내용</th>
-								<td>
-									<div class="content-box multiline-value"
-										th:text="${consult.consultContent != null and !#strings.isEmpty(consult.consultContent) ? consult.consultContent : '-'}">상담
-										내용</div>
-								</td>
-							</tr>
-
-							<tr class="memo-row">
-								<th>고객 상담일지</th>
-								<td>
-									<div class="memo-box">
-										<div class="memo-header">
-											<h4 class="memo-title">메모</h4>
-										</div>
-
-										<div class="memo-body"
-											th:classappend="${consult.consultMemoDisplay == null or #strings.isEmpty(consult.consultMemoDisplay) or consult.consultMemoDisplay == '-'} ? ' memo-empty' : ''"
-											th:text="${consult.consultMemoDisplay != null and !#strings.isEmpty(consult.consultMemoDisplay) ? consult.consultMemoDisplay : '-'}">-</div>
-									</div>
-								</td>
-							</tr>
-
 							<tr>
 								<th>상담상태</th>
-								<td><span th:if="${consult.consultStatusKor == '대기'}"
-									class="status-badge status-waiting"
-									th:text="${consult.consultStatusKor}">대기</span> <span
-									th:if="${consult.consultStatusKor == '진행중'}"
-									class="status-badge status-progress"
-									th:text="${consult.consultStatusKor}">진행중</span> <span
-									th:if="${consult.consultStatusKor == '완료'}"
-									class="status-badge status-completed"
-									th:text="${consult.consultStatusKor}">완료</span> <span
-									th:if="${consult.consultStatusKor != '대기' and consult.consultStatusKor != '진행중' and consult.consultStatusKor != '완료'}"
-									class="status-badge status-unknown"
-									th:text="${consult.consultStatusKor}">기타</span></td>
+								<td>
+									<span th:if="${consult.waitingStatus}" class="status-badge status-waiting"
+										th:text="${consult.consultStatusLabel}">신규 상담신청</span>
+									<span th:if="${consult.inProgressStatus}" class="status-badge status-progress"
+										th:text="${consult.consultStatusLabel}">진행중</span>
+									<span th:if="${consult.completedStatus}" class="status-badge status-completed"
+										th:text="${consult.consultStatusLabel}">완료</span>
+									<span th:if="${!consult.waitingStatus and !consult.inProgressStatus and !consult.completedStatus}"
+										class="status-badge status-waiting" th:text="${consult.consultStatusLabel}">상태</span>
+								</td>
 							</tr>
 							<tr>
-								<th>상담신청일시</th>
-								<td class="value-date"
-									th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-02
-									15:10:30</td>
+								<th>상담신청일</th>
+								<td th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-20 09:30:00</td>
 							</tr>
 							<tr>
 								<th>배정일시</th>
-								<td class="value-date"
-									th:text="${consult.assignedDate != null ? #temporals.format(consult.assignedDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-02
-									16:00:00</td>
+								<td th:text="${consult.assignedDate != null ? #temporals.format(consult.assignedDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-20 10:00:00</td>
 							</tr>
 							<tr>
 								<th>완료일시</th>
-								<td class="value-date"
-									th:text="${consult.completedDate != null ? #temporals.format(consult.completedDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-02
-									18:00:00</td>
+								<td th:text="${consult.completedDate != null ? #temporals.format(consult.completedDate, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-04-20 11:00:00</td>
+							</tr>
+							<tr>
+								<th>예산금액</th>
+								<td th:text="${consult.budgetAmount != null ? #numbers.formatInteger(consult.budgetAmount, 3, 'COMMA') + '원' : '-'}">45,000,000원</td>
+							</tr>
+							<tr>
+								<th>사용목적</th>
+								<td th:text="${consult.usePurpose != null ? consult.usePurpose : '-'}">출퇴근용</td>
+							</tr>
+							<tr>
+								<th>주행거리 정보</th>
+								<td th:text="${consult.mainRangeKm != null ? consult.mainRangeKm : '-'}">장거리</td>
+							</tr>
+							<tr>
+								<th>동승자/가족 정보</th>
+								<td th:text="${consult.fellowData != null ? consult.fellowData : '-'}">4인 가족</td>
+							</tr>
+							<tr>
+								<th>상담내용</th>
+								<td>
+									<div class="content-box" th:text="${consult.consultContentDisplay}">상담 내용</div>
+								</td>
+							</tr>
+							<tr>
+								<th>상담메모</th>
+								<td>
+									<div class="memo-box"
+										th:classappend="${consult.consultMemoDisplay == '-'} ? ' memo-empty' : ''"
+										th:text="${consult.consultMemoDisplay}">-</div>
+								</td>
 							</tr>
 						</table>
 					</div>
 
 					<div class="status-change-box">
 						<h3 class="status-change-title">상담 상태 변경</h3>
+						<p class="status-change-desc">
+							상태 코드는 `WAITING`, `IN_PROGRESS`, `COMPLETED`로 관리하고,
+							화면에서는 `신규 상담신청`, `진행중`, `완료`로 보여주도록 맞췄습니다.
+						</p>
 
-						<form th:action="@{/dealer/consult/status}" method="post"
-							class="status-form">
-							<input type="hidden" name="consultNo"
-								th:value="${consult.consultNo}"> <select
-								name="consultStatus">
-								<option value="대기"
-									th:selected="${consult.consultStatusKor == '대기'}">대기</option>
-								<option value="진행중"
-									th:selected="${consult.consultStatusKor == '진행중'}">진행중</option>
-								<option value="완료"
-									th:selected="${consult.consultStatusKor == '완료'}">완료</option>
+						<form th:action="@{/dealer/consult/status}" method="post" class="status-form">
+							<input type="hidden" name="consultNo" th:value="${consult.consultNo}">
+
+							<select name="consultStatus">
+								<option value="WAITING" th:selected="${consult.consultStatusCode == 'WAITING'}">신규 상담신청</option>
+								<option value="IN_PROGRESS" th:selected="${consult.consultStatusCode == 'IN_PROGRESS'}">진행중</option>
+								<option value="COMPLETED" th:selected="${consult.consultStatusCode == 'COMPLETED'}">완료</option>
 							</select>
 
 							<button type="submit" class="dark-btn">상태 변경</button>
@@ -521,8 +460,10 @@
 
 					<div class="btn-area">
 						<a th:href="@{/dealer/consult/list}" class="gray-btn">목록으로</a>
+						<a th:if="${consult.completedStatus}"
+							th:href="@{/dealer/sales/register/select(consultNo=${consult.consultNo})}"
+							class="dark-btn">판매 등록으로 이동</a>
 					</div>
-
 				</section>
 
 			</div>
