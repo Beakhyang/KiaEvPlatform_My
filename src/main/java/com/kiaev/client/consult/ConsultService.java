@@ -37,7 +37,7 @@ public class ConsultService {
     }
 
     // 상담 상태 변경
-    public void updateConsultStatus(Long consultNo, String consultStatus, Long dealerNo) {
+    public void updateConsultStatus(Long consultNo, String consultStatus, Integer dealerNo) {
         Consult consult = consultationRepository.findById(consultNo).orElse(null);
 
         if (consult == null) {
