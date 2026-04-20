@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 상세</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('member')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>회원 상세 정보</h1>
+                <p>회원 기본 정보와 연락처, 주소 정보를 확인합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/member/list}" class="btn btn-secondary">목록</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <div class="detail-grid">
+                <div class="label">회원번호</div><div th:text="${member.memberNo}">1</div>
+                <div class="label">아이디</div><div th:text="${member.loginId}">user01</div>
+                <div class="label">이름</div><div th:text="${member.memberName}">홍길동</div>
+                <div class="label">이메일</div><div th:text="${member.email}">user@example.com</div>
+                <div class="label">전화번호</div><div th:text="${member.phone}">010-0000-0000</div>
+                <div class="label">생년월일</div><div th:text="${member.birthDate != null ? member.birthDate : '-'}">1990-01-01</div>
+                <div class="label">우편번호</div><div th:text="${member.zipcode}">12345</div>
+                <div class="label">주소</div><div th:text="${member.address}">서울특별시</div>
+                <div class="label">상세주소</div><div th:text="${member.detailAddress}">101동 1001호</div>
+                <div class="label">가입일</div><div th:text="${member.joinDate != null ? member.joinDate : '-'}">2026-04-20</div>
+                <div class="label">회원상태</div><div th:text="${member.memberStatus}">정상회원</div>
+            </div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
