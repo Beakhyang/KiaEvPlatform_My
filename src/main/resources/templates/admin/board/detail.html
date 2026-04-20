@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 상세</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('board')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>게시글 상세</h1>
+                <p th:text="${isNotice} ? '공지사항 내용을 확인하고 수정할 수 있습니다.' : '문의 내용을 확인하고 관리자 답변을 등록할 수 있습니다.'">
+                    게시글 상세 설명
+                </p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/board/list}" class="btn btn-secondary">목록</a>
+                <a th:if="${isNotice}" th:href="@{|/admin/board/edit/${board.boardNo}|}" class="btn btn-primary">공지 수정</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <div class="detail-grid">
+                <div class="label">게시번호</div><div th:text="${board.boardNo}">1</div>
+                <div class="label">유형</div><div th:text="${isNotice ? '공지사항' : board.boardType}">공지사항</div>
+                <div class="label">작성자</div><div th:text="${isNotice ? 'GM' : '회원 #' + board.memberNo}">GM</div>
+                <div class="label">제목</div><div th:text="${board.title}">제목</div>
+                <div class="label">작성일</div><div th:text="${board.createdAt != null ? #temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</div>
+                <div class="label">답변상태</div>
+                <div th:text="${isNotice ? '공지 게시중' : (board.answerContent != null and !board.answerContent.isBlank() ? '답변완료' : '답변대기')}">공지 게시중</div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="page-header" style="margin-bottom: 18px;">
+                <div>
+                    <h1 style="font-size: 24px;">본문</h1>
+                    <p>사용자에게 노출되는 실제 게시글 내용입니다.</p>
+                </div>
+            </div>
+            <div class="text-block" th:text="${board.content}">게시글 내용</div>
+        </section>
+
+        <section class="panel" th:unless="${isNotice}">
+            <div class="page-header" style="margin-bottom: 18px;">
+                <div>
+                    <h1 style="font-size: 24px;">관리자 답변</h1>
+                    <p>답변 작성 시 관리자 작성자로 GM이 연결됩니다.</p>
+                </div>
+            </div>
+
+            <div class="text-block" th:if="${board.answerContent != null and !board.answerContent.isBlank()}" th:text="${board.answerContent}">
+                답변 내용
+            </div>
+            <div class="empty" th:if="${board.answerContent == null or board.answerContent.isBlank()}">아직 등록된 답변이 없습니다.</div>
+
+            <form th:action="@{|/admin/board/answer/${board.boardNo}|}" method="post" class="form-grid" style="margin-top: 18px;">
+                <div class="field full">
+                    <label>답변 내용</label>
+                    <textarea name="answerContent" th:text="${board.answerContent}" required></textarea>
+                </div>
+                <div class="field full form-actions">
+                    <button type="submit" class="btn btn-primary">답변 저장</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

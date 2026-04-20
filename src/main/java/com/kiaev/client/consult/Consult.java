@@ -1,9 +1,20 @@
 package com.kiaev.client.consult;
 
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -24,6 +35,9 @@ public class Consult {
 
     @Column(name = "car_no", nullable = false)
     private Long carNo;
+
+    @Column(name = "car_model_no")
+    private Long carModelNo;
 
     @Column(name = "dealer_no")
     private Integer dealerNo;
@@ -67,6 +81,10 @@ public class Consult {
 
         if (this.requestDate == null) {
             this.requestDate = now;
+        }
+
+        if (this.carModelNo == null) {
+            this.carModelNo = this.carNo;
         }
 
         if (this.consultStatus == null || this.consultStatus.isBlank()) {

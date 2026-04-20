@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `promotion_tbl`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `promotion_tbl` (
   `promotion_id` bigint NOT NULL AUTO_INCREMENT,
-  `type` varchar(20) NOT NULL COMMENT '프로모션 유형(DISCOUNT, GIFT, EVENT)',
+  `type` varchar(20) NOT NULL COMMENT '프로모션 유형(DISCOUNT, GIFT, EVENT, POPUP)',
   `title` varchar(200) NOT NULL COMMENT '프로모션 제목',
   `sub_title` varchar(255) DEFAULT NULL COMMENT '소제목 (짧은 설명)',
   `content` text COMMENT '상세 내용',

@@ -51,9 +51,15 @@ public class MainController {
         model.addAttribute("carLineup", bestLineup);
 
         // 3. 메인용 프로모션: 최신순으로 가져와서 활성화 상태인 것 3개만 추출
+        LocalDateTime now = LocalDateTime.now();
+
         List<Promotion> promoList = promotionRepository.findAllByOrderByIdDesc().stream()
-                .filter(p -> p.isActive() && 
-                             (p.getEndDate().isAfter(LocalDateTime.now()) || p.getEndDate().isEqual(LocalDateTime.now())))
+                .filter(p -> !"POPUP".equalsIgnoreCase(p.getType()))
+                .filter(p -> p.isActive()
+                        && p.getStartDate() != null
+                        && p.getEndDate() != null
+                        && (p.getStartDate().isBefore(now) || p.getStartDate().isEqual(now))
+                        && (p.getEndDate().isAfter(now) || p.getEndDate().isEqual(now)))
                 .limit(3)
                 .collect(Collectors.toList());
         model.addAttribute("promoList", promoList);
@@ -93,6 +99,7 @@ public class MainController {
             List<Promotion> popupPromos = promotionRepository
                     .findByIsActiveTrueAndStartDateBeforeAndEndDateAfterOrderByBannerOrderAsc(now, now)
                     .stream()
+                    .filter(promo -> "POPUP".equalsIgnoreCase(promo.getType()))
                     .sorted(Comparator.comparing(Promotion::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
                     .limit(1)
                     .collect(Collectors.toList());
