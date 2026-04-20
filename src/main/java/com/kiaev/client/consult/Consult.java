@@ -26,7 +26,7 @@ public class Consult {
     private Long carNo;
 
     @Column(name = "dealer_no")
-    private Long dealerNo;
+    private Integer dealerNo;
 
     @Column(name = "budget_amount")
     private Integer budgetAmount;

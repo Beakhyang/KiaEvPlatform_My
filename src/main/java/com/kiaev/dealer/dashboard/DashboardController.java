@@ -1,5 +1,6 @@
 package com.kiaev.dealer.dashboard;
 
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,32 +13,16 @@ import com.kiaev.dealer.login.DealerLogin;
 
 import jakarta.servlet.http.HttpSession;
 
-/**
- * 딜러 대시보드 Controller
- *
- * 기능
- * - 로그인한 딜러만 접근 가능
- * - 메인 대시보드 화면 제공
- * - 통계 화면 제공
- * - 메인/통계 화면에서 공통으로 사용하는 상담/판매 통계 데이터 구성
- */
 @Controller
 public class DashboardController {
 
 	@Autowired
 	private DashboardService dashboardService;
 
-	/**
-	 * 딜러 메인 페이지
-	 *
-	 * 요구사항에 맞춰 메인 대시보드에서도 상담현황과 판매현황을 함께 확인할 수 있도록
-	 * 요약 통계와 차트용 데이터를 같이 내려준다.
-	 */
 	@GetMapping("/dealer/main")
 	public String dealerMain(HttpSession session, Model model) {
 
 		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-
 		if (loginDealer == null) {
 			return "redirect:/dealer/login";
 		}
@@ -53,14 +38,10 @@ public class DashboardController {
 		return "dealer/dashboard/dashboardMain";
 	}
 
-	/**
-	 * 기존 /dealer/dashboard URL은 메인 대시보드로 유지한다.
-	 */
 	@GetMapping("/dealer/dashboard")
 	public String dashboardRedirect(HttpSession session) {
 
 		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-
 		if (loginDealer == null) {
 			return "redirect:/dealer/login";
 		}
@@ -68,14 +49,10 @@ public class DashboardController {
 		return "redirect:/dealer/main";
 	}
 
-	/**
-	 * 딜러 통계 페이지
-	 */
 	@GetMapping("/dealer/statistics")
 	public String statisticsMain(HttpSession session, Model model) {
 
 		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-
 		if (loginDealer == null) {
 			return "redirect:/dealer/login";
 		}
@@ -91,9 +68,6 @@ public class DashboardController {
 		return "dealer/dashboard/statisticsMain";
 	}
 
-	/**
-	 * 메인 대시보드와 통계 페이지가 함께 사용하는 공통 통계/차트 데이터 세팅
-	 */
 	private void addDashboardStatisticsAttributes(Model model, Integer dealerNo, Dashboard dashboard) {
 
 		List<MonthlySalesStat> monthlySalesStats = dashboardService.getMonthlySalesStats(dealerNo);
@@ -110,24 +84,9 @@ public class DashboardController {
 				continue;
 			}
 
-			String salesMonth = stat.getSalesMonth();
-			if (salesMonth == null || salesMonth.trim().isEmpty()) {
-				salesMonth = "";
-			}
-
-			Integer salesCount = stat.getSalesCount();
-			if (salesCount == null) {
-				salesCount = 0;
-			}
-
-			Integer salesAmount = stat.getSalesAmount();
-			if (salesAmount == null) {
-				salesAmount = 0;
-			}
-
-			monthlyLabels.add(salesMonth);
-			monthlyCounts.add(salesCount);
-			monthlyAmounts.add(salesAmount);
+			monthlyLabels.add(stat.getSalesMonth() != null ? stat.getSalesMonth() : "");
+			monthlyCounts.add(stat.getSalesCount() != null ? stat.getSalesCount() : 0);
+			monthlyAmounts.add(stat.getSalesAmount() != null ? stat.getSalesAmount() : 0);
 		}
 
 		List<CarModelSalesStat> carModelSalesStats = dashboardService.getCarModelSalesStats(dealerNo);
@@ -149,20 +108,32 @@ public class DashboardController {
 				modelName = "미분류 차량";
 			}
 
-			Integer salesCount = stat.getSalesCount();
-			if (salesCount == null) {
-				salesCount = 0;
-			}
-
-			Integer salesAmount = stat.getSalesAmount();
-			if (salesAmount == null) {
-				salesAmount = 0;
-			}
-
 			carModelLabels.add(modelName);
-			carModelCounts.add(salesCount);
-			carModelAmounts.add(salesAmount);
+			carModelCounts.add(stat.getSalesCount() != null ? stat.getSalesCount() : 0);
+			carModelAmounts.add(stat.getSalesAmount() != null ? stat.getSalesAmount() : 0);
 		}
+
+		int totalSalesCount = dashboard != null && dashboard.getTotalSalesCount() != null ? dashboard.getTotalSalesCount() : 0;
+		int totalSalesAmount = dashboard != null && dashboard.getTotalSalesAmount() != null ? dashboard.getTotalSalesAmount() : 0;
+		long averageSalesAmount = totalSalesCount > 0 ? Math.round((double) totalSalesAmount / totalSalesCount) : 0L;
+
+		MonthlySalesStat currentMonthStat = findCurrentMonthStat(monthlySalesStats);
+		int currentMonthSalesCount = currentMonthStat != null && currentMonthStat.getSalesCount() != null
+				? currentMonthStat.getSalesCount()
+				: 0;
+		int currentMonthSalesAmount = currentMonthStat != null && currentMonthStat.getSalesAmount() != null
+				? currentMonthStat.getSalesAmount()
+				: 0;
+
+		CarModelSalesStat topSellingModelStat = findTopSellingModelStat(carModelSalesStats);
+		String topSellingModelName = topSellingModelStat != null && topSellingModelStat.getModelName() != null
+				&& !topSellingModelStat.getModelName().trim().isEmpty() ? topSellingModelStat.getModelName() : "집계된 차량 없음";
+		int topSellingModelCount = topSellingModelStat != null && topSellingModelStat.getSalesCount() != null
+				? topSellingModelStat.getSalesCount()
+				: 0;
+		int topSellingModelAmount = topSellingModelStat != null && topSellingModelStat.getSalesAmount() != null
+				? topSellingModelStat.getSalesAmount()
+				: 0;
 
 		model.addAttribute("dashboard", dashboard);
 		model.addAttribute("monthlySalesStats", monthlySalesStats);
@@ -173,5 +144,42 @@ public class DashboardController {
 		model.addAttribute("carModelLabels", carModelLabels);
 		model.addAttribute("carModelCounts", carModelCounts);
 		model.addAttribute("carModelAmounts", carModelAmounts);
+		model.addAttribute("averageSalesAmount", averageSalesAmount);
+		model.addAttribute("currentMonthLabel", YearMonth.now().toString());
+		model.addAttribute("currentMonthSalesCount", currentMonthSalesCount);
+		model.addAttribute("currentMonthSalesAmount", currentMonthSalesAmount);
+		model.addAttribute("topSellingModelName", topSellingModelName);
+		model.addAttribute("topSellingModelCount", topSellingModelCount);
+		model.addAttribute("topSellingModelAmount", topSellingModelAmount);
+	}
+
+	private MonthlySalesStat findCurrentMonthStat(List<MonthlySalesStat> monthlySalesStats) {
+
+		if (monthlySalesStats == null || monthlySalesStats.isEmpty()) {
+			return null;
+		}
+
+		String currentMonth = YearMonth.now().toString();
+
+		for (MonthlySalesStat stat : monthlySalesStats) {
+			if (stat == null || stat.getSalesMonth() == null) {
+				continue;
+			}
+
+			if (currentMonth.equals(stat.getSalesMonth().trim())) {
+				return stat;
+			}
+		}
+
+		return null;
+	}
+
+	private CarModelSalesStat findTopSellingModelStat(List<CarModelSalesStat> carModelSalesStats) {
+
+		if (carModelSalesStats == null || carModelSalesStats.isEmpty()) {
+			return null;
+		}
+
+		return carModelSalesStats.get(0);
 	}
 }

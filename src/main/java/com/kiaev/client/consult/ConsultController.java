@@ -206,7 +206,7 @@ public class ConsultController {
             return "redirect:/mypage/consult";
         }
 
-        consultationService.updateConsultStatus(consultNo, consultStatus, loginUser.getMemberNo());
+        consultationService.updateConsultStatus(consultNo, consultStatus, toInteger(loginUser.getMemberNo()));
 
         return "redirect:/mypage/consult";
     }
@@ -220,5 +220,12 @@ public class ConsultController {
                 || memberStatus.equalsIgnoreCase("DEALER")
                 || memberStatus.equals("관리자")
                 || memberStatus.equals("딜러");
+    }
+    private Integer toInteger(Long value) {
+        if (value == null) {
+            return null;
+        }
+
+        return value.intValue();
     }
 }
