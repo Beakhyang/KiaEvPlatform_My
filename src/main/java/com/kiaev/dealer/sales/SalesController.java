@@ -43,8 +43,12 @@ public class SalesController {
 
 		Integer dealerNo = loginDealer.getDealerNo();
 		List<Sales> salesList = salesService.getSalesListByDealerNo(dealerNo);
+		long salesCount = salesService.getSalesCountByDealerNo(dealerNo);
+		Long totalSalesAmount = salesService.getSalesAmountSumByDealerNo(dealerNo);
 
 		model.addAttribute("salesList", salesList);
+		model.addAttribute("salesCount", salesCount);
+		model.addAttribute("totalSalesAmount", totalSalesAmount);
 		model.addAttribute("loginDealer", loginDealer);
 
 		return "dealer/sales/salesList";
