@@ -14,7 +14,7 @@
         <div class="page-header">
             <div>
                 <h1>프로모션 / 팝업 관리</h1>
-                <p>이벤트 혜택과 메인페이지 팝업 공지를 같은 테이블에서 유형별로 관리합니다.</p>
+                <p>이벤트 배너와 메인 팝업을 한 화면에서 조회하고 관리합니다.</p>
             </div>
             <div class="page-actions">
                 <a th:href="@{/admin/promotion/new}" class="btn btn-primary">신규 등록</a>
@@ -29,9 +29,9 @@
                     <th>유형</th>
                     <th>제목</th>
                     <th>대상 모델</th>
-                    <th>할인금액</th>
-                    <th>노출기간</th>
-                    <th>활성상태</th>
+                    <th>할인 금액</th>
+                    <th>노출 기간</th>
+                    <th>활성 상태</th>
                     <th>관리</th>
                 </tr>
                 </thead>
@@ -39,31 +39,31 @@
                 <tr th:each="promotion : ${promotionList}">
                     <td th:text="${promotion.id}">1</td>
                     <td>
-                        <span class="badge"
-                              th:classappend="${promotion.type == 'POPUP'} ? ' badge-popup' : ' badge-event'"
-                              th:text="${promotion.type == 'POPUP' ? '팝업' : '이벤트'}">이벤트</span>
+                        <span class="badge badge-popup" th:if="${promotion.type == 'POPUP'}">팝업</span>
+                        <span class="badge badge-event" th:unless="${promotion.type == 'POPUP'}">이벤트</span>
                     </td>
                     <td>
                         <div class="stack">
                             <strong th:text="${promotion.title}">프로모션 제목</strong>
-                            <span class="small" th:text="${promotion.subTitle != null && !promotion.subTitle.isBlank() ? promotion.subTitle : (promotion.type == 'POPUP' ? '메인 팝업 노출용 콘텐츠' : '일반 프로모션 콘텐츠')}">
+                            <span class="small"
+                                  th:text="${promotion.subTitle != null and !promotion.subTitle.isBlank() ? promotion.subTitle : (promotion.type == 'POPUP' ? '메인 팝업 안내 문구' : '일반 프로모션 설명')}">
                                 부가 설명
                             </span>
                         </div>
                     </td>
-                    <td th:text="${promotion.targetModel}">ALL</td>
+                    <td th:text="${promotion.targetModel != null and !promotion.targetModel.isBlank() ? promotion.targetModel : 'ALL'}">ALL</td>
                     <td th:text="${promotion.discountAmount != null ? #numbers.formatInteger(promotion.discountAmount, 0, 'COMMA') + '원' : '-'}">1,500,000원</td>
                     <td th:text="${promotion.startDate != null and promotion.endDate != null ? #temporals.format(promotion.startDate, 'yyyy-MM-dd HH:mm') + ' ~ ' + #temporals.format(promotion.endDate, 'yyyy-MM-dd HH:mm') : '-'}">
                         2026-04-20 10:00 ~ 2026-04-30 23:59
                     </td>
                     <td>
-                        <span class="badge" th:classappend="${promotion.active} ? ' badge-active' : ' badge-inactive'"
-                              th:text="${promotion.active} ? '활성' : '비활성'">활성</span>
+                        <span class="badge badge-active" th:if="${promotion.active}">활성</span>
+                        <span class="badge badge-inactive" th:unless="${promotion.active}">비활성</span>
                     </td>
                     <td class="inline-actions">
                         <a th:href="@{|/admin/promotion/edit/${promotion.id}|}" class="btn btn-outline">수정</a>
                         <form th:action="@{|/admin/promotion/toggle/${promotion.id}|}" method="post">
-                            <button type="submit" class="btn btn-secondary" th:text="${promotion.active} ? '비활성화' : '활성화'}">활성화</button>
+                            <button type="submit" class="btn btn-secondary" th:text="${promotion.active ? '비활성화' : '활성화'}">활성화</button>
                         </form>
                         <form th:action="@{|/admin/promotion/delete/${promotion.id}|}" method="post">
                             <button type="submit" class="btn btn-danger" onclick="return confirm('해당 항목을 삭제하시겠습니까?');">삭제</button>

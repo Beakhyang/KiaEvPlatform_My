@@ -14,7 +14,7 @@
         <div class="page-header">
             <div>
                 <h1>상담 상세 관리</h1>
-                <p>상담 내용 확인과 상태 변경, 딜러 배정을 한 화면에서 처리합니다.</p>
+                <p>상담 내용을 확인하고 상태 변경, 딜러 배정, 관리자 메모를 한 화면에서 처리합니다.</p>
             </div>
             <div class="page-actions">
                 <a th:href="@{/admin/consult/list}" class="btn btn-secondary">목록</a>
@@ -30,11 +30,11 @@
                         <div class="label">회원명</div><div th:text="${consult.memberName}">홍길동</div>
                         <div class="label">이메일</div><div th:text="${consult.memberEmail}">user@example.com</div>
                         <div class="label">연락처</div><div th:text="${consult.memberPhone}">010-0000-0000</div>
-                        <div class="label">관심차량</div><div th:text="${consult.carModelName}">EV6</div>
+                        <div class="label">관심 차량</div><div th:text="${consult.carModelName}">EV6</div>
                         <div class="label">희망 예산</div><div th:text="${consult.budgetAmount != null ? #numbers.formatInteger(consult.budgetAmount, 0, 'COMMA') + '원' : '-'}">45,000,000원</div>
-                        <div class="label">사용 목적</div><div th:text="${consult.usePurpose != null && !consult.usePurpose.isBlank() ? consult.usePurpose : '-'}">출퇴근</div>
-                        <div class="label">주행거리</div><div th:text="${consult.mainRangeKm != null && !consult.mainRangeKm.isBlank() ? consult.mainRangeKm : '-'}">400km</div>
-                        <div class="label">동승 정보</div><div th:text="${consult.fellowData != null && !consult.fellowData.isBlank() ? consult.fellowData : '-'}">가족 4인</div>
+                        <div class="label">사용 목적</div><div th:text="${consult.usePurpose != null and !consult.usePurpose.isBlank() ? consult.usePurpose : '-'}">출퇴근</div>
+                        <div class="label">주행 거리</div><div th:text="${consult.mainRangeKm != null and !consult.mainRangeKm.isBlank() ? consult.mainRangeKm : '-'}">400km</div>
+                        <div class="label">추가 정보</div><div th:text="${consult.fellowData != null and !consult.fellowData.isBlank() ? consult.fellowData : '-'}">가족 4인</div>
                         <div class="label">신청일</div><div th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</div>
                         <div class="label">배정일</div><div th:text="${consult.assignedDate != null ? #temporals.format(consult.assignedDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 13:00</div>
                         <div class="label">완료일</div><div th:text="${consult.completedDate != null ? #temporals.format(consult.completedDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 14:00</div>
@@ -47,15 +47,16 @@
                         <div class="field">
                             <label>상담 상태</label>
                             <select name="consultStatus">
-                                <option value="대기" th:selected="${consult.statusLabel == '대기'}">대기</option>
-                                <option value="진행중" th:selected="${consult.statusLabel == '진행중'}">진행중</option>
-                                <option value="완료" th:selected="${consult.statusLabel == '완료'}">완료</option>
+                                <option value="WAITING" th:selected="${consult.statusLabel == '대기'}">대기</option>
+                                <option value="IN_PROGRESS" th:selected="${consult.statusLabel == '진행중'}">진행중</option>
+                                <option value="COMPLETED" th:selected="${consult.statusLabel == '완료'}">완료</option>
                             </select>
                         </div>
+
                         <div class="field">
                             <label>배정 딜러</label>
                             <select name="dealerNo">
-                                <option value="">현재 배정 유지</option>
+                                <option value="">현재 배정 없음</option>
                                 <option th:each="dealer : ${dealerList}"
                                         th:value="${dealer.dealerNo}"
                                         th:selected="${consult.dealerNo != null and consult.dealerNo == dealer.dealerNo}"
@@ -63,12 +64,14 @@
                                     김기아 (202604D001)
                                 </option>
                             </select>
-                            <p class="form-help">승인 완료된 활성 딜러만 배정 목록에 표시됩니다.</p>
+                            <p class="form-help">승인 완료되고 활성 상태인 딜러만 배정 목록에 표시됩니다.</p>
                         </div>
+
                         <div class="field full">
-                            <label>관리 메모</label>
-                            <textarea name="consultMemo" th:text="${consult.consultMemo}" placeholder="배정 메모, 상담 진행 내용 등을 기록하세요."></textarea>
+                            <label>관리자 메모</label>
+                            <textarea name="consultMemo" th:text="${consult.consultMemo}" placeholder="배정 메모나 상담 진행 내용을 기록하세요."></textarea>
                         </div>
+
                         <div class="field full form-actions">
                             <button type="submit" class="btn btn-primary">저장</button>
                             <a th:href="@{/admin/consult/list}" class="btn btn-secondary">취소</a>
@@ -79,12 +82,15 @@
                         <div class="label">현재 상태</div>
                         <div>
                             <span class="badge"
-                                  th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' :
-                                                  (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
-                                  th:text="${consult.statusLabel}">대기</span>
+                                  th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' : (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
+                                  th:text="${consult.statusLabel}">
+                                대기
+                            </span>
                         </div>
                         <div class="label">현재 딜러</div>
-                        <div th:text="${consult.dealerName + ' / ' + consult.dealerEmpNo}">미배정 / -</div>
+                        <div th:text="${(consult.dealerName != null and !consult.dealerName.isBlank() ? consult.dealerName : '미배정') + ' / ' + (consult.dealerEmpNo != null and !consult.dealerEmpNo.isBlank() ? consult.dealerEmpNo : '-')}">
+                            미배정 / -
+                        </div>
                     </div>
                 </div>
             </div>
@@ -94,10 +100,10 @@
             <div class="page-header" style="margin-bottom: 18px;">
                 <div>
                     <h1 style="font-size: 24px;">상담 내용</h1>
-                    <p>회원이 남긴 상세 요청 사항입니다.</p>
+                    <p>회원이 남긴 상담 신청 상세 내용입니다.</p>
                 </div>
             </div>
-            <div class="text-block" th:text="${consult.consultContent != null && !consult.consultContent.isBlank() ? consult.consultContent : '등록된 상담 내용이 없습니다.'}">
+            <div class="text-block" th:text="${consult.consultContent != null and !consult.consultContent.isBlank() ? consult.consultContent : '등록된 상담 내용이 없습니다.'}">
                 상담 내용
             </div>
         </section>

@@ -44,13 +44,18 @@
 
                 <div class="field">
                     <label>노출 설정</label>
-                    <div class="check-row">
+                    <div class="check-group">
                         <input type="hidden" name="isPinned" value="N">
-                        <label><input type="checkbox" name="isPinned" value="Y" th:checked="${board.isPinned == 'Y'}"> 상단 고정</label>
-                    </div>
-                    <div class="check-row" style="margin-top: 12px;">
+                        <label class="check-option">
+                            <input type="checkbox" name="isPinned" value="Y" th:checked="${board.isPinned == 'Y'}">
+                            <span>상단 고정</span>
+                        </label>
+
                         <input type="hidden" name="hidden" value="N">
-                        <label><input type="checkbox" name="hidden" value="Y" th:checked="${board.hidden == 'Y'}"> 비공개</label>
+                        <label class="check-option">
+                            <input type="checkbox" name="hidden" value="Y" th:checked="${board.hidden == 'Y'}">
+                            <span>비공개</span>
+                        </label>
                     </div>
                 </div>
 
