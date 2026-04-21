@@ -25,10 +25,22 @@
             <form th:action="@{/admin/dealer/save}" method="post" class="form-grid">
                 <input type="hidden" name="dealerNo" th:value="${dealer.dealerNo}">
 
-                <div class="field"><label>이름</label><input type="text" name="dealerName" th:value="${dealer.dealerName}" required></div>
-                <div class="field"><label>생년월일</label><input type="date" name="birthDate" th:value="${dealer.birthDate}" required></div>
-                <div class="field"><label>연락처</label><input type="text" name="phone" th:value="${dealer.phone}" required></div>
-                <div class="field"><label>이메일</label><input type="email" name="email" th:value="${dealer.email}"></div>
+                <div class="field">
+                    <label>이름</label>
+                    <input type="text" name="dealerName" th:value="${dealer.dealerName}" required>
+                </div>
+                <div class="field">
+                    <label>생년월일</label>
+                    <input type="date" name="birthDate" th:value="${dealer.birthDate}" required>
+                </div>
+                <div class="field">
+                    <label>연락처</label>
+                    <input type="text" name="phone" th:value="${dealer.phone}" required>
+                </div>
+                <div class="field">
+                    <label>이메일</label>
+                    <input type="email" name="email" th:value="${dealer.email}">
+                </div>
                 <div class="field">
                     <label>소속</label>
                     <select name="affiliation" required>

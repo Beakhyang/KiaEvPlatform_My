@@ -4,8 +4,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,7 @@ public class AdminConsultService {
 
     public AdminConsultView getConsultView(Long consultNo) {
         Consult consult = consultRepository.findById(consultNo)
-                .orElseThrow(() -> new IllegalArgumentException("상담을 찾을 수 없습니다. ID: " + consultNo));
+                .orElseThrow(() -> new IllegalArgumentException("Consult not found: " + consultNo));
 
         Map<Long, Member> memberMap = loadMembers(List.of(consult));
         Map<Long, Car> carMap = loadCars(List.of(consult));
@@ -54,17 +56,10 @@ public class AdminConsultService {
 
     public void updateConsult(Long consultNo, String consultStatus, Integer dealerNo, String consultMemo) {
         Consult consult = consultRepository.findById(consultNo)
-                .orElseThrow(() -> new IllegalArgumentException("상담을 찾을 수 없습니다. ID: " + consultNo));
+                .orElseThrow(() -> new IllegalArgumentException("Consult not found: " + consultNo));
 
         if (consult.getCarModelNo() == null && consult.getCarNo() != null) {
             consult.setCarModelNo(consult.getCarNo());
-        }
-
-        if (dealerNo != null) {
-            consult.setDealerNo(dealerNo);
-            if (consult.getAssignedDate() == null) {
-                consult.setAssignedDate(LocalDateTime.now());
-            }
         }
 
         if (consultMemo != null) {
@@ -72,20 +67,37 @@ public class AdminConsultService {
         }
 
         String normalizedStatus = normalizeStatus(consultStatus);
+        boolean hasDealer = dealerNo != null;
+
+        consult.setDealerNo(dealerNo);
+
+        if (hasDealer) {
+            if (consult.getAssignedDate() == null) {
+                consult.setAssignedDate(LocalDateTime.now());
+            }
+        } else {
+            consult.setAssignedDate(null);
+            consult.setCompletedDate(null);
+
+            if ("IN_PROGRESS".equals(normalizedStatus) || "COMPLETED".equals(normalizedStatus)) {
+                normalizedStatus = "WAITING";
+            }
+        }
+
         if (normalizedStatus != null) {
             consult.setConsultStatus(normalizedStatus);
 
-            if ("진행중".equals(normalizedStatus)) {
+            if ("IN_PROGRESS".equals(normalizedStatus)) {
                 if (consult.getAssignedDate() == null) {
                     consult.setAssignedDate(LocalDateTime.now());
                 }
                 consult.setCompletedDate(null);
-            } else if ("완료".equals(normalizedStatus)) {
+            } else if ("COMPLETED".equals(normalizedStatus)) {
                 if (consult.getAssignedDate() == null) {
                     consult.setAssignedDate(LocalDateTime.now());
                 }
                 consult.setCompletedDate(LocalDateTime.now());
-            } else if ("대기".equals(normalizedStatus)) {
+            } else if ("WAITING".equals(normalizedStatus)) {
                 consult.setCompletedDate(null);
             }
         }
@@ -118,14 +130,14 @@ public class AdminConsultService {
         view.setCarModelNo(consult.getCarModelNo());
         view.setCarModelName(car != null ? car.getModelName() : "차량 정보 없음");
         view.setDealerNo(consult.getDealerNo());
-        view.setDealerName(dealer != null ? dealer.getDealerName() : "미배정");
-        view.setDealerEmpNo(dealer != null ? dealer.getDealerEmpNo() : "-");
+        view.setDealerName(dealer != null ? dealer.getDealerName() : null);
+        view.setDealerEmpNo(dealer != null ? dealer.getDealerEmpNo() : null);
         view.setBudgetAmount(consult.getBudgetAmount());
         view.setUsePurpose(consult.getUsePurpose());
         view.setMainRangeKm(consult.getMainRangeKm());
         view.setFellowData(consult.getFellowData());
         view.setConsultContent(consult.getConsultContent());
-        view.setConsultStatus(consult.getConsultStatus());
+        view.setConsultStatus(normalizeStatus(consult.getConsultStatus()));
         view.setRequestDate(consult.getRequestDate());
         view.setAssignedDate(consult.getAssignedDate());
         view.setCompletedDate(consult.getCompletedDate());
@@ -136,7 +148,7 @@ public class AdminConsultService {
     private Map<Long, Member> loadMembers(List<Consult> consults) {
         Set<Long> memberNos = consults.stream()
                 .map(Consult::getMemberNo)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Map<Long, Member> memberMap = new HashMap<>();
@@ -146,8 +158,8 @@ public class AdminConsultService {
 
     private Map<Long, Car> loadCars(List<Consult> consults) {
         Set<Long> carNos = consults.stream()
-                .flatMap(consult -> java.util.stream.Stream.of(consult.getCarNo(), consult.getCarModelNo()))
-                .filter(java.util.Objects::nonNull)
+                .flatMap(consult -> Stream.of(consult.getCarNo(), consult.getCarModelNo()))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Map<Long, Car> carMap = new HashMap<>();
@@ -158,7 +170,7 @@ public class AdminConsultService {
     private Map<Integer, DealerLogin> loadDealers(List<Consult> consults) {
         Set<Integer> dealerNos = consults.stream()
                 .map(Consult::getDealerNo)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
         Map<Integer, DealerLogin> dealerMap = new HashMap<>();
@@ -177,11 +189,12 @@ public class AdminConsultService {
             return null;
         }
 
-        return switch (status.trim().toUpperCase()) {
-        case "WAITING", "대기" -> "대기";
-        case "IN_PROGRESS", "진행중" -> "진행중";
-        case "COMPLETED", "완료" -> "완료";
-        default -> status.trim();
+        String trimmed = status.trim();
+        return switch (trimmed.toUpperCase()) {
+        case "WAITING", "대기" -> "WAITING";
+        case "IN_PROGRESS", "진행중" -> "IN_PROGRESS";
+        case "COMPLETED", "완료" -> "COMPLETED";
+        default -> trimmed.toUpperCase();
         };
     }
 }

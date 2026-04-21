@@ -9,6 +9,11 @@
         th, td { border: 1px solid #ddd; padding: 12px; }
         th { background-color: #f4f4f4; width: 15%; text-align: center; }
         .content-area { min-height: 300px; padding: 20px; border: 1px solid #ddd; margin-bottom: 20px; line-height: 1.6; white-space: pre-wrap; }
+        .section-title { margin: 28px 0 12px; font-size: 22px; font-weight: 700; }
+        .answer-wrap { border: 1px solid #d6dde8; background-color: #f8fbff; padding: 20px; margin-bottom: 20px; }
+        .answer-meta { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; color: #516173; font-size: 14px; }
+        .answer-content { line-height: 1.7; white-space: pre-wrap; color: #1f2937; }
+        .answer-empty { border: 1px dashed #c8d1dd; background-color: #fafbfc; padding: 18px 20px; margin-bottom: 20px; color: #667085; }
         .btn-group { text-align: right; }
         .btn { display: inline-block; padding: 10px 15px; color: white; text-decoration: none; margin-left: 5px; font-size: 14px; border: none; cursor: pointer; }
         .btn-edit { background-color: #0d6efd; }
@@ -37,14 +42,31 @@
             </tr>
             <tr>
                 <th>조회수</th>
-                <td colspan="3" th:text="${board.viewCount}">0</td>
+                <td th:text="${board.viewCount}">0</td>
+                <th th:text="${board.noticeYn == 'Y' ? '게시글 유형' : '답변상태'}">답변상태</th>
+                <td th:text="${board.noticeYn == 'Y' ? '공지사항' : (#strings.isEmpty(board.answerContent) ? '답변 대기' : '답변 완료')}">답변 대기</td>
             </tr>
         </tbody>
     </table>
 
+    <div class="section-title">문의 내용</div>
     <div class="content-area" th:text="${board.content}">
         게시글 내용
     </div>
+
+    <th:block th:if="${board.noticeYn != 'Y'}">
+        <div class="section-title">관리자 답변</div>
+        <div class="answer-wrap" th:if="${!#strings.isEmpty(board.answerContent)}">
+            <div class="answer-meta">
+                <span>작성자: GM</span>
+                <span th:text="${board.answerDate != null ? #temporals.format(board.answerDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 10:30</span>
+            </div>
+            <div class="answer-content" th:text="${board.answerContent}">관리자 답변 내용</div>
+        </div>
+        <div class="answer-empty" th:if="${#strings.isEmpty(board.answerContent)}">
+            아직 등록된 관리자 답변이 없습니다.
+        </div>
+    </th:block>
 
     <div class="btn-group">
         <a th:if="${isAuthor}" th:href="@{/board/edit(boardNo=${board.boardNo})}" class="btn btn-edit">수정</a>
