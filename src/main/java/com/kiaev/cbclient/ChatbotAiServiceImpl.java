@@ -32,7 +32,8 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
     private static final String PROVIDER = "Gemini";
     private static final int MAX_HISTORY_MESSAGES = 4;
-    private static final int MAX_OUTPUT_TOKENS = 320;
+    private static final int MAX_OUTPUT_TOKENS = 1024;
+    private static final int THINKING_BUDGET = 0;
     private static final int SALES_SUMMARY_LIMIT = 3;
 
     private final CarRepository carRepository;
@@ -124,7 +125,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
     private GeminiGenerateContentRequest buildGeminiRequest(String message, List<ChatbotAiMessage> history, Login loginUser) {
         return new GeminiGenerateContentRequest(
                 List.of(new GeminiContent("user", List.of(new GeminiPart(buildPrompt(message, history, loginUser))))),
-                new GeminiGenerationConfig(0.5, 0.8, MAX_OUTPUT_TOKENS));
+                new GeminiGenerationConfig(0.5, 0.8, MAX_OUTPUT_TOKENS, new GeminiThinkingConfig(THINKING_BUDGET)));
     }
 
     private String buildPrompt(String message, List<ChatbotAiMessage> history, Login loginUser) {
@@ -291,12 +292,18 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
         return response.candidates().stream()
                 .filter(candidate -> candidate != null && candidate.content() != null && candidate.content().parts() != null)
-                .flatMap(candidate -> candidate.content().parts().stream())
-                .map(GeminiPartResponse::text)
-                .filter(this::hasText)
+                .map(this::joinAnswerParts)
+                .filter(answer -> !answer.isBlank())
                 .findFirst()
                 .map(String::trim)
                 .orElse("지금은 AI 답변을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    }
+
+    private String joinAnswerParts(GeminiCandidate candidate) {
+        return candidate.content().parts().stream()
+                .map(GeminiPartResponse::text)
+                .filter(this::hasText)
+                .collect(Collectors.joining());
     }
 
     private String buildApiErrorMessage(RestClientResponseException ex) {
@@ -408,7 +415,11 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
     private record GeminiGenerationConfig(
             double temperature,
             double topP,
-            int maxOutputTokens) {
+            int maxOutputTokens,
+            GeminiThinkingConfig thinkingConfig) {
+    }
+
+    private record GeminiThinkingConfig(int thinkingBudget) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

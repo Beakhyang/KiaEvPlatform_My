@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -70,10 +71,31 @@ class ChatbotAiServiceImplTest {
                 .contains("참고 판매 데이터");
     }
 
+    @Test
+    void extractAnswerJoinsAllGeminiTextParts() throws Exception {
+        Object firstPart = newGeminiRecord("GeminiPartResponse", new Class<?>[] { String.class }, "A roomy ");
+        Object secondPart = newGeminiRecord("GeminiPartResponse", new Class<?>[] { String.class }, "EV9 works well for travel with pets.");
+        Object content = newGeminiRecord("GeminiContentResponse", new Class<?>[] { List.class }, List.of(firstPart, secondPart));
+        Class<?> contentClass = content.getClass();
+        Object candidate = newGeminiRecord("GeminiCandidate", new Class<?>[] { contentClass }, content);
+        Object response = newGeminiRecord("GeminiGenerateContentResponse", new Class<?>[] { List.class }, List.of(candidate));
+
+        String answer = ReflectionTestUtils.invokeMethod(chatbotAiService, "extractAnswer", response);
+
+        assertThat(answer).isEqualTo("A roomy EV9 works well for travel with pets.");
+    }
+
     private ChatbotAiRequest request(String message) {
         ChatbotAiRequest request = new ChatbotAiRequest();
         request.setMessage(message);
         return request;
+    }
+
+    private Object newGeminiRecord(String simpleName, Class<?>[] parameterTypes, Object... args) throws Exception {
+        Class<?> type = Class.forName("com.kiaev.cbclient.ChatbotAiServiceImpl$" + simpleName);
+        Constructor<?> constructor = type.getDeclaredConstructor(parameterTypes);
+        constructor.setAccessible(true);
+        return constructor.newInstance(args);
     }
 
     private Car car(String modelName) {
