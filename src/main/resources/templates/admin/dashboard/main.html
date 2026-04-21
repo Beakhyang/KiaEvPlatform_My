@@ -19,21 +19,57 @@
         </div>
 
         <section class="summary-grid">
-            <article class="summary-card"><span>총 회원 수</span><strong th:text="${dashboard.memberCount}">0</strong></article>
-            <article class="summary-card"><span>등록 차량 수</span><strong th:text="${dashboard.carCount}">0</strong></article>
-            <article class="summary-card"><span>상담 신청 수</span><strong th:text="${dashboard.consultCount}">0</strong></article>
-            <article class="summary-card"><span>게시글 수</span><strong th:text="${dashboard.boardCount}">0</strong></article>
-            <article class="summary-card"><span>등록 딜러 수</span><strong th:text="${dashboard.dealerCount}">0</strong></article>
-            <article class="summary-card"><span>프로모션 수</span><strong th:text="${dashboard.promotionCount}">0</strong></article>
+            <a th:href="@{/admin/member/list}" class="summary-card summary-link">
+                <span>총 회원 수</span>
+                <strong th:text="${dashboard.memberCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/car/list}" class="summary-card summary-link">
+                <span>등록 차량 수</span>
+                <strong th:text="${dashboard.carCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list}" class="summary-card summary-link">
+                <span>상담 신청 수</span>
+                <strong th:text="${dashboard.consultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list}" class="summary-card summary-link">
+                <span>게시글 수</span>
+                <strong th:text="${dashboard.boardCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/dealer/list}" class="summary-card summary-link">
+                <span>등록 딜러 수</span>
+                <strong th:text="${dashboard.dealerCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/promotion/list}" class="summary-card summary-link">
+                <span>프로모션 수</span>
+                <strong th:text="${dashboard.promotionCount}">0</strong>
+            </a>
         </section>
 
         <section class="summary-grid">
-            <article class="summary-card"><span>대기 상담</span><strong th:text="${dashboard.waitingConsultCount}">0</strong></article>
-            <article class="summary-card"><span>진행중 상담</span><strong th:text="${dashboard.inProgressConsultCount}">0</strong></article>
-            <article class="summary-card"><span>완료 상담</span><strong th:text="${dashboard.completedConsultCount}">0</strong></article>
-            <article class="summary-card"><span>공지사항</span><strong th:text="${dashboard.noticeCount}">0</strong></article>
-            <article class="summary-card"><span>문의글</span><strong th:text="${dashboard.inquiryCount}">0</strong></article>
-            <article class="summary-card"><span>승인대기 딜러</span><strong th:text="${dashboard.waitingDealerCount}">0</strong></article>
+            <a th:href="@{/admin/consult/list(status='대기')}" class="summary-card summary-link">
+                <span>대기 상담</span>
+                <strong th:text="${dashboard.waitingConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list(status='진행중')}" class="summary-card summary-link">
+                <span>진행중 상담</span>
+                <strong th:text="${dashboard.inProgressConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list(status='완료')}" class="summary-card summary-link">
+                <span>완료 상담</span>
+                <strong th:text="${dashboard.completedConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list(boardType='NOTICE')}" class="summary-card summary-link">
+                <span>공지사항</span>
+                <strong th:text="${dashboard.noticeCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list}" class="summary-card summary-link">
+                <span>문의글</span>
+                <strong th:text="${dashboard.inquiryCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/dealer/list}" class="summary-card summary-link">
+                <span>승인대기 딜러</span>
+                <strong th:text="${dashboard.waitingDealerCount}">0</strong>
+            </a>
         </section>
 
         <section class="panel">

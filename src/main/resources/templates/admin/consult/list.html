@@ -13,8 +13,8 @@
     <main class="admin-content">
         <div class="page-header">
             <div>
-                <h1>상담 신청 관리</h1>
-                <p>회원 상담 요청을 조회하고 상태 변경, 딜러 배정, 메모 관리를 처리합니다.</p>
+                <h1>상담 요청 관리</h1>
+                <p>회원 상담 신청을 조회하고 상태 변경, 딜러 배정, 메모 관리를 처리합니다.</p>
             </div>
         </div>
 
@@ -22,10 +22,10 @@
             <form method="get" th:action="@{/admin/consult/list}" class="filter-bar">
                 <div class="field">
                     <select name="status">
-                        <option value="">전체 상태</option>
-                        <option value="대기" th:selected="${status == '대기'}">대기</option>
-                        <option value="진행중" th:selected="${status == '진행중'}">진행중</option>
-                        <option value="완료" th:selected="${status == '완료'}">완료</option>
+                        <option value="" th:selected="${status == null or status == ''}">전체 상태</option>
+                        <option value="WAITING" th:selected="${status == 'WAITING'}">대기</option>
+                        <option value="IN_PROGRESS" th:selected="${status == 'IN_PROGRESS'}">진행중</option>
+                        <option value="COMPLETED" th:selected="${status == 'COMPLETED'}">완료</option>
                     </select>
                 </div>
                 <button type="submit" class="btn btn-primary">조회</button>
@@ -37,7 +37,7 @@
                 <tr>
                     <th>상담번호</th>
                     <th>회원</th>
-                    <th>관심차량</th>
+                    <th>관심 차량</th>
                     <th>상태</th>
                     <th>배정 딜러</th>
                     <th>신청일</th>
@@ -56,14 +56,15 @@
                     <td th:text="${consult.carModelName}">EV6</td>
                     <td>
                         <span class="badge"
-                              th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' :
-                                              (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
-                              th:text="${consult.statusLabel}">대기</span>
+                              th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' : (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
+                              th:text="${consult.statusLabel}">
+                            대기
+                        </span>
                     </td>
                     <td>
                         <div class="stack">
-                            <strong th:text="${consult.dealerName}">미배정</strong>
-                            <span class="small" th:text="${consult.dealerEmpNo}">-</span>
+                            <strong th:text="${consult.dealerName != null and !consult.dealerName.isBlank() ? consult.dealerName : '미배정'}">미배정</strong>
+                            <span class="small" th:text="${consult.dealerEmpNo != null and !consult.dealerEmpNo.isBlank() ? consult.dealerEmpNo : '-'}">-</span>
                         </div>
                     </td>
                     <td th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</td>
@@ -74,7 +75,7 @@
                 </tbody>
             </table>
 
-            <div class="empty" th:if="${#lists.isEmpty(consultList)}">조회된 상담 신청이 없습니다.</div>
+            <div class="empty" th:if="${#lists.isEmpty(consultList)}">조회된 상담 요청이 없습니다.</div>
         </section>
     </main>
 </div>
