@@ -2,11 +2,13 @@ package com.kiaev.cbclient;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kiaev.client.car.Car;
 import com.kiaev.client.car.CarRepository;
 import com.kiaev.client.login.Login;
+import com.kiaev.dealer.sales.SalesRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -30,8 +33,10 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
     private static final String PROVIDER = "Gemini";
     private static final int MAX_HISTORY_MESSAGES = 4;
     private static final int MAX_OUTPUT_TOKENS = 320;
+    private static final int SALES_SUMMARY_LIMIT = 3;
 
     private final CarRepository carRepository;
+    private final SalesRepository salesRepository;
 
     private final RestClient restClient = RestClient.builder()
             .baseUrl("https://generativelanguage.googleapis.com")
@@ -66,6 +71,11 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
                     .provider(PROVIDER)
                     .suggestedQuestions(defaultSuggestedQuestions())
                     .build();
+        }
+
+        ChatbotAiResponse dataBackedResponse = buildDataBackedResponse(message);
+        if (dataBackedResponse != null) {
+            return dataBackedResponse;
         }
 
         String apiKey = resolveApiKey();
@@ -133,16 +143,17 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
         String carSummary = carRepository.findAll().stream()
                 .sorted(Comparator.comparing(Car::getModelName, Comparator.nullsLast(String::compareToIgnoreCase)))
-                .limit(5)
                 .map(this::toCarSummary)
                 .collect(Collectors.joining("\n"));
 
+        String salesSummary = buildSalesSummary();
         String historySection = historySummary.isBlank() ? "이전 대화 없음" : historySummary;
 
         return """
                 당신은 Kia EV 플랫폼의 AI 상담사입니다.
                 항상 한국어로 짧고 정확하게 답변하세요.
                 차량 추천, 주행거리, 보조금, 시승, 출고, 충전, 사이트 이용 질문을 우선 안내하세요.
+                판매량이나 인기 모델 질문은 아래 판매 데이터를 우선 근거로 사용하세요.
                 확정이 필요한 정보는 상담신청이나 공식 공고 확인이 필요하다고 덧붙이세요.
                 답변은 최대 4문장으로 간결하게 작성하세요.
 
@@ -150,6 +161,9 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
                 %s
 
                 참고 차량 정보:
+                %s
+
+                참고 판매 데이터:
                 %s
 
                 이전 대화:
@@ -160,8 +174,104 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
                 """.formatted(
                 memberSummary,
                 carSummary.isBlank() ? "등록된 차량 정보 없음" : carSummary,
+                salesSummary,
                 historySection,
                 message);
+    }
+
+    private ChatbotAiResponse buildDataBackedResponse(String message) {
+        if (!isSalesRankingQuestion(message)) {
+            return null;
+        }
+
+        return ChatbotAiResponse.builder()
+                .answer(buildSalesRankingAnswer())
+                .available(hasText(resolveApiKey()))
+                .provider(PROVIDER)
+                .suggestedQuestions(defaultSuggestedQuestions())
+                .build();
+    }
+
+    private boolean isSalesRankingQuestion(String message) {
+        String compressed = normalize(message).replaceAll("\\s+", "");
+        boolean salesIntent = List.of("잘팔리", "많이팔리", "판매량", "판매순위", "베스트셀러", "인기모델", "인기많")
+                .stream()
+                .anyMatch(compressed::contains);
+        boolean vehicleIntent = List.of("차", "차량", "모델", "전기차")
+                .stream()
+                .anyMatch(compressed::contains);
+
+        return salesIntent && vehicleIntent;
+    }
+
+    private String buildSalesRankingAnswer() {
+        List<SalesModelStat> topModels = getTopSalesModels();
+        if (topModels.isEmpty()) {
+            return "현재 시스템에 등록된 판매 완료 데이터가 아직 없어 어떤 모델이 가장 잘 팔렸는지 집계할 수 없어요. 판매 데이터가 쌓이면 바로 안내해드릴게요.";
+        }
+
+        long topCount = topModels.get(0).salesCount();
+        List<SalesModelStat> leaders = topModels.stream()
+                .filter(stat -> stat.salesCount() == topCount)
+                .toList();
+        String leaderNames = leaders.stream()
+                .map(SalesModelStat::modelName)
+                .collect(Collectors.joining(", "));
+
+        StringBuilder answer = new StringBuilder();
+        if (leaders.size() == 1) {
+            answer.append("현재 시스템에 등록된 판매 완료 데이터 기준으로 가장 많이 팔린 모델은 ")
+                    .append(leaderNames)
+                    .append("이며 ")
+                    .append(topCount)
+                    .append("건입니다.");
+        } else {
+            answer.append("현재 시스템에 등록된 판매 완료 데이터 기준으로 ")
+                    .append(leaderNames)
+                    .append("가 공동 1위이며 각각 ")
+                    .append(topCount)
+                    .append("건입니다.");
+        }
+
+        List<SalesModelStat> runnersUp = topModels.subList(leaders.size(), topModels.size());
+        if (!runnersUp.isEmpty()) {
+            String runnerUpSummary = runnersUp.stream()
+                    .map(stat -> "%s %d건".formatted(stat.modelName(), stat.salesCount()))
+                    .collect(Collectors.joining(", "));
+            answer.append(" 뒤이어 ").append(runnerUpSummary).append(" 순으로 집계됐어요.");
+        }
+
+        answer.append(" 이 답변은 외부 실시간 시장 점유율이 아니라 현재 플랫폼에 등록된 누적 판매 데이터 기준입니다.");
+        return answer.toString();
+    }
+
+    private String buildSalesSummary() {
+        List<SalesModelStat> topModels = getTopSalesModels();
+        if (topModels.isEmpty()) {
+            return "등록된 판매 완료 데이터 없음";
+        }
+
+        return topModels.stream()
+                .map(stat -> "- %s | 판매 %d건 | 판매금액 합계 %s"
+                        .formatted(stat.modelName(), stat.salesCount(), formatWon(stat.salesAmount())))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private List<SalesModelStat> getTopSalesModels() {
+        return salesRepository.findTopSellingModelStats(PageRequest.of(0, SALES_SUMMARY_LIMIT)).stream()
+                .map(this::toSalesModelStat)
+                .toList();
+    }
+
+    private SalesModelStat toSalesModelStat(Object[] row) {
+        if (row == null || row.length < 3) {
+            return new SalesModelStat("미분류 차량", 0L, 0L);
+        }
+
+        String modelName = hasText(row[0] != null ? row[0].toString() : null)
+                ? row[0].toString().trim()
+                : "미분류 차량";
+        return new SalesModelStat(modelName, toLong(row[1]), toLong(row[2]));
     }
 
     private String toCarSummary(Car car) {
@@ -209,8 +319,8 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
     private List<String> defaultSuggestedQuestions() {
         return List.of(
+                "제일 잘 팔리는 차는 뭐야?",
                 "EV6 주행거리 알려줘",
-                "보조금 상담은 어떻게 받아?",
                 "가족용 전기차 추천해줘",
                 "시승 상담은 어디서 신청해?");
     }
@@ -220,7 +330,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
         String prefix = memberName.isBlank() ? "안녕하세요." : "안녕하세요, %s님.".formatted(memberName);
 
         if (available) {
-            return "%s 메인 화면에서 바로 AI 상담을 시작할 수 있어요. 차량 추천, 보조금, 시승, 충전 관련 질문을 편하게 남겨 주세요."
+            return "%s 메인 화면에서 바로 AI 상담을 시작할 수 있어요. 차량 추천, 판매 데이터 기준 인기 모델, 보조금, 시승, 충전 관련 질문을 편하게 남겨 주세요."
                     .formatted(prefix);
         }
 
@@ -256,6 +366,26 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
     private String safeValue(String value, String fallback) {
         return hasText(value) ? value.trim() : fallback;
+    }
+
+    private long toLong(Object value) {
+        if (value == null) {
+            return 0L;
+        }
+
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+
+        try {
+            return Long.parseLong(value.toString());
+        } catch (NumberFormatException ex) {
+            return 0L;
+        }
+    }
+
+    private String formatWon(long amount) {
+        return String.format(Locale.KOREA, "%,d원", amount);
     }
 
     private boolean hasText(String value) {
@@ -295,5 +425,8 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private record GeminiPartResponse(String text) {
+    }
+
+    private record SalesModelStat(String modelName, long salesCount, long salesAmount) {
     }
 }
