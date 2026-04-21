@@ -1,61 +1,93 @@
 package com.kiaev.dealer.sales;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/**
- * 판매 Repository
- * 
- * 기능 - 딜러별 판매 목록 조회 - 딜러별 판매 상세 조회 - 상담번호 중복 판매 확인 - 차량번호 중복 판매 확인 - 딜러 기준 판매
- * 건수 조회 - 딜러 기준 판매 총액 조회
- * 
- * 중요 수정 사항 - DealerConsult.carNo / Sales.carNo 와 타입을 맞추기 위해 existsByCarNo 파라미터를
- * String 으로 수정 - 기존 기능은 그대로 유지
- */
 public interface SalesRepository extends JpaRepository<Sales, Integer> {
 
-	/**
-	 * 로그인한 딜러 기준 판매 목록 조회
-	 * 
-	 * 판매번호 내림차순 정렬
-	 */
-	List<Sales> findByDealerNoOrderBySalesNoDesc(Integer dealerNo);
+	@Query(value = """
+			SELECT
+			    s.sales_no,
+			    s.consult_no,
+			    s.member_no,
+			    s.dealer_no,
+			    m.member_name,
+			    m.phone,
+			    m.email,
+			    s.car_no,
+			    COALESCE(
+			        NULLIF(TRIM(s.model_name), ''),
+			        NULLIF(TRIM(sales_car.model_name), ''),
+			        NULLIF(TRIM(consult_car.model_name), ''),
+			        '차량 정보 없음'
+			    ) AS resolved_model_name,
+			    s.sales_amount,
+			    s.sales_date,
+			    s.created_at,
+			    s.sales_status,
+			    c.request_date,
+			    c.completed_date
+			FROM sales_tbl s
+			LEFT JOIN member_tbl m
+			    ON s.member_no = m.member_no
+			LEFT JOIN consult_tbl c
+			    ON s.consult_no = c.consult_no
+			LEFT JOIN car_tbl sales_car
+			    ON s.car_model_no = sales_car.car_no
+			LEFT JOIN car_tbl consult_car
+			    ON c.car_model_no = consult_car.car_no
+			WHERE s.dealer_no = :dealerNo
+			ORDER BY s.sales_no DESC
+			""", nativeQuery = true)
+	List<Object[]> findSalesListRowsByDealerNo(@Param("dealerNo") Integer dealerNo);
 
-	/**
-	 * 로그인한 딜러 본인 판매 상세 조회
-	 */
-	Optional<Sales> findBySalesNoAndDealerNo(Integer salesNo, Integer dealerNo);
+	@Query(value = """
+			SELECT
+			    s.sales_no,
+			    s.consult_no,
+			    s.member_no,
+			    s.dealer_no,
+			    m.member_name,
+			    m.phone,
+			    m.email,
+			    s.car_no,
+			    COALESCE(
+			        NULLIF(TRIM(s.model_name), ''),
+			        NULLIF(TRIM(sales_car.model_name), ''),
+			        NULLIF(TRIM(consult_car.model_name), ''),
+			        '차량 정보 없음'
+			    ) AS resolved_model_name,
+			    s.sales_amount,
+			    s.sales_date,
+			    s.created_at,
+			    s.sales_status,
+			    c.request_date,
+			    c.completed_date
+			FROM sales_tbl s
+			LEFT JOIN member_tbl m
+			    ON s.member_no = m.member_no
+			LEFT JOIN consult_tbl c
+			    ON s.consult_no = c.consult_no
+			LEFT JOIN car_tbl sales_car
+			    ON s.car_model_no = sales_car.car_no
+			LEFT JOIN car_tbl consult_car
+			    ON c.car_model_no = consult_car.car_no
+			WHERE s.sales_no = :salesNo
+			  AND s.dealer_no = :dealerNo
+			""", nativeQuery = true)
+	List<Object[]> findSalesDetailRowsBySalesNoAndDealerNo(@Param("salesNo") Integer salesNo,
+			@Param("dealerNo") Integer dealerNo);
 
-	/**
-	 * 이미 판매 등록된 상담인지 확인
-	 */
 	boolean existsByConsultNo(Integer consultNo);
 
-	/**
-	 * 이미 판매된 차량인지 확인
-	 * 
-	 * 중요: - 현재 carNo 는 String 타입으로 맞춰야 SalesService 와 충돌이 나지 않습니다.
-	 */
-	boolean existsByCarNo(String carNo);
-
-	/**
-	 * 딜러 기준 판매 건수 조회
-	 */
 	long countByDealerNo(Integer dealerNo);
 
-	/**
-	 * 딜러 기준 판매 총액 조회
-	 */
 	@Query("SELECT COALESCE(SUM(s.salesAmount), 0) FROM Sales s WHERE s.dealerNo = :dealerNo")
 	Long sumSalesAmountByDealerNo(@Param("dealerNo") Integer dealerNo);
-<<<<<<< Updated upstream
-}
-=======
 
 	@Query(value = """
 			SELECT
@@ -86,4 +118,3 @@ public interface SalesRepository extends JpaRepository<Sales, Integer> {
 			""", nativeQuery = true)
 	List<Object[]> findTopSellingModelStats(Pageable pageable);
 }
->>>>>>> Stashed changes

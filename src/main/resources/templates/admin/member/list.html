@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('member')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>회원 관리</h1>
+                <p>회원 목록을 조회하고 상세 정보를 확인하거나 계정을 탈퇴 처리할 수 있습니다.</p>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form method="get" th:action="@{/admin/member/list}" class="filter-bar">
+                <div class="field"><input type="text" name="keyword" th:value="${keyword}" placeholder="아이디, 이름, 이메일 검색"></div>
+                <button type="submit" class="btn btn-primary">검색</button>
+                <a th:href="@{/admin/member/list}" class="btn btn-secondary">초기화</a>
+            </form>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(memberList)}">
+                <thead>
+                <tr>
+                    <th>회원번호</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>전화번호</th>
+                    <th>가입일</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member : ${memberList}">
+                    <td th:text="${member.memberNo}">1</td>
+                    <td th:text="${member.loginId}">user01</td>
+                    <td th:text="${member.memberName}">홍길동</td>
+                    <td th:text="${member.email}">user@example.com</td>
+                    <td th:text="${member.phone}">010-0000-0000</td>
+                    <td th:text="${member.joinDate != null ? member.joinDate : '-'}">2026-04-20</td>
+                    <td th:text="${member.memberStatus}">정상회원</td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/member/detail/${member.memberNo}|}" class="btn btn-outline">상세</a>
+                        <form th:action="@{|/admin/member/delete/${member.memberNo}|}" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('해당 회원을 탈퇴 처리하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(memberList)}">조회된 회원이 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

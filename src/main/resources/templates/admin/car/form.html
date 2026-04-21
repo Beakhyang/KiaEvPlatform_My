@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit} ? '차량 수정' : '차량 등록'">차량 등록</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('car')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1 th:text="${isEdit} ? '차량 정보 수정' : '차량 등록'">차량 등록</h1>
+                <p>모델명, 가격, 배터리, 주행거리, 이미지 경로까지 한 번에 관리합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/car/list}" class="btn btn-secondary">목록</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form th:action="@{/admin/car/save}" method="post" class="form-grid">
+                <input type="hidden" name="carNo" th:value="${car.carNo}">
+
+                <div class="field"><label>모델명</label><input type="text" name="modelName" th:value="${car.modelName}" required></div>
+                <div class="field"><label>차종</label><input type="text" name="carType" th:value="${car.carType}" required></div>
+                <div class="field"><label>가격(숫자)</label><input type="number" name="price" th:value="${car.price}" required></div>
+                <div class="field"><label>표시 가격</label><input type="text" name="priceDisplay" th:value="${car.priceDisplay}" placeholder="예: 4,700만원"></div>
+                <div class="field"><label>배터리 용량</label><input type="text" name="batteryCapacity" th:value="${car.batteryCapacity}" required></div>
+                <div class="field"><label>1회 충전 주행거리(km)</label><input type="number" name="drivingRangeKm" th:value="${car.drivingRangeKm}" required></div>
+                <div class="field"><label>급속 충전 시간</label><input type="text" name="fastChargeTime" th:value="${car.fastChargeTime}"></div>
+                <div class="field"><label>충전 정보</label><input type="text" name="chargeInfo" th:value="${car.chargeInfo}"></div>
+                <div class="field full"><label>차량 색상</label><input type="text" name="carColor" th:value="${car.carColor}" placeholder="콤마(,)로 구분"></div>
+                <div class="field full"><label>차량 설명</label><textarea name="carDescription" th:text="${car.carDescription}"></textarea></div>
+                <div class="field"><label>대표 이미지 경로</label><input type="text" name="imagePath" th:value="${car.imagePath}"></div>
+                <div class="field"><label>상세 이미지 1 경로</label><input type="text" name="imageDetail1" th:value="${car.imageDetail1}"></div>
+                <div class="field"><label>상세 이미지 2 경로</label><input type="text" name="imageDetail2" th:value="${car.imageDetail2}"></div>
+                <div class="field">
+                    <label>판매 상태</label>
+                    <select name="saleStatus">
+                        <option value="판매중" th:selected="${car.saleStatus == '판매중'}">판매중</option>
+                        <option value="판매종료" th:selected="${car.saleStatus == '판매종료'}">판매종료</option>
+                    </select>
+                </div>
+
+                <div class="field full form-actions">
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    <a th:href="@{/admin/car/list}" class="btn btn-secondary">취소</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

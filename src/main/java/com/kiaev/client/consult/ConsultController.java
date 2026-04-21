@@ -7,7 +7,11 @@ import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.kiaev.client.car.Car;
 import com.kiaev.client.car.CarService;
@@ -36,7 +40,7 @@ public class ConsultController {
         if (session.getAttribute("loginUser") == null) {
             session.setAttribute("prevPage", "/consult/formPage");
             return "<script>"
-                    + "alert('로그인 후에 이용 가능한 서비스 입니다.');"
+                    + "alert('로그인 후 이용 가능한 서비스입니다.');"
                     + "location.href='/login';"
                     + "</script>";
         }
@@ -65,13 +69,11 @@ public class ConsultController {
                            Model model) {
 
         Object loginUserObj = session.getAttribute("loginUser");
-
         if (loginUserObj == null) {
             return "redirect:/consult/form";
         }
 
         List<Car> allCarList = carService.findAll();
-
         List<Wishlist> wishlist = wishlistService.getMyWishlist(loginUserObj);
         List<Car> favoriteCarList = new ArrayList<>();
         Set<Long> favoriteCarNoSet = new HashSet<>();
@@ -85,13 +87,9 @@ public class ConsultController {
         }
 
         Long selectedCarNo = null;
-
-        // 상세페이지에서 구매 상담 신청하기 누른 경우 현재 차량 자동선택
         if (carNo != null) {
             selectedCarNo = carNo;
-        }
-        // 그냥 상담신청 메뉴로 들어왔고 관심차량이 1개면 자동선택
-        else if (favoriteCarList.size() == 1) {
+        } else if (favoriteCarList.size() == 1) {
             selectedCarNo = favoriteCarList.get(0).getCarNo();
         }
 
@@ -108,16 +106,9 @@ public class ConsultController {
     public String submitForm(Consult consultation, HttpSession session) {
 
         Object loginUserObj = session.getAttribute("loginUser");
-
-        if (loginUserObj == null) {
+        if (!(loginUserObj instanceof Login loginUser)) {
             return "redirect:/consult/form";
         }
-
-        if (!(loginUserObj instanceof Login)) {
-            return "redirect:/consult/form";
-        }
-
-        Login loginUser = (Login) loginUserObj;
 
         if (loginUser.getMemberNo() == null) {
             return "redirect:/consult/form";
@@ -125,22 +116,23 @@ public class ConsultController {
 
         consultation.setMemberNo(loginUser.getMemberNo());
 
+        if (consultation.getCarModelNo() == null && consultation.getCarNo() != null) {
+            consultation.setCarModelNo(consultation.getCarNo());
+        }
+
         if (consultation.getConsultStatus() == null || consultation.getConsultStatus().isBlank()) {
             consultation.setConsultStatus("대기");
         }
 
         consultationService.save(consultation);
-
         return "redirect:/consult/success";
     }
 
     @GetMapping("/success")
     public String successPage(HttpSession session) {
-
         if (session.getAttribute("loginUser") == null) {
             return "redirect:/consult/form";
         }
-
         return "client/consult/success";
     }
 
@@ -148,16 +140,9 @@ public class ConsultController {
     public String consultDetail(@RequestParam("id") Long id, Model model, HttpSession session) {
 
         Object loginUserObj = session.getAttribute("loginUser");
-
-        if (loginUserObj == null) {
+        if (!(loginUserObj instanceof Login loginUser)) {
             return "redirect:/consult/form";
         }
-
-        if (!(loginUserObj instanceof Login)) {
-            return "redirect:/consult/form";
-        }
-
-        Login loginUser = (Login) loginUserObj;
 
         Long memberNo = loginUser.getMemberNo();
         String memberStatus = loginUser.getMemberStatus();
@@ -166,13 +151,9 @@ public class ConsultController {
             return "redirect:/consult/form";
         }
 
-        Consult consult;
-
-        if (isAdminOrDealer(memberStatus)) {
-            consult = consultationService.findById(id);
-        } else {
-            consult = consultationService.findByConsultNoAndMemberNo(id, memberNo);
-        }
+        Consult consult = isAdminOrDealer(memberStatus)
+                ? consultationService.findById(id)
+                : consultationService.findByConsultNoAndMemberNo(id, memberNo);
 
         if (consult == null) {
             return "redirect:/consult/form";
@@ -181,7 +162,6 @@ public class ConsultController {
         model.addAttribute("consult", consult);
         model.addAttribute("member", loginUser);
         model.addAttribute("memberStatus", memberStatus);
-
         return "client/consult/consultDetail";
     }
 
@@ -191,23 +171,15 @@ public class ConsultController {
                                       HttpSession session) {
 
         Object loginUserObj = session.getAttribute("loginUser");
-
-        if (loginUserObj == null) {
+        if (!(loginUserObj instanceof Login loginUser)) {
             return "redirect:/login";
         }
-
-        if (!(loginUserObj instanceof Login)) {
-            return "redirect:/login";
-        }
-
-        Login loginUser = (Login) loginUserObj;
 
         if (!isAdminOrDealer(loginUser.getMemberStatus())) {
             return "redirect:/mypage/consult";
         }
 
-        consultationService.updateConsultStatus(consultNo, consultStatus, loginUser.getMemberNo());
-
+        consultationService.updateConsultStatus(consultNo, consultStatus, toInteger(loginUser.getMemberNo()));
         return "redirect:/mypage/consult";
     }
 
@@ -220,5 +192,12 @@ public class ConsultController {
                 || memberStatus.equalsIgnoreCase("DEALER")
                 || memberStatus.equals("관리자")
                 || memberStatus.equals("딜러");
+    }
+
+    private Integer toInteger(Long value) {
+        if (value == null) {
+            return null;
+        }
+        return value.intValue();
     }
 }

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="sidebar(currentMenu)">
+    <aside class="admin-sidebar">
+        <div class="admin-brand">
+            <strong>KIA EV Admin</strong>
+            <span>운영 · 상담 · 프로모션 · 챗봇 관리</span>
+        </div>
+
+        <div class="admin-user">
+            <strong th:text="${loginAdmin != null ? loginAdmin.adminName : 'GM'}">GM</strong>
+            <span th:text="${loginAdmin != null ? loginAdmin.adminId : 'admin'}">gmadmin</span>
+        </div>
+
+        <nav class="admin-nav">
+            <a th:href="@{/admin/main}" th:classappend="${currentMenu == 'dashboard'} ? ' is-active'">대시보드</a>
+            <a th:href="@{/admin/member/list}" th:classappend="${currentMenu == 'member'} ? ' is-active'">회원 관리</a>
+            <a th:href="@{/admin/car/list}" th:classappend="${currentMenu == 'car'} ? ' is-active'">차량 관리</a>
+            <a th:href="@{/admin/consult/list}" th:classappend="${currentMenu == 'consult'} ? ' is-active'">상담 관리</a>
+            <a th:href="@{/admin/board/list}" th:classappend="${currentMenu == 'board'} ? ' is-active'">게시판 관리</a>
+            <a th:href="@{/admin/promotion/list}" th:classappend="${currentMenu == 'promotion'} ? ' is-active'">프로모션 관리</a>
+            <a th:href="@{/admin/dealer/list}" th:classappend="${currentMenu == 'dealer'} ? ' is-active'">딜러 관리</a>
+            <a th:href="@{/admin/chatbot/faq/list}" th:classappend="${currentMenu == 'chatbot'} ? ' is-active'">FAQ 챗봇 관리</a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            <a th:href="@{/admin/logout}">로그아웃</a>
+        </div>
+    </aside>
+</th:block>
+</html>

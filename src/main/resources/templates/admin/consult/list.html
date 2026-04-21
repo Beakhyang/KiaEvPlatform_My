@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>상담 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('consult')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>상담 신청 관리</h1>
+                <p>회원 상담 요청을 조회하고 상태 변경, 딜러 배정, 메모 관리를 처리합니다.</p>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form method="get" th:action="@{/admin/consult/list}" class="filter-bar">
+                <div class="field">
+                    <select name="status">
+                        <option value="">전체 상태</option>
+                        <option value="대기" th:selected="${status == '대기'}">대기</option>
+                        <option value="진행중" th:selected="${status == '진행중'}">진행중</option>
+                        <option value="완료" th:selected="${status == '완료'}">완료</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">조회</button>
+                <a th:href="@{/admin/consult/list}" class="btn btn-secondary">초기화</a>
+            </form>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(consultList)}">
+                <thead>
+                <tr>
+                    <th>상담번호</th>
+                    <th>회원</th>
+                    <th>관심차량</th>
+                    <th>상태</th>
+                    <th>배정 딜러</th>
+                    <th>신청일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="consult : ${consultList}">
+                    <td th:text="${consult.consultNo}">1</td>
+                    <td>
+                        <div class="stack">
+                            <strong th:text="${consult.memberName}">홍길동</strong>
+                            <span class="small" th:text="${consult.memberEmail}">user@example.com</span>
+                        </div>
+                    </td>
+                    <td th:text="${consult.carModelName}">EV6</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' :
+                                              (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
+                              th:text="${consult.statusLabel}">대기</span>
+                    </td>
+                    <td>
+                        <div class="stack">
+                            <strong th:text="${consult.dealerName}">미배정</strong>
+                            <span class="small" th:text="${consult.dealerEmpNo}">-</span>
+                        </div>
+                    </td>
+                    <td th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/consult/detail/${consult.consultNo}|}" class="btn btn-outline">상세</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(consultList)}">조회된 상담 신청이 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

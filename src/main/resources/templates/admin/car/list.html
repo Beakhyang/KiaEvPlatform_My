@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>차량 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('car')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>차량 관리</h1>
+                <p>등록된 차량 목록을 확인하고 신규 차량 등록, 수정, 삭제를 처리합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/car/new}" class="btn btn-primary">차량 등록</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <table class="data-table" th:if="${not #lists.isEmpty(carList)}">
+                <thead>
+                <tr>
+                    <th>차량번호</th>
+                    <th>모델명</th>
+                    <th>차종</th>
+                    <th>가격</th>
+                    <th>주행거리</th>
+                    <th>판매상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="car : ${carList}">
+                    <td th:text="${car.carNo}">1</td>
+                    <td th:text="${car.modelName}">EV6</td>
+                    <td th:text="${car.carType}">SUV</td>
+                    <td th:text="${car.priceDisplay}">4,700만원</td>
+                    <td th:text="${car.drivingRangeKm != null ? car.drivingRangeKm + 'km' : '-'}">400km</td>
+                    <td th:text="${car.saleStatus}">판매중</td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/car/edit/${car.carNo}|}" class="btn btn-outline">수정</a>
+                        <form th:action="@{|/admin/car/delete/${car.carNo}|}" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('해당 차량을 삭제 처리하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(carList)}">등록된 차량이 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
