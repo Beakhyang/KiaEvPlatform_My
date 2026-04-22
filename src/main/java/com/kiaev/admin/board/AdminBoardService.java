@@ -1,7 +1,9 @@
 package com.kiaev.admin.board;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,12 @@ public class AdminBoardService {
     private final BoardRepository boardRepository;
 
     public List<Board> getBoards(String boardType) {
-        return boardRepository.findAll(Sort.by(Sort.Direction.DESC, "boardNo")).stream()
+        Sort sort = Sort.by(
+                Sort.Order.desc("noticeYn"),
+                Sort.Order.asc("priority"),
+                Sort.Order.desc("boardNo"));
+
+        return boardRepository.findAll(sort).stream()
                 .filter(board -> !"Y".equalsIgnoreCase(board.getDeletedYn()))
                 .filter(board -> boardType == null || boardType.isBlank() || boardType.equalsIgnoreCase(board.getBoardType()))
                 .toList();
@@ -50,8 +57,8 @@ public class AdminBoardService {
         target.setMemberNo(null);
         target.setTitle(board.getTitle());
         target.setContent(board.getContent());
-        target.setIsPinned(isBlank(board.getIsPinned()) ? "N" : board.getIsPinned());
-        target.setHidden(isBlank(board.getHidden()) ? "N" : board.getHidden());
+        target.setIsPinned(normalizeYn(board.getIsPinned(), "N"));
+        target.setHidden(normalizeYn(board.getHidden(), "N"));
         target.setDeletedYn("N");
         target.setPriority(board.getPriority() == null ? 0 : board.getPriority());
 
@@ -75,5 +82,27 @@ public class AdminBoardService {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private String normalizeYn(String value, String defaultValue) {
+        if (isBlank(value)) {
+            return defaultValue;
+        }
+
+        boolean hasYesToken = Arrays.stream(value.split(","))
+                .map(String::trim)
+                .map(token -> token.toUpperCase(Locale.ROOT))
+                .anyMatch(token -> "Y".equals(token) || "ON".equals(token) || "TRUE".equals(token));
+
+        if (hasYesToken) {
+            return "Y";
+        }
+
+        boolean hasNoToken = Arrays.stream(value.split(","))
+                .map(String::trim)
+                .map(token -> token.toUpperCase(Locale.ROOT))
+                .anyMatch(token -> "N".equals(token) || "OFF".equals(token) || "FALSE".equals(token));
+
+        return hasNoToken ? "N" : defaultValue;
     }
 }

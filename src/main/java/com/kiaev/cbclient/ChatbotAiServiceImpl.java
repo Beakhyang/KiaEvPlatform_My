@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
+import com.kiaev.common.aws.AwsSecretsBootstrap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kiaev.client.car.Car;
 import com.kiaev.client.car.CarRepository;
@@ -81,7 +82,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
         String apiKey = resolveApiKey();
         if (!hasText(apiKey)) {
             return ChatbotAiResponse.builder()
-                    .answer("AI 상담 키가 아직 연결되지 않았습니다. 서버 환경변수 `GEMINI_API_KEY`를 확인한 뒤 서버를 다시 시작해 주세요.")
+                    .answer("AI 상담 키가 아직 연결되지 않았습니다. 서버 환경 변수 `GEMINI_API_KEY` 또는 AWS Secrets Manager 설정을 확인한 뒤 서버를 다시 시작해 주세요.")
                     .available(false)
                     .provider(PROVIDER)
                     .suggestedQuestions(defaultSuggestedQuestions())
@@ -346,6 +347,22 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
     private String resolveApiKey() {
         if (hasText(configuredApiKey)) {
             return configuredApiKey.trim();
+        }
+
+        String resolvedSecretValue = AwsSecretsBootstrap.resolveValue(
+                "api.key.chatbot",
+                "GEMINI_API_KEY",
+                "Gemini API Key",
+                "Gemini_API_Key");
+        if (hasText(resolvedSecretValue)) {
+            return resolvedSecretValue.trim();
+        }
+
+        for (String propertyName : List.of("api.key.chatbot", "GEMINI_API_KEY", "Gemini_API_Key")) {
+            String value = System.getProperty(propertyName);
+            if (hasText(value)) {
+                return value.trim();
+            }
         }
 
         for (String envName : List.of("GEMINI_API_KEY", "Gemini_API_Key", "GEMINI API KEY", "Gemini API Key", "Gemini_ API_Key")) {

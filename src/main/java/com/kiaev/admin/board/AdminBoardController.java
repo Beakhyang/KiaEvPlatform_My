@@ -54,7 +54,7 @@ public class AdminBoardController {
     public String save(Board board, HttpSession session) {
         Admin loginAdmin = (Admin) session.getAttribute("loginAdmin");
         adminBoardService.saveNotice(board, loginAdmin);
-        return "redirect:/admin/board/list";
+        return "redirect:/admin/board/list?boardType=NOTICE";
     }
 
     @PostMapping("/answer/{boardNo}")

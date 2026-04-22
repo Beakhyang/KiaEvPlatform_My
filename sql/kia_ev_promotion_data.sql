@@ -76,7 +76,7 @@ VALUES
   (6, 'GIFT', '2026 해맞이 EV 캠핑 세트', '전기차 계약 고객 대상 캠핑 의자 증정',
    '새해 맞이 V2L 활용 캠핑 용품 증정', 'ALL', 0,
    DATE_SUB(CURDATE(), INTERVAL 90 DAY), DATE_SUB(CURDATE(), INTERVAL 40 DAY), 6,
-   '/uploads/니로_EV_재고_특별전_할인이벤트.jpg', 0, NOW(), NOW()),
+   '/images/promotion/니로_EV_재고_특별전_할인이벤트.jpg', 0, NOW(), NOW()),
   (7, 'DISCOUNT', '노후차 교체 특별 지원금', '10년 이상 노후차 폐차 후 EV 구매 시 추가 할인',
    '환경 보호를 위한 노후차 교체 캠페인', 'ALL', 300000,
    DATE_SUB(CURDATE(), INTERVAL 10 DAY), DATE_ADD(CURDATE(), INTERVAL 40 DAY), 4,
@@ -84,7 +84,7 @@ VALUES
   (8, 'GIFT', '기아 커넥트 스토어 이용권', '원격 주차, 스트리밍 서비스 1년 무료 체험',
    '기아 커넥트 스토어의 모든 기능을 1년간 무료로', 'ALL', 0,
    DATE_SUB(CURDATE(), INTERVAL 7 DAY), DATE_ADD(CURDATE(), INTERVAL 180 DAY), 5,
-   '/uploads/기아_커넥트_스토어_1년_무료_이용권.jpg', 1, NOW(), NOW()),
+   '/images/promotion/기아_커넥트_스토어_1년_무료_이용권.jpg', 1, NOW(), NOW()),
   (9, 'DISCOUNT', '니로 EV 재고 특별전', '한정 수량! 바로 출고 가능한 니로 EV 특별 할인',
    '빠른 출고와 특별 할인을 동시에', 'Niro EV', 2000000,
    DATE_SUB(CURDATE(), INTERVAL 5 DAY), DATE_ADD(CURDATE(), INTERVAL 1 DAY) - INTERVAL 1 SECOND, 2,
@@ -92,7 +92,7 @@ VALUES
   (10, 'EVENT', '내부 테스트 프로모션', '시스템 테스트용 데이터입니다. (노출금지)',
    '관리자 테스트 목적의 데이터', 'ALL', 0,
    DATE_SUB(CURDATE(), INTERVAL 1 DAY), DATE_ADD(CURDATE(), INTERVAL 365 DAY), 10,
-   '/uploads/니로_EV_재고_특별전_할인이벤트.jpg', 0, NOW(), NOW());
+   '/images/promotion/니로_EV_재고_특별전_할인이벤트.jpg', 0, NOW(), NOW());
 /*!40000 ALTER TABLE `promotion_tbl` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

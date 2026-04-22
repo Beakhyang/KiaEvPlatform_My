@@ -1,6 +1,7 @@
 package com.kiaev.dealer.sales;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -81,6 +82,8 @@ public interface SalesRepository extends JpaRepository<Sales, Integer> {
 			""", nativeQuery = true)
 	List<Object[]> findSalesDetailRowsBySalesNoAndDealerNo(@Param("salesNo") Integer salesNo,
 			@Param("dealerNo") Integer dealerNo);
+
+	Optional<Sales> findBySalesNoAndDealerNo(Integer salesNo, Integer dealerNo);
 
 	boolean existsByConsultNo(Integer consultNo);
 
