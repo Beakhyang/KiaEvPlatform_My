@@ -5,6 +5,7 @@
     <title>상담 상세</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
     <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+    <script th:src="@{/js/admin-form-submit-state.js}" defer></script>
 </head>
 <body>
 <div class="admin-shell">
@@ -32,10 +33,10 @@
                         <div class="label">연락처</div><div th:text="${consult.memberPhone}">010-0000-0000</div>
                         <div class="label">관심 차량</div><div th:text="${consult.carModelName}">EV6</div>
                         <div class="label">희망 예산</div><div th:text="${consult.budgetAmount != null ? #numbers.formatInteger(consult.budgetAmount, 0, 'COMMA') + '원' : '-'}">45,000,000원</div>
-                        <div class="label">사용 목적</div><div th:text="${consult.usePurpose != null and !consult.usePurpose.isBlank() ? consult.usePurpose : '-'}">출퇴근</div>
+                        <div class="label">사용 목적</div><div th:text="${consult.usePurpose != null and !consult.usePurpose.isBlank() ? consult.usePurpose : '-'}">출퇴근용</div>
                         <div class="label">주행 거리</div><div th:text="${consult.mainRangeKm != null and !consult.mainRangeKm.isBlank() ? consult.mainRangeKm : '-'}">400km</div>
                         <div class="label">추가 정보</div><div th:text="${consult.fellowData != null and !consult.fellowData.isBlank() ? consult.fellowData : '-'}">가족 4인</div>
-                        <div class="label">신청일</div><div th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</div>
+                        <div class="label">요청일</div><div th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</div>
                         <div class="label">배정일</div><div th:text="${consult.assignedDate != null ? #temporals.format(consult.assignedDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 13:00</div>
                         <div class="label">완료일</div><div th:text="${consult.completedDate != null ? #temporals.format(consult.completedDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 14:00</div>
                     </div>
@@ -43,7 +44,7 @@
 
                 <div class="info-box">
                     <h2>처리 정보</h2>
-                    <form th:action="@{|/admin/consult/update/${consult.consultNo}|}" method="post" class="form-grid">
+                    <form th:action="@{|/admin/consult/update/${consult.consultNo}|}" method="post" class="form-grid" data-submit-state-form>
                         <div class="field">
                             <label>상담 상태</label>
                             <select name="consultStatus">
@@ -73,7 +74,7 @@
                         </div>
 
                         <div class="field full form-actions">
-                            <button type="submit" class="btn btn-primary">저장</button>
+                            <button type="submit" class="btn btn-primary" data-loading-text="저장 중...">저장</button>
                             <a th:href="@{/admin/consult/list}" class="btn btn-secondary">취소</a>
                         </div>
                     </form>
@@ -100,7 +101,7 @@
             <div class="page-header" style="margin-bottom: 18px;">
                 <div>
                     <h1 style="font-size: 24px;">상담 내용</h1>
-                    <p>회원이 남긴 상담 신청 상세 내용입니다.</p>
+                    <p>회원이 입력한 상담 요청 상세 내용입니다.</p>
                 </div>
             </div>
             <div class="text-block" th:text="${consult.consultContent != null and !consult.consultContent.isBlank() ? consult.consultContent : '등록된 상담 내용이 없습니다.'}">

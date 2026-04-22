@@ -6,20 +6,50 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.kiaev.common.aws.AwsSecretsBootstrap;
+
 @Controller
 @RequestMapping("/charging")
 public class ChargingMapController {
 
-    // 환경변수(application.properties)에 저장해둔 카카오맵 API 키를 가져옵니다.
-    @Value("${api.key.kakao-map}")
+    @Value("${api.key.kakao-map:}")
     private String kakaoApiKey;
 
     @GetMapping("/map")
     public String showMap(Model model) {
-        // Thymeleaf 템플릿 엔진으로 카카오 API 키를 넘겨줍니다.
-        model.addAttribute("kakaoApiKey", kakaoApiKey);
-        
-        // src/main/resources/templates/charging/map.html 파일을 화면에 렌더링합니다.
-        return "client/charging/map"; 
+        model.addAttribute("kakaoApiKey", resolveKakaoApiKey());
+        return "client/charging/map";
+    }
+
+    private String resolveKakaoApiKey() {
+        if (hasText(kakaoApiKey)) {
+            return kakaoApiKey.trim();
+        }
+
+        String resolvedSecretValue = AwsSecretsBootstrap.resolveValue(
+                "api.key.kakao-map",
+                "KAKAO_API_KEY",
+                "Kakao API Key");
+        if (hasText(resolvedSecretValue)) {
+            return resolvedSecretValue.trim();
+        }
+
+        for (String propertyName : new String[] { "api.key.kakao-map", "KAKAO_API_KEY" }) {
+            String value = System.getProperty(propertyName);
+            if (hasText(value)) {
+                return value.trim();
+            }
+        }
+
+        String envValue = System.getenv("KAKAO_API_KEY");
+        if (hasText(envValue)) {
+            return envValue.trim();
+        }
+
+        return "";
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

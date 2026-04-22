@@ -25,7 +25,7 @@
 
     <div id="map" style="width:100%; height:600px;"></div>
 
-    <script th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${kakaoApiKey}}"></script>
+    <script th:src="|//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoApiKey}&libraries=clusterer|"></script>
 
     <script>
         const container = document.getElementById('map');
@@ -34,6 +34,11 @@
             level: 7
         };
         const map = new kakao.maps.Map(container, options);
+        const clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            averageCenter: true,
+            minLevel: 8
+        });
 
         let allChargers = [];
         const markers = [];
@@ -49,9 +54,7 @@
             .catch(error => console.error('데이터 로딩 실패:', error));
 
         function clearMarkers() {
-            for (let i = 0; i < markers.length; i++) {
-                markers[i].setMap(null);
-            }
+            clusterer.clear();
             markers.length = 0;
         }
 
@@ -69,7 +72,13 @@
                 openInfowindow = null;
             }
 
-            if (chargerList.length === 0) {
+            const validChargers = chargerList.filter(function (charger) {
+                const lat = Number(charger.lat);
+                const lng = Number(charger.lng);
+                return Number.isFinite(lat) && Number.isFinite(lng);
+            });
+
+            if (validChargers.length === 0) {
                 alert('해당하는 충전소가 없습니다. 검색어를 확인해주세요.');
                 return;
             }
@@ -80,17 +89,18 @@
                 bounds.extend(myLocationMarker.getPosition());
             }
 
-            for (let i = 0; i < chargerList.length; i++) {
-                const charger = chargerList[i];
-                const markerPosition = new kakao.maps.LatLng(charger.lat, charger.lng);
+            const nextMarkers = [];
+
+            for (let i = 0; i < validChargers.length; i++) {
+                const charger = validChargers[i];
+                const markerPosition = new kakao.maps.LatLng(Number(charger.lat), Number(charger.lng));
                 bounds.extend(markerPosition);
 
                 const marker = new kakao.maps.Marker({
-                    map: map,
                     position: markerPosition,
                     title: charger.statNm
                 });
-                markers.push(marker);
+                nextMarkers.push(marker);
 
                 const content = `
                     <div style="padding:10px; min-width:250px; line-height:1.5;">
@@ -109,6 +119,9 @@
                     openInfowindow = infowindow;
                 });
             }
+
+            markers.push(...nextMarkers);
+            clusterer.addMarkers(nextMarkers);
 
             if (fitBounds) {
                 map.setBounds(bounds);

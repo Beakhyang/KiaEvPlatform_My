@@ -2,7 +2,6 @@ package com.kiaev.dealer.sales;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,131 +13,183 @@ import com.kiaev.dealer.dealerconsult.DealerConsultView;
 import com.kiaev.dealer.login.DealerLogin;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 
 @Controller
+@RequiredArgsConstructor
 public class SalesController {
 
-	@Autowired
-	private SalesService salesService;
+    private final SalesService salesService;
 
-	@GetMapping("/dealer/sales/list")
-	public String salesList(HttpSession session, Model model) {
+    @GetMapping("/dealer/sales/list")
+    public String salesList(HttpSession session, Model model) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-		if (loginDealer == null) {
-			return "redirect:/dealer/login";
-		}
+        Integer dealerNo = loginDealer.getDealerNo();
+        List<SalesView> salesList = salesService.getSalesListByDealerNo(dealerNo);
+        long salesCount = salesService.getSalesCountByDealerNo(dealerNo);
+        Long totalSalesAmount = salesService.getSalesAmountSumByDealerNo(dealerNo);
 
-		Integer dealerNo = loginDealer.getDealerNo();
-		List<SalesView> salesList = salesService.getSalesListByDealerNo(dealerNo);
-		long salesCount = salesService.getSalesCountByDealerNo(dealerNo);
-		Long totalSalesAmount = salesService.getSalesAmountSumByDealerNo(dealerNo);
+        model.addAttribute("salesList", salesList);
+        model.addAttribute("salesCount", salesCount);
+        model.addAttribute("totalSalesAmount", totalSalesAmount);
+        model.addAttribute("loginDealer", loginDealer);
+        return "dealer/sales/salesList";
+    }
 
-		model.addAttribute("salesList", salesList);
-		model.addAttribute("salesCount", salesCount);
-		model.addAttribute("totalSalesAmount", totalSalesAmount);
-		model.addAttribute("loginDealer", loginDealer);
+    @GetMapping("/dealer/sales/detail")
+    public String salesDetail(@RequestParam("salesNo") Integer salesNo, HttpSession session, Model model,
+            RedirectAttributes redirectAttributes) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		return "dealer/sales/salesList";
-	}
+        SalesView sales = salesService.getSalesDetailByDealerNo(salesNo, loginDealer.getDealerNo());
+        if (sales == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "판매 상세 정보를 찾을 수 없습니다.");
+            return "redirect:/dealer/sales/list";
+        }
 
-	@GetMapping("/dealer/sales/detail")
-	public String salesDetail(@RequestParam("salesNo") Integer salesNo, HttpSession session, Model model) {
+        model.addAttribute("sales", sales);
+        model.addAttribute("loginDealer", loginDealer);
+        return "dealer/sales/salesDetail";
+    }
 
-		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-		if (loginDealer == null) {
-			return "redirect:/dealer/login";
-		}
+    @GetMapping("/dealer/sales/register")
+    public String salesRegisterForm(@RequestParam(value = "consultNo", required = false) Integer consultNo,
+            HttpSession session, Model model) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		SalesView sales = salesService.getSalesDetailByDealerNo(salesNo, loginDealer.getDealerNo());
-		if (sales == null) {
-			return "redirect:/dealer/sales/list";
-		}
+        populateSalesRegisterModel(model, loginDealer, consultNo, null, null);
+        return "dealer/sales/salesRegister";
+    }
 
-		model.addAttribute("sales", sales);
-		model.addAttribute("loginDealer", loginDealer);
+    @GetMapping("/dealer/sales/register/select")
+    public String selectConsultForSales(@RequestParam("consultNo") Integer consultNo, HttpSession session) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		return "dealer/sales/salesDetail";
-	}
+        return "redirect:/dealer/sales/register?consultNo=" + consultNo;
+    }
 
-	@GetMapping("/dealer/sales/register")
-	public String salesRegisterForm(@RequestParam(value = "consultNo", required = false) Integer consultNo,
-			HttpSession session, Model model) {
+    @PostMapping("/dealer/sales/register")
+    public String salesRegister(@RequestParam("consultNo") Integer consultNo,
+            @RequestParam("salesAmount") Integer salesAmount, HttpSession session, Model model,
+            RedirectAttributes redirectAttributes) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-		if (loginDealer == null) {
-			return "redirect:/dealer/login";
-		}
+        String resultMessage = salesService.registerSales(consultNo, loginDealer.getDealerNo(), salesAmount);
+        if (SalesService.REGISTER_SUCCESS_MESSAGE.equals(resultMessage)) {
+            redirectAttributes.addFlashAttribute("successMessage", resultMessage);
+            return "redirect:/dealer/sales/list";
+        }
 
-		populateSalesRegisterModel(model, loginDealer, consultNo, null, null);
-		return "dealer/sales/salesRegister";
-	}
+        populateSalesRegisterModel(model, loginDealer, consultNo, salesAmount, resultMessage);
+        return "dealer/sales/salesRegister";
+    }
 
-	@GetMapping("/dealer/sales/register/select")
-	public String selectConsultForSales(@RequestParam("consultNo") Integer consultNo, HttpSession session) {
+    @GetMapping("/dealer/sales/edit")
+    public String salesEditForm(@RequestParam("salesNo") Integer salesNo, HttpSession session, Model model,
+            RedirectAttributes redirectAttributes) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-		if (loginDealer == null) {
-			return "redirect:/dealer/login";
-		}
+        SalesView salesDetail = salesService.getSalesDetailByDealerNo(salesNo, loginDealer.getDealerNo());
+        if (salesDetail == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "수정할 판매 정보를 찾을 수 없습니다.");
+            return "redirect:/dealer/sales/list";
+        }
 
-		return "redirect:/dealer/sales/register?consultNo=" + consultNo;
-	}
+        populateSalesEditModel(model, loginDealer, salesDetail, null, null);
+        return "dealer/sales/salesEdit";
+    }
 
-	@PostMapping("/dealer/sales/register")
-	public String salesRegister(@RequestParam("consultNo") Integer consultNo,
-			@RequestParam("salesAmount") Integer salesAmount, HttpSession session, Model model,
-			RedirectAttributes redirectAttributes) {
+    @PostMapping("/dealer/sales/edit")
+    public String salesEdit(@RequestParam("salesNo") Integer salesNo, @RequestParam("salesAmount") Integer salesAmount,
+            HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
+        if (loginDealer == null) {
+            return "redirect:/dealer/login";
+        }
 
-		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
-		if (loginDealer == null) {
-			return "redirect:/dealer/login";
-		}
+        String resultMessage = salesService.updateSalesAmount(salesNo, loginDealer.getDealerNo(), salesAmount);
+        if (SalesService.UPDATE_SUCCESS_MESSAGE.equals(resultMessage)) {
+            redirectAttributes.addFlashAttribute("successMessage", resultMessage);
+            return "redirect:/dealer/sales/detail?salesNo=" + salesNo;
+        }
 
-		String resultMessage = salesService.registerSales(consultNo, loginDealer.getDealerNo(), salesAmount);
-		if (SalesService.REGISTER_SUCCESS_MESSAGE.equals(resultMessage)) {
-			redirectAttributes.addFlashAttribute("successMessage", resultMessage);
-			return "redirect:/dealer/sales/list";
-		}
+        SalesView salesDetail = salesService.getSalesDetailByDealerNo(salesNo, loginDealer.getDealerNo());
+        if (salesDetail == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", resultMessage);
+            return "redirect:/dealer/sales/list";
+        }
 
-		populateSalesRegisterModel(model, loginDealer, consultNo, salesAmount, resultMessage);
-		return "dealer/sales/salesRegister";
-	}
+        populateSalesEditModel(model, loginDealer, salesDetail, salesAmount, resultMessage);
+        return "dealer/sales/salesEdit";
+    }
 
-	private void populateSalesRegisterModel(Model model, DealerLogin loginDealer, Integer consultNo, Integer salesAmount,
-			String errorMessage) {
+    private void populateSalesRegisterModel(Model model, DealerLogin loginDealer, Integer consultNo, Integer salesAmount,
+            String errorMessage) {
+        Integer dealerNo = loginDealer.getDealerNo();
+        List<DealerConsultView> completedConsultList = salesService.getCompletedConsultList(dealerNo);
+        DealerConsultView selectedConsult = null;
+        Sales sales = new Sales();
 
-		Integer dealerNo = loginDealer.getDealerNo();
-		List<DealerConsultView> completedConsultList = salesService.getCompletedConsultList(dealerNo);
-		DealerConsultView selectedConsult = null;
-		Sales sales = new Sales();
+        if (consultNo != null) {
+            selectedConsult = salesService.getCompletedConsultDetail(consultNo, dealerNo);
 
-		if (consultNo != null) {
-			selectedConsult = salesService.getCompletedConsultDetail(consultNo, dealerNo);
+            Sales selectedSales = salesService.createSalesFromConsult(consultNo, dealerNo);
+            if (selectedSales != null) {
+                sales = selectedSales;
+            } else {
+                sales.setConsultNo(consultNo);
+                if (errorMessage == null) {
+                    errorMessage = "선택한 상담으로 판매 등록을 진행할 수 없습니다.";
+                }
+            }
+        }
 
-			Sales selectedSales = salesService.createSalesFromConsult(consultNo, dealerNo);
-			if (selectedSales != null) {
-				sales = selectedSales;
-			} else {
-				sales.setConsultNo(consultNo);
-				if (errorMessage == null) {
-					errorMessage = "선택한 상담으로 판매 등록을 진행할 수 없습니다.";
-				}
-			}
-		}
+        if (salesAmount != null) {
+            sales.setSalesAmount(salesAmount);
+        }
 
-		if (salesAmount != null) {
-			sales.setSalesAmount(salesAmount);
-		}
+        model.addAttribute("completedConsultList", completedConsultList);
+        model.addAttribute("selectedConsultNo", consultNo);
+        model.addAttribute("selectedConsult", selectedConsult);
+        model.addAttribute("sales", sales);
+        model.addAttribute("loginDealer", loginDealer);
 
-		model.addAttribute("completedConsultList", completedConsultList);
-		model.addAttribute("selectedConsultNo", consultNo);
-		model.addAttribute("selectedConsult", selectedConsult);
-		model.addAttribute("sales", sales);
-		model.addAttribute("loginDealer", loginDealer);
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage", errorMessage);
+        }
+    }
 
-		if (errorMessage != null) {
-			model.addAttribute("errorMessage", errorMessage);
-		}
-	}
+    private void populateSalesEditModel(Model model, DealerLogin loginDealer, SalesView salesDetail,
+            Integer salesAmount, String errorMessage) {
+        Sales sales = new Sales();
+        sales.setSalesNo(salesDetail.getSalesNo());
+        sales.setSalesAmount(salesAmount != null ? salesAmount : salesDetail.getSalesAmount());
+
+        model.addAttribute("salesDetail", salesDetail);
+        model.addAttribute("sales", sales);
+        model.addAttribute("loginDealer", loginDealer);
+
+        if (errorMessage != null) {
+            model.addAttribute("errorMessage", errorMessage);
+        }
+    }
 }
