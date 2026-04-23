@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>내 정보 수정</title>
 
 <style>
@@ -59,6 +60,39 @@ input {
 .btn-danger {
     background: red;
     color: white;
+}
+
+@media (max-width: 760px) {
+    body {
+        margin: 0;
+    }
+
+    .mypage-container {
+        width: 100%;
+        margin: 0;
+        padding: 24px 16px;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    .side-menu,
+    .content {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .side-menu {
+        padding: 22px;
+    }
+
+    .content {
+        padding: 26px 18px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-top: 8px;
+    }
 }
 </style>
 </head>

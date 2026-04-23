@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LOGIN</title>
 <style>
 * {
@@ -212,6 +213,65 @@ body {
 
 .modal-btn:hover {
    background: #00264b;
+}
+
+@media (max-width: 600px) {
+   .login-box {
+      padding: 28px 22px 24px;
+   }
+
+   .login-title {
+      font-size: 22px;
+      margin-bottom: 24px;
+   }
+
+   .login-type {
+      gap: 26px;
+      font-size: 15px;
+      margin-bottom: 20px;
+   }
+
+   .input-group input {
+      height: 48px;
+      font-size: 14px;
+   }
+
+   .login-btn {
+      height: 48px;
+      font-size: 16px;
+   }
+
+   .find-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 4px 10px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: keep-all;
+   }
+
+   .find-links a {
+      margin: 0;
+      white-space: nowrap;
+   }
+
+   .bottom-line {
+      margin: 28px 0 18px;
+   }
+
+   .join-area {
+      font-size: 14px;
+      line-height: 1.55;
+      word-break: keep-all;
+   }
+
+   .join-area a {
+      display: inline-block;
+      margin-left: 4px;
+      white-space: nowrap;
+   }
 }
 </style>
 </head>

@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기아 전기차 - 프로모션 상세</title>
 <style>
 .promotion-container {
@@ -114,9 +115,64 @@
 	border-top: 1px solid #ddd;
 	padding-top: 20px;
 }
+
+@media (max-width: 900px) {
+	body.promotion-page .promotion-container {
+		margin: 180px auto 36px !important;
+		padding: 0 16px 36px !important;
+		box-sizing: border-box !important;
+	}
+
+	body.promotion-page .promo-header {
+		margin-bottom: 16px !important;
+		padding-bottom: 14px !important;
+	}
+
+	body.promotion-page .promo-title {
+		font-size: clamp(24px, 7vw, 30px) !important;
+		line-height: 1.3 !important;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	body.promotion-page .promo-meta {
+		font-size: 13px !important;
+		line-height: 1.55 !important;
+	}
+
+	body.promotion-page .promo-banner {
+		margin: 20px 0 !important;
+	}
+
+	body.promotion-page .promo-banner img {
+		border-radius: 12px !important;
+		box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+	}
+
+	body.promotion-page .promo-content {
+		min-height: auto !important;
+		padding: 12px 0 !important;
+		font-size: 14px !important;
+		line-height: 1.65 !important;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	body.promotion-page .button-group {
+		margin-top: 18px !important;
+		padding-top: 16px !important;
+	}
+
+	body.promotion-page .btn-list {
+		width: 100% !important;
+		box-sizing: border-box !important;
+		text-align: center !important;
+		font-size: 14px !important;
+	}
+}
 </style>
 </head>
-<body>
+<body class="promotion-page promotion-detail-page">
 	<th:block th:replace="~{common/header :: header}"></th:block>
 
 	<div class="promotion-container">
