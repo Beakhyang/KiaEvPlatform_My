@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>상담 신청 완료</title>
     <style>
         body {
@@ -65,6 +66,33 @@
             background: #f1f5f9;
             color: #111;
             border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 760px) {
+            .container {
+                width: calc(100% - 28px);
+                margin: 36px auto;
+                padding: 42px 20px;
+            }
+
+            h2 {
+                font-size: 26px;
+                word-break: keep-all;
+            }
+
+            .message,
+            .sub-message {
+                word-break: keep-all;
+                overflow-wrap: anywhere;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>

@@ -1,7 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>전기차 충전소 지도</title>
     <style>
         .search-container { margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; }
@@ -10,6 +11,39 @@
         .search-container button.reset-btn { background-color: #6c757d; border-color: #6c757d; }
         .search-container button.location-btn { background-color: #28a745; border-color: #28a745; }
         .search-container button.view-search-btn { background-color: #ff9800; border-color: #ff9800; }
+
+        @media (max-width: 768px) {
+            body {
+                margin: 0;
+                padding: 18px 14px;
+                box-sizing: border-box;
+            }
+
+            h2 {
+                font-size: 22px;
+                line-height: 1.35;
+                word-break: keep-all;
+            }
+
+            .search-container {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+
+            .search-container input,
+            .search-container button {
+                width: 100%;
+                margin-left: 0;
+                box-sizing: border-box;
+            }
+
+            #map {
+                height: calc(100vh - 270px) !important;
+                min-height: 420px;
+            }
+        }
     </style>
 </head>
 <body>

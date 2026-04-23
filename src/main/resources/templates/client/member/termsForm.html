@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>약관동의</title>
 <style>
 * {
@@ -124,6 +125,34 @@ button:disabled {
     font-size: 14px;
     font-weight: bold;
     margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+    .wrap {
+        width: calc(100% - 28px);
+        margin: 24px auto;
+        padding: 28px 18px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
+
+    .all-check,
+    .term-box {
+        padding: 16px;
+    }
+
+    .term-content {
+        height: 150px;
+        font-size: 13px;
+    }
+
+    button {
+        width: 100%;
+    }
 }
 </style>
 
