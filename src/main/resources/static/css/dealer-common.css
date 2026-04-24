@@ -351,6 +351,7 @@ button, input, select, textarea {
 	width: 100%;
 	padding: 28px 30px 24px 30px;
 	flex: 1;
+	min-width: 0;
 }
 
 /* =========================================================
@@ -434,6 +435,7 @@ button, input, select, textarea {
 	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
 	margin-bottom: 22px;
 	border: 1px solid #ececec;
+	min-width: 0;
 }
 
 .panel-header {
