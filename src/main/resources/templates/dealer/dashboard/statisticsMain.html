@@ -1,273 +1,277 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>딜러 판매 통계</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>딜러 판매 통계</title>
 
-<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-.statistics-page .page-header {
-	margin-bottom: 24px;
-}
+	<style>
+		.statistics-page .page-header {
+			margin-bottom: 24px;
+		}
 
-.statistics-page .panel {
-	margin-bottom: 22px;
-	padding: 24px;
-	border-radius: 20px;
-}
+		.statistics-page .panel {
+			margin-bottom: 22px;
+			padding: 24px;
+			border-radius: 20px;
+		}
 
-.statistics-page .panel:last-child {
-	margin-bottom: 0;
-}
+		.statistics-page .panel:last-child {
+			margin-bottom: 0;
+		}
 
-.statistics-page .panel-header {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-	margin-bottom: 18px;
-}
+		.statistics-page .panel-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-bottom: 18px;
+		}
 
-.statistics-page .section-title {
-	margin: 0;
-	font-size: 28px;
-	font-weight: 800;
-	line-height: 1.3;
-	letter-spacing: -0.4px;
-}
+		.statistics-page .section-title {
+			margin: 0;
+			font-size: 28px;
+			font-weight: 800;
+			line-height: 1.3;
+			letter-spacing: -0.4px;
+		}
 
-.section-desc {
-	margin: 8px 0 0 0;
-	font-size: 14px;
-	line-height: 1.6;
-	color: #666;
-}
+		.section-desc {
+			margin: 8px 0 0 0;
+			font-size: 14px;
+			line-height: 1.6;
+			color: #666;
+		}
 
-.summary-grid {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 16px;
-}
+		.summary-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 16px;
+		}
 
-.stats-summary-card {
-	position: relative;
-	overflow: hidden;
-	min-height: 160px;
-	padding: 20px;
-	border-radius: 18px;
-}
+		.stats-summary-card {
+			position: relative;
+			overflow: hidden;
+			min-height: 160px;
+			padding: 20px;
+			border-radius: 18px;
+		}
 
-.stats-summary-card::after {
-	content: "";
-	position: absolute;
-	right: -30px;
-	bottom: -30px;
-	width: 120px;
-	height: 120px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.05);
-}
+		.stats-summary-card::after {
+			content: "";
+			position: absolute;
+			right: -30px;
+			bottom: -30px;
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.05);
+		}
 
-.stats-card-label {
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.8px;
-	text-transform: uppercase;
-	opacity: 0.72;
-	margin-bottom: 8px;
-}
+		.stats-card-label {
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.8px;
+			text-transform: uppercase;
+			opacity: 0.72;
+			margin-bottom: 8px;
+		}
 
-.stats-card-title {
-	font-size: 15px;
-	font-weight: 700;
-	margin-bottom: 12px;
-	line-height: 1.4;
-}
+		.stats-card-title {
+			font-size: 15px;
+			font-weight: 700;
+			margin-bottom: 12px;
+			line-height: 1.4;
+		}
 
-.stats-card-value {
-	font-size: 30px;
-	font-weight: 800;
-	line-height: 1.35;
-	letter-spacing: -0.3px;
-	word-break: keep-all;
-}
+		.stats-card-value {
+			font-size: 30px;
+			font-weight: 800;
+			line-height: 1.35;
+			letter-spacing: -0.3px;
+			word-break: keep-all;
+		}
 
-.stats-card-meta {
-	margin-top: 10px;
-	font-size: 13px;
-	line-height: 1.6;
-	opacity: 0.84;
-}
+		.stats-card-meta {
+			margin-top: 10px;
+			font-size: 13px;
+			line-height: 1.6;
+			opacity: 0.84;
+		}
 
-.amount-text {
-	white-space: nowrap;
-	word-break: keep-all;
-}
+		.amount-text {
+			white-space: nowrap;
+			word-break: keep-all;
+		}
 
-.section-pill {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 9px 14px;
-	border-radius: 999px;
-	background: #f5f5f5;
-	color: #111;
-	font-size: 13px;
-	font-weight: 800;
-	white-space: nowrap;
-}
+		.section-pill {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 9px 14px;
+			border-radius: 999px;
+			background: #f5f5f5;
+			color: #111;
+			font-size: 13px;
+			font-weight: 800;
+			white-space: nowrap;
+		}
 
-.chart-wrap {
-	position: relative;
-	padding: 8px 4px 0;
-	border-radius: 16px;
-	background: #fff;
-}
+		.chart-wrap {
+			position: relative;
+			padding: 8px 4px 0;
+			border-radius: 16px;
+			background: #fff;
+		}
 
-.chart-wrap.chart-lg {
-	height: 420px;
-}
+		.chart-wrap.chart-lg {
+			height: 420px;
+		}
 
-.chart-empty-message {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	color: #666;
-	font-size: 15px;
-	font-weight: 700;
-	text-align: center;
-	padding: 20px;
-}
+		.chart-empty-message {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			color: #666;
+			font-size: 15px;
+			font-weight: 700;
+			text-align: center;
+			padding: 20px;
+		}
 
-.dual-axis-chart-wrap {
-	position: relative;
-	padding-left: 40px;
-	padding-right: 40px;
-}
+		.dual-axis-chart-wrap {
+			position: relative;
+			padding-left: 40px;
+			padding-right: 40px;
+		}
 
-.axis-label {
-	position: absolute;
-	bottom: 44px;
-	font-size: 12px;
-	font-weight: 700;
-	color: #666;
-	line-height: 1;
-	pointer-events: none;
-	z-index: 2;
-	background: #fff;
-	padding: 2px 4px;
-	white-space: nowrap;
-}
+		.axis-label {
+			position: absolute;
+			bottom: 44px;
+			font-size: 12px;
+			font-weight: 700;
+			color: #666;
+			line-height: 1;
+			pointer-events: none;
+			z-index: 2;
+			background: #fff;
+			padding: 2px 4px;
+			white-space: nowrap;
+		}
 
-.axis-label-left {
-	left: 0;
-}
+		.axis-label-left {
+			left: 0;
+		}
 
-.axis-label-right {
-	right: 0;
-}
+		.axis-label-right {
+			right: 0;
+		}
 
-.detail-grid {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 20px;
-}
+		.detail-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 20px;
+		}
 
-.table-wrap {
-	margin-top: 4px;
-	overflow-x: auto;
-}
+		.table-wrap {
+			margin-top: 4px;
+			overflow-x: auto;
+		}
 
-.stats-table tbody td {
-	font-weight: 500;
-	vertical-align: middle;
-}
+		.stats-table tbody td {
+			font-weight: 500;
+			vertical-align: middle;
+		}
 
-.stats-table .td-month, .stats-table .td-model {
-	font-weight: 700;
-	white-space: nowrap;
-}
+		.stats-table .td-month,
+		.stats-table .td-model {
+			font-weight: 700;
+			white-space: nowrap;
+		}
 
-.stats-table .td-count {
-	font-weight: 700;
-}
+		.stats-table .td-count {
+			font-weight: 700;
+		}
 
-.stats-table .td-amount {
-	font-weight: 800;
-	white-space: nowrap;
-	word-break: keep-all;
-}
+		.stats-table .td-amount {
+			font-weight: 800;
+			white-space: nowrap;
+			word-break: keep-all;
+		}
 
-.empty-message {
-	text-align: center;
-	padding: 24px 12px;
-	color: #666;
-	font-weight: 600;
-}
+		.empty-message {
+			text-align: center;
+			padding: 24px 12px;
+			color: #666;
+			font-weight: 600;
+		}
 
-@media ( max-width : 1200px) {
-	.summary-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
+		@media (max-width : 1200px) {
+			.summary-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
 
-	.detail-grid {
-		grid-template-columns: 1fr;
-	}
-}
+			.detail-grid {
+				grid-template-columns: 1fr;
+			}
+		}
 
-@media ( max-width : 1024px) {
-	.statistics-page .section-title {
-		font-size: 24px;
-	}
-}
+		@media (max-width : 1024px) {
+			.statistics-page .section-title {
+				font-size: 24px;
+			}
+		}
 
-@media ( max-width : 768px) {
-	.statistics-page .page-header {
-		margin-bottom: 20px;
-	}
+		@media (max-width : 768px) {
+			.statistics-page .page-header {
+				margin-bottom: 20px;
+			}
 
-	.statistics-page .panel {
-		padding: 18px 16px;
-		margin-bottom: 18px;
-	}
+			.statistics-page .panel {
+				padding: 18px 16px;
+				margin-bottom: 18px;
+			}
 
-	.statistics-page .section-title {
-		font-size: 22px;
-	}
+			.statistics-page .section-title {
+				font-size: 22px;
+			}
 
-	.summary-grid {
-		grid-template-columns: 1fr;
-	}
+			.summary-grid {
+				grid-template-columns: 1fr;
+			}
 
-	.stats-summary-card {
-		min-height: 136px;
-		padding: 18px 16px;
-	}
+			.stats-summary-card {
+				min-height: 136px;
+				padding: 18px 16px;
+			}
 
-	.stats-card-value {
-		font-size: 24px;
-	}
+			.stats-card-value {
+				font-size: 24px;
+			}
 
-	.chart-wrap.chart-lg {
-		height: 340px;
-	}
+			.chart-wrap.chart-lg {
+				height: 340px;
+			}
 
-	.dual-axis-chart-wrap {
-		padding-left: 28px;
-		padding-right: 28px;
-	}
+			.dual-axis-chart-wrap {
+				padding-left: 28px;
+				padding-right: 28px;
+			}
 
-	.axis-label {
-		bottom: 36px;
-		font-size: 11px;
-	}
-}
-</style>
+			.axis-label {
+				bottom: 36px;
+				font-size: 11px;
+			}
+		}
+	</style>
 </head>
+
 <body>
 
 	<div class="dealer-layout">
@@ -317,16 +321,19 @@
 							<div class="stats-card-value"
 								th:text="${dashboard != null ? dashboard.totalSalesCount : 0}">0</div>
 							<div class="stats-card-meta"
-								th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건'}">2026-04 판매 0건</div>
+								th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건'}">2026-04 판매 0건
+							</div>
 						</div>
 
 						<div class="summary-card summary-card-dark stats-summary-card">
 							<div class="stats-card-label">Sales Amount</div>
 							<div class="stats-card-title">총 판매 금액</div>
 							<div class="stats-card-value amount-text"
-								th:text="${dashboard != null and dashboard.totalSalesAmount != null ? #numbers.formatInteger(dashboard.totalSalesAmount, 3, 'COMMA') + '원' : '0원'}">0원</div>
+								th:text="${dashboard != null and dashboard.totalSalesAmount != null ? #numbers.formatInteger(dashboard.totalSalesAmount, 3, 'COMMA') + '원' : '0원'}">
+								0원</div>
 							<div class="stats-card-meta"
-								th:text="${currentMonthLabel + ' 판매금액 ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">2026-04 판매금액 0원</div>
+								th:text="${currentMonthLabel + ' 판매금액 ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">
+								2026-04 판매금액 0원</div>
 						</div>
 
 						<div class="summary-card summary-card-dark stats-summary-card">
@@ -335,16 +342,17 @@
 							<div class="stats-card-value amount-text"
 								th:text="${#numbers.formatInteger(averageSalesAmount, 3, 'COMMA') + '원'}">0원</div>
 							<div class="stats-card-meta"
-								th:text="${dashboard != null ? '누적 판매 ' + dashboard.totalSalesCount + '건 기준' : '누적 판매 0건 기준'}">누적 판매 0건 기준</div>
+								th:text="${dashboard != null ? '누적 판매 ' + dashboard.totalSalesCount + '건 기준' : '누적 판매 0건 기준'}">
+								누적 판매 0건 기준</div>
 						</div>
 
 						<div class="summary-card summary-card-dark stats-summary-card">
 							<div class="stats-card-label">Top Model</div>
 							<div class="stats-card-title">베스트셀링 차량</div>
-							<div class="stats-card-value"
-								th:text="${topSellingModelName}">집계된 차량 없음</div>
+							<div class="stats-card-value" th:text="${topSellingModelName}">집계된 차량 없음</div>
 							<div class="stats-card-meta"
-								th:text="${topSellingModelCount + '건 / ' + #numbers.formatInteger(topSellingModelAmount, 3, 'COMMA') + '원'}">0건 / 0원</div>
+								th:text="${topSellingModelCount + '건 / ' + #numbers.formatInteger(topSellingModelAmount, 3, 'COMMA') + '원'}">
+								0건 / 0원</div>
 						</div>
 					</div>
 				</section>
@@ -357,7 +365,8 @@
 						</div>
 
 						<div class="section-pill"
-							th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건 / ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">2026-04 판매 0건 / 0원</div>
+							th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건 / ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">
+							2026-04 판매 0건 / 0원</div>
 					</div>
 
 					<div class="chart-wrap chart-lg dual-axis-chart-wrap" id="monthlyChartWrap">
@@ -375,7 +384,8 @@
 						</div>
 
 						<div class="section-pill"
-							th:text="${'베스트 차량 ' + topSellingModelName + ' / ' + topSellingModelCount + '건'}">베스트 차량 집계된 차량 없음 / 0건</div>
+							th:text="${'베스트 차량 ' + topSellingModelName + ' / ' + topSellingModelCount + '건'}">베스트 차량 집계된
+							차량 없음 / 0건</div>
 					</div>
 
 					<div class="chart-wrap chart-lg dual-axis-chart-wrap" id="carModelChartWrap">
@@ -412,7 +422,8 @@
 										<td class="td-month" th:text="${stat.salesMonth}">2026-04</td>
 										<td class="td-count" th:text="${stat.salesCount}">0</td>
 										<td class="td-amount"
-											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원</td>
+											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -445,7 +456,8 @@
 										<td class="td-model" th:text="${stat.modelName}">EV6</td>
 										<td class="td-count" th:text="${stat.salesCount}">0</td>
 										<td class="td-amount"
-											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원</td>
+											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원
+										</td>
 									</tr>
 								</tbody>
 							</table>
@@ -518,9 +530,9 @@
 			}
 
 			return {
-				labels : safeLabels,
-				counts : safeCounts,
-				amounts : safeAmounts
+				labels: safeLabels,
+				counts: safeCounts,
+				amounts: safeAmounts
 			};
 		}
 
@@ -535,7 +547,7 @@
 			canvas.style.display = 'none';
 
 			const axisLabels = wrap.querySelectorAll('.axis-label');
-			axisLabels.forEach(function(label) {
+			axisLabels.forEach(function (label) {
 				label.style.display = 'none';
 			});
 
@@ -566,67 +578,67 @@
 			const safeData = makeSafeChartData(labels, counts, amounts, '기타');
 
 			new Chart(chartCanvas, {
-				data : {
-					labels : safeData.labels,
-					datasets : [ {
-						type : 'bar',
-						label : '판매 건수',
-						data : safeData.counts,
-						backgroundColor : '#60A5FA',
-						borderRadius : 8,
-						maxBarThickness : 40,
-						categoryPercentage : 0.6,
-						barPercentage : 0.82,
-						yAxisID : 'y',
-						order : 2
+				data: {
+					labels: safeData.labels,
+					datasets: [{
+						type: 'bar',
+						label: '판매 건수',
+						data: safeData.counts,
+						backgroundColor: '#60A5FA',
+						borderRadius: 8,
+						maxBarThickness: 40,
+						categoryPercentage: 0.6,
+						barPercentage: 0.82,
+						yAxisID: 'y',
+						order: 2
 					}, {
-						type : 'line',
-						label : '판매 금액',
-						data : safeData.amounts,
-						borderColor : '#F59E0B',
-						backgroundColor : '#F59E0B',
-						borderWidth : 3,
-						pointRadius : 4,
-						pointHoverRadius : 5,
-						pointBackgroundColor : '#F59E0B',
-						pointBorderColor : '#F59E0B',
-						tension : 0.25,
-						fill : false,
-						yAxisID : 'y1',
-						order : 1
-					} ]
+						type: 'line',
+						label: '판매 금액',
+						data: safeData.amounts,
+						borderColor: '#F59E0B',
+						backgroundColor: '#F59E0B',
+						borderWidth: 3,
+						pointRadius: 4,
+						pointHoverRadius: 5,
+						pointBackgroundColor: '#F59E0B',
+						pointBorderColor: '#F59E0B',
+						tension: 0.25,
+						fill: false,
+						yAxisID: 'y1',
+						order: 1
+					}]
 				},
-				options : {
-					responsive : true,
-					maintainAspectRatio : false,
-					interaction : {
-						mode : 'index',
-						intersect : false
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					interaction: {
+						mode: 'index',
+						intersect: false
 					},
-					layout : {
-						padding : {
-							top : 8,
-							right : 6,
-							left : 6,
-							bottom : 0
+					layout: {
+						padding: {
+							top: 8,
+							right: 6,
+							left: 6,
+							bottom: 0
 						}
 					},
-					scales : {
-						x : {
-							offset : true,
-							grid : {
-								display : false
+					scales: {
+						x: {
+							offset: true,
+							grid: {
+								display: false
 							},
-							ticks : {
-								autoSkip : false,
-								maxRotation : 0,
-								minRotation : 0,
-								padding : 8,
-								font : {
-									size : 12,
-									weight : '600'
+							ticks: {
+								autoSkip: false,
+								maxRotation: 0,
+								minRotation: 0,
+								padding: 8,
+								font: {
+									size: 12,
+									weight: '600'
 								},
-								callback : function(value) {
+								callback: function (value) {
 									const label = this.getLabelForValue(value);
 
 									if (!label) {
@@ -641,45 +653,45 @@
 								}
 							}
 						},
-						y : {
-							beginAtZero : true,
-							position : 'left',
-							grid : {
-								color : '#E5E7EB'
+						y: {
+							beginAtZero: true,
+							position: 'left',
+							grid: {
+								color: '#E5E7EB'
 							},
-							ticks : {
-								precision : 0,
-								padding : 6
+							ticks: {
+								precision: 0,
+								padding: 6
 							}
 						},
-						y1 : {
-							beginAtZero : true,
-							position : 'right',
-							grid : {
-								drawOnChartArea : false
+						y1: {
+							beginAtZero: true,
+							position: 'right',
+							grid: {
+								drawOnChartArea: false
 							},
-							ticks : {
-								padding : 6,
-								callback : function(value) {
+							ticks: {
+								padding: 6,
+								callback: function (value) {
 									return formatManwon(value);
 								}
 							}
 						}
 					},
-					plugins : {
-						legend : {
-							position : 'bottom',
-							labels : {
-								padding : 14,
-								font : {
-									size : 12,
-									weight : '600'
+					plugins: {
+						legend: {
+							position: 'bottom',
+							labels: {
+								padding: 14,
+								font: {
+									size: 12,
+									weight: '600'
 								}
 							}
 						},
-						tooltip : {
-							callbacks : {
-								label : function(context) {
+						tooltip: {
+							callbacks: {
+								label: function (context) {
 									if (context.dataset.label === '판매 금액') {
 										return context.dataset.label + ' : ' + formatCurrency(context.raw);
 									}
@@ -701,27 +713,27 @@
 		const carModelCountsRaw = /*[[${carModelCounts}]]*/[];
 		const carModelAmountsRaw = /*[[${carModelAmounts}]]*/[];
 
-		const monthlyLabels = (Array.isArray(monthlyLabelsRaw) ? monthlyLabelsRaw : []).map(function(item) {
+		const monthlyLabels = (Array.isArray(monthlyLabelsRaw) ? monthlyLabelsRaw : []).map(function (item) {
 			return toSafeLabel(item, '');
 		});
 
-		const monthlyCounts = (Array.isArray(monthlyCountsRaw) ? monthlyCountsRaw : []).map(function(item) {
+		const monthlyCounts = (Array.isArray(monthlyCountsRaw) ? monthlyCountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const monthlyAmounts = (Array.isArray(monthlyAmountsRaw) ? monthlyAmountsRaw : []).map(function(item) {
+		const monthlyAmounts = (Array.isArray(monthlyAmountsRaw) ? monthlyAmountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const carModelLabels = (Array.isArray(carModelLabelsRaw) ? carModelLabelsRaw : []).map(function(item) {
+		const carModelLabels = (Array.isArray(carModelLabelsRaw) ? carModelLabelsRaw : []).map(function (item) {
 			return toSafeLabel(item, '미분류 차량');
 		});
 
-		const carModelCounts = (Array.isArray(carModelCountsRaw) ? carModelCountsRaw : []).map(function(item) {
+		const carModelCounts = (Array.isArray(carModelCountsRaw) ? carModelCountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const carModelAmounts = (Array.isArray(carModelAmountsRaw) ? carModelAmountsRaw : []).map(function(item) {
+		const carModelAmounts = (Array.isArray(carModelAmountsRaw) ? carModelAmountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
@@ -747,4 +759,5 @@
 	</script>
 
 </body>
+
 </html>
