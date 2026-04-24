@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
 
+import com.kiaev.common.aws.AwsSecretsBootstrap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.kiaev.client.car.Car;
 import com.kiaev.client.car.CarRepository;
@@ -47,7 +48,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
     @Value("${api.key.chatbot:}")
     private String configuredApiKey;
 
-    @Value("${chatbot.ai.model:gemini-2.0-flash}")
+    @Value("${chatbot.ai.model:gemini-2.5-flash}")
     private String modelName;
 
     @Override
@@ -82,7 +83,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
         String apiKey = resolveApiKey();
         if (!hasText(apiKey)) {
             return ChatbotAiResponse.builder()
-                    .answer("AI 상담 키가 아직 연결되지 않았습니다. 서버 환경변수 `GEMINI_API_KEY`를 확인한 뒤 서버를 다시 시작해 주세요.")
+                    .answer("AI 상담 키가 아직 연결되지 않았습니다. 서버 환경 변수 `GEMINI_API_KEY` 또는 AWS Secrets Manager 설정을 확인한 뒤 서버를 다시 시작해 주세요.")
                     .available(false)
                     .provider(PROVIDER)
                     .suggestedQuestions(defaultSuggestedQuestions())
@@ -104,7 +105,8 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
                     .suggestedQuestions(defaultSuggestedQuestions())
                     .build();
         } catch (RestClientResponseException ex) {
-            log.warn("Gemini API request failed. status={}, body={}", ex.getRawStatusCode(), ex.getResponseBodyAsString());
+            log.warn("Gemini API request failed. model={}, status={}, body={}", modelName, ex.getRawStatusCode(),
+                    ex.getResponseBodyAsString());
             return ChatbotAiResponse.builder()
                     .answer(buildApiErrorMessage(ex))
                     .available(true)
@@ -112,7 +114,7 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
                     .suggestedQuestions(defaultSuggestedQuestions())
                     .build();
         } catch (RestClientException ex) {
-            log.warn("Gemini API connection failed", ex);
+            log.warn("Gemini API connection failed. model={}", modelName, ex);
             return ChatbotAiResponse.builder()
                     .answer("AI 상담 서버와 연결하는 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.")
                     .available(true)
@@ -313,6 +315,10 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
             return "현재 Gemini API 요청 한도에 도달했습니다. 잠시 후 다시 시도하시거나 Google AI Studio에서 사용량 및 결제 설정을 확인해 주세요.";
         }
 
+        if (statusCode == 404) {
+            return "현재 설정된 Gemini 모델을 사용할 수 없습니다. 서버 설정을 최신 모델(gemini-2.5-flash 등)로 바꾼 뒤 다시 시작해 주세요.";
+        }
+
         if (statusCode == 401 || statusCode == 403) {
             return "Gemini API 인증에 실패했습니다. API 키 권한과 프로젝트 설정을 다시 확인해 주세요.";
         }
@@ -350,7 +356,23 @@ public class ChatbotAiServiceImpl implements ChatbotAiService {
             return configuredApiKey.trim();
         }
 
-        for (String envName : List.of("GEMINI_API_KEY", "Gemini_API_Key", "Gemini_ API_Key")) {
+        String resolvedSecretValue = AwsSecretsBootstrap.resolveValue(
+                "api.key.chatbot",
+                "GEMINI_API_KEY",
+                "Gemini API Key",
+                "Gemini_API_Key");
+        if (hasText(resolvedSecretValue)) {
+            return resolvedSecretValue.trim();
+        }
+
+        for (String propertyName : List.of("api.key.chatbot", "GEMINI_API_KEY", "Gemini_API_Key")) {
+            String value = System.getProperty(propertyName);
+            if (hasText(value)) {
+                return value.trim();
+            }
+        }
+
+        for (String envName : List.of("GEMINI_API_KEY", "Gemini_API_Key", "GEMINI API KEY", "Gemini API Key", "Gemini_ API_Key")) {
             String value = System.getenv(envName);
             if (hasText(value)) {
                 return value.trim();

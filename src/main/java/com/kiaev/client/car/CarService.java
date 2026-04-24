@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class CarService {
 
     private final CarRepository carRepository;
+    private final CarImagePathNormalizer carImagePathNormalizer;
 
     public List<Car> searchCars(String keyword, String carType, String sort) {
         String searchKeyword = keyword == null ? "" : keyword;
@@ -34,6 +35,7 @@ public class CarService {
         }
 
         return carRepository.findByModelNameContainingAndCarTypeContaining(searchKeyword, searchType, sortOrder).stream()
+                .map(carImagePathNormalizer::normalize)
                 .filter(this::isVisibleCar)
                 .collect(Collectors.toList());
     }
@@ -46,11 +48,13 @@ public class CarService {
             throw new IllegalArgumentException("해당 차량 없음. ID: " + carNo);
         }
 
+        carImagePathNormalizer.normalize(car);
         return car;
     }
 
     public List<Car> findAll() {
         return carRepository.findAll(Sort.by(Sort.Direction.ASC, "modelName")).stream()
+                .map(carImagePathNormalizer::normalize)
                 .filter(this::isVisibleCar)
                 .collect(Collectors.toList());
     }

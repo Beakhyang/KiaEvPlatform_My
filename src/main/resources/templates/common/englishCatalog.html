@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KIA EV | Catalog</title>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
     <style>
@@ -10,10 +11,15 @@
             font-family: 'Pretendard', sans-serif; 
             background-color: #f4f7f9; 
             color: #05141f;
+            overflow-x: hidden;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         .container {
-            width: 1200px;
+            width: min(1200px, calc(100% - 40px));
             margin: 0 auto;
             padding: 160px 0 100px;
         }
@@ -113,6 +119,54 @@
         footer {
             margin-top: 100px;
         }
+
+        @media (max-width: 900px) {
+            .container {
+                width: 100%;
+                padding: 190px 16px 70px;
+            }
+
+            .catalog-header {
+                margin-bottom: 32px;
+            }
+
+            .catalog-header h1 {
+                font-size: clamp(36px, 12vw, 48px);
+                letter-spacing: -0.04em;
+            }
+
+            .catalog-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .catalog-item {
+                border-radius: 20px;
+            }
+
+            .catalog-item:hover {
+                transform: none;
+            }
+
+            .thumb-box {
+                height: 210px;
+            }
+
+            .item-info {
+                padding: 22px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .thumb-box {
+                height: 190px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -132,7 +186,7 @@
             <!-- 카드 1: Ray EV -->
             <div class="catalog-item" onclick="window.open('/pdf/Ray_EV_Catalog_EN.pdf', '_blank')">
                 <div class="thumb-box">
-                    <img th:src="@{/images/cars/rayev_1.jpg}" alt="Ray EV">
+                    <img th:src="@{/images/cars/RayEV_1.jpg}" alt="Ray EV">
                 </div>
                 <div class="item-info">
                     <h3>Ray EV</h3>
@@ -142,7 +196,7 @@
             <!-- 카드 2: EV6 -->
             <div class="catalog-item" onclick="window.open('/pdf/EV6_Catalog_EN.pdf', '_blank')">
                 <div class="thumb-box">
-                    <img th:src="@{/images/cars/ev6_1.jpg}" alt="EV6">
+                    <img th:src="@{/images/cars/EV6_1.jpg}" alt="EV6">
                 </div>
                 <div class="item-info">
                     <h3>EV6</h3>
@@ -152,7 +206,7 @@
             <!-- 카드 3: EV9 -->
             <div class="catalog-item" onclick="window.open('/pdf/EV9_Catalog_EN.pdf', '_blank')">
                 <div class="thumb-box">
-                    <img th:src="@{/images/cars/ev9_1.jpg}" alt="EV9">
+                    <img th:src="@{/images/cars/EV9_1.jpg}" alt="EV9">
                 </div>
                 <div class="item-info">
                     <h3>EV9</h3>

@@ -14,7 +14,7 @@
         }
 
         .footer-inner { 
-            max-width: 1200px; 
+            width: min(1200px, calc(100% - 40px));
             margin: 0 auto; 
             text-align: center; 
         }
@@ -54,6 +54,36 @@
             font-size: 13px;   
             letter-spacing: 0.25px;
             line-height: 1.2;
+        }
+
+        @media (max-width: 768px) {
+            .footer-wrap {
+                padding: 24px 0;
+                margin-top: 28px;
+            }
+
+            .footer-inner {
+                width: calc(100% - 32px);
+            }
+
+            .f-links {
+                flex-wrap: wrap;
+                gap: 10px 14px;
+                margin-bottom: 12px;
+            }
+
+            .f-links a {
+                font-size: 13px;
+            }
+
+            .f-links a:not(:last-child)::after {
+                display: none;
+            }
+
+            .f-copy {
+                font-size: 12px;
+                line-height: 1.5;
+            }
         }
     </style>
     

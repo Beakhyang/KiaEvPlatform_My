@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기아 전기차 - 현재 진행 중인 프로모션</title>
 <style>
 .promotion-container {
@@ -235,9 +236,86 @@
 .detail-btn:hover {
 	background-color: #c91f1a;
 }
+
+@media (max-width: 900px) {
+	body.promotion-page .promotion-container {
+		margin: 180px auto 36px !important;
+		padding: 0 16px 36px !important;
+		box-sizing: border-box !important;
+	}
+
+	body.promotion-page .page-header {
+		margin-bottom: 22px !important;
+		padding-bottom: 12px !important;
+	}
+
+	body.promotion-page .page-title {
+		font-size: clamp(25px, 7vw, 30px) !important;
+		line-height: 1.25 !important;
+		letter-spacing: -0.04em;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	body.promotion-page .promotion-card {
+		padding: 18px !important;
+		margin-bottom: 16px !important;
+		border-radius: 12px !important;
+	}
+
+	body.promotion-page .badge-group {
+		flex-wrap: wrap;
+		margin-bottom: 8px !important;
+	}
+
+	body.promotion-page .promotion-title {
+		font-size: 20px !important;
+		line-height: 1.35 !important;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	body.promotion-page .promotion-content-preview {
+		font-size: 14px !important;
+		line-height: 1.55 !important;
+	}
+
+	body.promotion-page .promotion-benefit-card {
+		width: 100% !important;
+		padding: 12px 14px !important;
+		margin-bottom: 14px !important;
+		gap: 8px !important;
+	}
+
+	body.promotion-page .benefit-label,
+	body.promotion-page .benefit-text {
+		font-size: 14px !important;
+	}
+
+	body.promotion-page .card-footer {
+		gap: 10px !important;
+		padding-top: 12px !important;
+	}
+
+	body.promotion-page .promotion-date {
+		font-size: 13px !important;
+		line-height: 1.5 !important;
+	}
+
+	body.promotion-page .detail-btn {
+		min-width: 0 !important;
+		padding: 10px 16px !important;
+		font-size: 13px !important;
+	}
+
+	body.promotion-page .empty-message {
+		padding: 36px 16px !important;
+		font-size: 14px !important;
+	}
+}
 </style>
 </head>
-<body>
+<body class="promotion-page promotion-list-page">
 	<th:block th:replace="~{common/header :: header}"></th:block>
 
 	<div class="promotion-container">

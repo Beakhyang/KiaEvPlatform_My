@@ -1,0 +1,16 @@
+[Unit]
+Description=KiaEvPlatform Spring Boot Application
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/kiaevplatform
+EnvironmentFile=/opt/kiaevplatform/app.env
+ExecStart=/usr/bin/java -Duser.timezone=Asia/Seoul -jar /opt/kiaevplatform/app.jar
+SuccessExitStatus=143
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -5,6 +5,7 @@
     <title th:text="${isEdit} ? '공지사항 수정' : '공지사항 작성'">공지사항 작성</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
     <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+    <script th:src="@{/js/admin-form-submit-state.js}" defer></script>
 </head>
 <body>
 <div class="admin-shell">
@@ -14,7 +15,7 @@
         <div class="page-header">
             <div>
                 <h1 th:text="${isEdit} ? '공지사항 수정' : '공지사항 작성'">공지사항 작성</h1>
-                <p>관리자 공지사항은 작성자명이 자동으로 GM으로 표시됩니다.</p>
+                <p>관리자 공지사항을 작성하거나 수정합니다.</p>
             </div>
             <div class="page-actions">
                 <a th:href="@{/admin/board/list}" class="btn btn-secondary">목록</a>
@@ -22,7 +23,7 @@
         </div>
 
         <section class="panel">
-            <form th:action="@{/admin/board/save}" method="post" class="form-grid">
+            <form th:action="@{/admin/board/save}" method="post" class="form-grid" data-submit-state-form>
                 <input type="hidden" name="boardNo" th:value="${board.boardNo}">
                 <input type="hidden" name="boardType" value="NOTICE">
 
@@ -44,18 +45,22 @@
 
                 <div class="field">
                     <label>노출 설정</label>
-                    <div class="check-row">
-                        <input type="hidden" name="isPinned" value="N">
-                        <label><input type="checkbox" name="isPinned" value="Y" th:checked="${board.isPinned == 'Y'}"> 상단 고정</label>
-                    </div>
-                    <div class="check-row" style="margin-top: 12px;">
-                        <input type="hidden" name="hidden" value="N">
-                        <label><input type="checkbox" name="hidden" value="Y" th:checked="${board.hidden == 'Y'}"> 비공개</label>
+                    <div class="check-group">
+                        <label class="check-option">
+                            <input type="checkbox" name="isPinned" value="Y" th:checked="${board.isPinned == 'Y'}">
+                            <span>상단 고정</span>
+                        </label>
+
+                        <label class="check-option">
+                            <input type="checkbox" name="hidden" value="Y" th:checked="${board.hidden == 'Y'}">
+                            <span>비공개</span>
+                        </label>
                     </div>
                 </div>
 
                 <div class="field full form-actions">
-                    <button type="submit" class="btn btn-primary">저장</button>
+                    <button type="submit" class="btn btn-primary"
+                            th:attr="data-loading-text=${isEdit} ? '저장 중...' : '등록 중...'">저장</button>
                     <a th:href="@{/admin/board/list}" class="btn btn-secondary">취소</a>
                 </div>
             </form>
