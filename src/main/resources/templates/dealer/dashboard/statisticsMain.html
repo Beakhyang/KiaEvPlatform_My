@@ -151,6 +151,10 @@
 			padding-right: 40px;
 		}
 
+		.model-donut-chart-wrap {
+			padding: 10px 24px 14px;
+		}
+
 		.axis-label {
 			position: absolute;
 			bottom: 44px;
@@ -388,9 +392,7 @@
 							차량 없음 / 0건</div>
 					</div>
 
-					<div class="chart-wrap chart-lg dual-axis-chart-wrap" id="carModelChartWrap">
-						<div class="axis-label axis-label-left">판매 건수</div>
-						<div class="axis-label axis-label-right">판매 금액(만원)</div>
+					<div class="chart-wrap chart-lg model-donut-chart-wrap" id="carModelChartWrap">
 						<canvas id="carModelSalesChart"></canvas>
 					</div>
 				</section>
@@ -527,6 +529,35 @@
 				safeCounts.push(0);
 				safeAmounts.unshift(0);
 				safeAmounts.push(0);
+			}
+
+			return {
+				labels: safeLabels,
+				counts: safeCounts,
+				amounts: safeAmounts
+			};
+		}
+
+		function makeModelDoughnutData(labels, counts, amounts, fallbackLabel) {
+			const safeLabels = [];
+			const safeCounts = [];
+			const safeAmounts = [];
+
+			const labelArray = Array.isArray(labels) ? labels : [];
+			const countArray = Array.isArray(counts) ? counts : [];
+			const amountArray = Array.isArray(amounts) ? amounts : [];
+			const maxLength = Math.max(labelArray.length, countArray.length, amountArray.length);
+
+			for (let i = 0; i < maxLength; i++) {
+				const count = toSafeNumber(countArray[i]);
+
+				if (count <= 0) {
+					continue;
+				}
+
+				safeLabels.push(toSafeLabel(labelArray[i], fallbackLabel));
+				safeCounts.push(count);
+				safeAmounts.push(toSafeNumber(amountArray[i]));
 			}
 
 			return {
@@ -705,6 +736,99 @@
 			});
 		}
 
+		function getChartColors(length) {
+			const palette = [
+				'#111111',
+				'#2563EB',
+				'#10B981',
+				'#F59E0B',
+				'#EF4444',
+				'#8B5CF6',
+				'#14B8A6',
+				'#64748B'
+			];
+			const colors = [];
+
+			for (let i = 0; i < length; i++) {
+				colors.push(palette[i % palette.length]);
+			}
+
+			return colors;
+		}
+
+		function createModelDoughnutChart(targetCanvasId, wrapId, labels, counts, amounts, emptyMessage) {
+			const chartCanvas = document.getElementById(targetCanvasId);
+
+			if (!chartCanvas) {
+				return;
+			}
+
+			if (!labels || labels.length === 0) {
+				showChartEmptyMessage(targetCanvasId, wrapId, emptyMessage);
+				return;
+			}
+
+			const safeData = makeModelDoughnutData(labels, counts, amounts, '미분류 차량');
+			const totalCount = safeData.counts.reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+
+			if (totalCount === 0) {
+				showChartEmptyMessage(targetCanvasId, wrapId, emptyMessage);
+				return;
+			}
+
+			new Chart(chartCanvas, {
+				type: 'doughnut',
+				data: {
+					labels: safeData.labels,
+					datasets: [{
+						label: '판매 건수',
+						data: safeData.counts,
+						backgroundColor: getChartColors(safeData.labels.length),
+						borderColor: '#FFFFFF',
+						borderWidth: 3,
+						hoverOffset: 8
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					cutout: '58%',
+					layout: {
+						padding: {
+							top: 8,
+							right: 10,
+							left: 10,
+							bottom: 0
+						}
+					},
+					plugins: {
+						legend: {
+							position: 'bottom',
+							labels: {
+								padding: 14,
+								usePointStyle: true,
+								pointStyle: 'circle',
+								font: {
+									size: 12,
+									weight: '600'
+								}
+							}
+						},
+						tooltip: {
+							callbacks: {
+								label: function (context) {
+									const amount = safeData.amounts[context.dataIndex] || 0;
+									return context.label + ' : ' + context.raw + '건 / ' + formatCurrency(amount);
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+
 		const monthlyLabelsRaw = /*[[${monthlyLabels}]]*/[];
 		const monthlyCountsRaw = /*[[${monthlyCounts}]]*/[];
 		const monthlyAmountsRaw = /*[[${monthlyAmounts}]]*/[];
@@ -746,7 +870,7 @@
 			'월별 판매 데이터가 없습니다.'
 		);
 
-		createMixedChart(
+		createModelDoughnutChart(
 			'carModelSalesChart',
 			'carModelChartWrap',
 			carModelLabels,
