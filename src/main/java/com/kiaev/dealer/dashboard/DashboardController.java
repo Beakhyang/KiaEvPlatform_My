@@ -38,7 +38,7 @@ public class DashboardController {
 		return "dealer/dashboard/dashboardMain";
 	}
 
-	@GetMapping({"/dealer/dashboard", "/dealer"})
+	@GetMapping("/dealer/dashboard")
 	public String dashboardRedirect(HttpSession session) {
 
 		DealerLogin loginDealer = (DealerLogin) session.getAttribute("loginDealer");
