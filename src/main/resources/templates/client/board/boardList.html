@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>기아 전기차 - 문의게시판</title>
 <style>
 /* 화면을 조금 예쁘게 보이게 해주는 간단한 CSS 입니다 */
@@ -43,9 +44,104 @@ a:hover {
 	color: #fff;
 	text-decoration: none;
 }
+
+@media (max-width: 900px) {
+	.board-page > div[style*="width: 800px"] {
+		width: 100% !important;
+		margin: 0 !important;
+		padding: 190px 10px 50px !important;
+		box-sizing: border-box !important;
+	}
+
+	.board-page h2 {
+		font-size: 22px !important;
+		line-height: 1.25 !important;
+		margin: 0 0 14px !important;
+	}
+
+	.board-page table {
+		display: table !important;
+		width: 100% !important;
+		table-layout: fixed !important;
+		margin-top: 0 !important;
+		border-collapse: collapse !important;
+		box-sizing: border-box !important;
+		overflow: visible !important;
+	}
+
+	.board-page thead {
+		display: table-header-group !important;
+	}
+
+	.board-page tbody {
+		display: table-row-group !important;
+	}
+
+	.board-page tr {
+		display: table-row !important;
+	}
+
+	.board-page th,
+	.board-page td {
+		display: table-cell !important;
+		border: 1px solid #ddd !important;
+		padding: 6px 3px !important;
+		text-align: center !important;
+		font-size: 10.5px !important;
+		line-height: 1.35 !important;
+		letter-spacing: -0.04em !important;
+		vertical-align: middle !important;
+		white-space: normal !important;
+		word-break: keep-all !important;
+		overflow-wrap: anywhere !important;
+	}
+
+	.board-page th:nth-child(1),
+	.board-page td:nth-child(1) {
+		width: 11% !important;
+	}
+
+	.board-page th:nth-child(2),
+	.board-page td:nth-child(2) {
+		width: 17% !important;
+	}
+
+	.board-page th:nth-child(3),
+	.board-page td:nth-child(3) {
+		width: 36% !important;
+	}
+
+	.board-page th:nth-child(4),
+	.board-page td:nth-child(4) {
+		width: 12% !important;
+	}
+
+	.board-page th:nth-child(5),
+	.board-page td:nth-child(5) {
+		width: 24% !important;
+	}
+
+	.board-page .title-td {
+		text-align: left !important;
+	}
+
+	.board-page .title-td a {
+		display: block;
+		font-size: 10.5px !important;
+		line-height: 1.35 !important;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	.board-page .btn {
+		width: 100%;
+		text-align: center;
+		box-sizing: border-box;
+	}
+}
 </style>
 </head>
-<body>
+<body class="board-page board-list-page">
 	<th:block th:replace="~{common/header :: header}"></th:block>
 	<div style="width: 800px; margin: 120px auto 50px;">
 		<h2> 문의 게시판</h2>

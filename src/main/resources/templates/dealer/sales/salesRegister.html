@@ -2,17 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>판매 등록</title>
 
-<!-- =====================================================
-     딜러 공통 CSS
-===================================================== -->
 <link rel="stylesheet" th:href="@{/css/dealer-common.css}">
 
 <style>
-/* =========================================================
-   판매 등록 화면 전용 스타일
-========================================================= */
 .selected-row td {
 	background-color: #f8f8f8 !important;
 }
@@ -31,11 +26,6 @@
 
 .register-consult-table tbody td {
 	font-weight: 500;
-}
-
-.register-consult-table .td-number, .register-consult-table .td-carno {
-	font-weight: 700;
-	white-space: nowrap;
 }
 
 .register-form-wrap {
@@ -114,6 +104,16 @@
 	border-radius: 12px;
 }
 
+.content-box {
+	min-height: 84px;
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: #fcfcfc;
+	border: 1px solid #e5e5e5;
+	white-space: pre-wrap;
+	line-height: 1.7;
+}
+
 .empty-register-box {
 	display: flex;
 	flex-direction: column;
@@ -159,12 +159,15 @@
 		width: 130px;
 		font-size: 14px;
 	}
+
 	.register-detail-table td {
 		padding: 12px;
 	}
+
 	.save-btn, .select-btn {
 		width: 100%;
 	}
+
 	.btn-row {
 		flex-direction: column;
 	}
@@ -175,41 +178,29 @@
 
 	<div class="dealer-layout">
 
-		<!-- =====================================================
-		     상단 고정 헤더
-		     - 현재 페이지: 판매 등록 active
-		===================================================== -->
 		<header class="top-fixed-header">
 			<div class="top-header-left">
 				<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
 
 				<nav class="top-nav">
-					<a th:href="@{/dealer/main}">대시보드</a> <a
-						th:href="@{/dealer/consult/list}">상담관리</a> <a
-						th:href="@{/dealer/sales/list}">판매관리</a> <a
-						th:href="@{/dealer/sales/register}" class="active">판매등록</a> <a
-						th:href="@{/dealer/statistics}">통계</a> <a
-						th:href="@{/dealer/logout}">로그아웃</a>
+					<a th:href="@{/dealer/main}">대시보드</a>
+					<a th:href="@{/dealer/consult/list}">상담관리</a>
+					<a th:href="@{/dealer/sales/list}">판매관리</a>
+					<a th:href="@{/dealer/sales/register}" class="active">판매등록</a>
+					<a th:href="@{/dealer/statistics}">통계</a>
+					<a th:href="@{/dealer/logout}">로그아웃</a>
 				</nav>
 			</div>
 
 			<div class="top-header-right">
 				<div class="top-user-box">
-					<span class="top-user-label">접속 사용자</span> <strong
-						class="top-user-name"
-						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">홍길동
-						딜러</strong>
+					<span class="top-user-label">접속 사용자</span>
+					<strong class="top-user-name"
+						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">딜러</strong>
 				</div>
 			</div>
 		</header>
 
-		<!-- =====================================================
-		     메인 컨텐츠
-		     - 기존 판매 등록 기능 유지
-		     - 수정 사항:
-		       1) 완료 상태 상담만 목록에 내려오도록 Service에서 제어
-		       2) 빈 상태 문구도 완료 기준으로 수정
-		===================================================== -->
 		<main class="content register-page">
 			<div class="dashboard-container">
 
@@ -217,20 +208,19 @@
 					<h1 class="page-title">판매 등록</h1>
 				</header>
 
-				<div th:if="${successMessage != null}"
-					class="message-box message-success">
+				<div th:if="${successMessage != null}" class="message-box message-success">
 					<p th:text="${successMessage}">판매 등록이 완료되었습니다.</p>
 				</div>
 
-				<div th:if="${errorMessage != null}"
-					class="message-box message-error">
-					<p th:text="${errorMessage}">에러 메시지</p>
+				<div th:if="${errorMessage != null}" class="message-box message-error">
+					<p th:text="${errorMessage}">오류가 발생했습니다.</p>
 				</div>
 
 				<section class="panel register-select-panel">
 					<div class="panel-header">
 						<div>
-							<h2 class="section-title">상담 선택</h2>
+							<h2 class="section-title">판매 등록 가능한 상담</h2>
+							<p class="section-desc">완료 처리된 상담 중 아직 판매 등록이 되지 않은 건만 선택할 수 있습니다.</p>
 						</div>
 					</div>
 
@@ -239,51 +229,40 @@
 							<thead>
 								<tr>
 									<th>상담번호</th>
-									<th>회원번호</th>
-									<th>차량번호</th>
-									<th>상담상태</th>
+									<th>고객이름</th>
+									<th>차량모델명</th>
+									<th>상담완료일</th>
+									<th>상태</th>
 									<th>선택</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr th:if="${#lists.isEmpty(completedConsultList)}">
-									<td colspan="5" class="empty-message">
+									<td colspan="6" class="empty-message">
 										<div class="empty-register-box">
-											<div class="empty-register-title">판매 등록 가능한 완료 상담이
-												없습니다.</div>
-											<div class="empty-register-desc">
-												상담 상태가 <strong>완료</strong>인 상담만 이 영역에서 선택할 수 있습니다.
-											</div>
+											<div class="empty-register-title">판매 등록 가능한 완료 상담이 없습니다.</div>
+											<div class="empty-register-desc">상담 상태를 완료로 변경한 뒤 다시 확인해주세요.</div>
 										</div>
 									</td>
 								</tr>
 
 								<tr th:each="consult : ${completedConsultList}"
 									th:classappend="${selectedConsultNo != null and selectedConsultNo == consult.consultNo} ? 'selected-row' : ''">
-
 									<td class="td-number" th:text="${consult.consultNo}">1</td>
-									<td th:text="${consult.memberNo}">20260401</td>
-									<td class="td-carno" th:text="${consult.carNo}">123가1111</td>
-
-									<td><span
-										th:if="${consult.consultStatus == 'WAITING' or consult.consultStatus == '대기'}"
-										class="status-badge status-waiting">대기</span> <span
-										th:if="${consult.consultStatus == 'IN_PROGRESS' or consult.consultStatus == '진행중'}"
-										class="status-badge status-progress">진행중</span> <span
-										th:if="${consult.consultStatus == 'COMPLETED' or consult.consultStatus == '완료'}"
-										class="status-badge status-completed">완료</span> <span
-										th:if="${consult.consultStatus != 'WAITING'
-												and consult.consultStatus != '대기'
-												and consult.consultStatus != 'IN_PROGRESS'
-												and consult.consultStatus != '진행중'
-												and consult.consultStatus != 'COMPLETED'
-												and consult.consultStatus != '완료'}"
-										class="status-badge status-waiting"
-										th:text="${consult.consultStatus}">상태</span></td>
-
-									<td><a
-										th:href="@{/dealer/sales/register/select(consultNo=${consult.consultNo})}"
-										class="btn btn-sm select-btn">선택</a></td>
+									<td th:text="${consult.customerNameDisplay}">홍길동</td>
+									<td th:text="${consult.carModelNameDisplay}">EV6</td>
+									<td class="td-date"
+										th:text="${consult.completedDate != null ? #temporals.format(consult.completedDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 11:00</td>
+									<td>
+										<span th:if="${consult.completedStatus}" class="status-badge status-completed"
+											th:text="${consult.consultStatusLabel}">완료</span>
+										<span th:if="${!consult.completedStatus}" class="status-badge status-waiting"
+											th:text="${consult.consultStatusLabel}">상태</span>
+									</td>
+									<td>
+										<a th:href="@{/dealer/sales/register/select(consultNo=${consult.consultNo})}"
+											class="btn btn-sm select-btn">선택</a>
+									</td>
 								</tr>
 							</tbody>
 						</table>
@@ -294,64 +273,74 @@
 					<div class="panel-header">
 						<div>
 							<h2 class="section-title">판매 정보 입력</h2>
+							<p class="section-desc">선택한 상담의 고객 정보와 차량 정보를 확인한 뒤 판매 금액을 등록합니다.</p>
 						</div>
 					</div>
 
 					<div class="register-form-wrap">
-						<form th:action="@{/dealer/sales/register}" method="post"
-							th:object="${sales}">
+						<form th:action="@{/dealer/sales/register}" method="post" th:object="${sales}">
 							<input type="hidden" th:field="*{consultNo}">
 
 							<table class="register-detail-table">
 								<tbody>
 									<tr>
 										<th>상담번호</th>
-										<td><input type="text" th:value="*{consultNo}" readonly></td>
+										<td><input type="text" th:value="${selectedConsult != null ? selectedConsult.consultNo : ''}" readonly></td>
 									</tr>
 									<tr>
-										<th>회원번호</th>
-										<td><input type="text" th:value="*{memberNo}" readonly></td>
+										<th>고객이름</th>
+										<td><input type="text" th:value="${selectedConsult != null ? selectedConsult.customerNameDisplay : ''}" readonly></td>
 									</tr>
 									<tr>
-										<th>차량번호</th>
-										<td><input type="text" th:value="*{carNo}" readonly></td>
+										<th>연락처</th>
+										<td><input type="text" th:value="${selectedConsult != null ? selectedConsult.customerPhoneDisplay : ''}" readonly></td>
 									</tr>
 									<tr>
-										<th>딜러번호</th>
-										<td><input type="text" th:value="*{dealerNo}" readonly></td>
+										<th>이메일</th>
+										<td><input type="text" th:value="${selectedConsult != null ? selectedConsult.customerEmailDisplay : ''}" readonly></td>
 									</tr>
 									<tr>
-										<th>판매일시</th>
+										<th>차량모델명</th>
+										<td><input type="text" th:value="${selectedConsult != null ? selectedConsult.carModelNameDisplay : ''}" readonly></td>
+									</tr>
+									<tr>
+										<th>상담내용</th>
+										<td>
+											<div class="content-box" th:text="${selectedConsult != null ? selectedConsult.consultContentDisplay : '상단 목록에서 상담을 먼저 선택해주세요.'}">
+												상담 내용을 보여주는 영역
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<th>판매예정일시</th>
 										<td><input type="text"
-											th:value="${sales != null and sales.salesDate != null ? #temporals.format(sales.salesDate, 'yyyy-MM-dd HH:mm:ss') : ''}"
-											readonly></td>
-									</tr>
-									<tr>
-										<th>판매금액</th>
-										<td><input type="number" th:field="*{salesAmount}"
-											placeholder="판매금액 입력" min="1" required>
-											<div class="info-text">예: 45000000</div></td>
+											th:value="${sales != null and sales.salesDate != null ? #temporals.format(sales.salesDate, 'yyyy-MM-dd HH:mm:ss') : ''}" readonly></td>
 									</tr>
 									<tr>
 										<th>판매상태</th>
-										<td><input type="text" th:value="*{salesStatus}" readonly></td>
+										<td><input type="text" th:value="${selectedConsult != null ? '판매 완료' : ''}" readonly></td>
+									</tr>
+									<tr>
+										<th>판매금액</th>
+										<td>
+											<input type="number" th:field="*{salesAmount}" placeholder="판매금액 입력" min="1" required>
+											<div class="info-text">예: 47000000</div>
+										</td>
 									</tr>
 								</tbody>
 							</table>
 
-							<p th:if="${sales == null or sales.consultNo == null}"
-								class="help-text">
-								상단의 <strong>완료된 상담 목록</strong>에서 먼저 <strong>선택</strong> 버튼을 누른 뒤
-								판매 등록을 진행해주세요.
+							<p th:if="${selectedConsult == null}" class="help-text">
+								상단 목록에서 완료 상담을 먼저 선택해야 판매 등록을 진행할 수 있습니다.
 							</p>
 
 							<div class="btn-row">
 								<button type="submit" class="btn save-btn"
-									th:disabled="${sales == null or sales.consultNo == null}">
-									저장</button>
+									th:disabled="${selectedConsult == null or sales == null or sales.consultNo == null}">
+									등록
+								</button>
 
-								<a th:href="@{/dealer/sales/list}" class="btn btn-secondary">
-									판매 관리 </a>
+								<a th:href="@{/dealer/sales/list}" class="btn btn-secondary">판매 목록으로</a>
 							</div>
 						</form>
 					</div>

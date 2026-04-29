@@ -1,7 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>기아 전기차 - 문의글 작성</title>
     <style>
         .container { width: 800px; margin: 120px auto 50px; font-family: sans-serif; }
@@ -17,9 +18,86 @@
         .btn { display: inline-block; padding: 10px 20px; color: white; text-decoration: none; border: none; cursor: pointer; font-size: 14px; margin: 0 5px; }
         .btn-submit { background-color: #000; }
         .btn-cancel { background-color: #6c757d; }
+
+        @media (max-width: 900px) {
+            .board-page .container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 190px 16px 50px !important;
+                box-sizing: border-box !important;
+            }
+
+            .board-page h2 {
+                font-size: 24px !important;
+                line-height: 1.25 !important;
+                margin: 0 0 18px !important;
+            }
+
+            .board-page table,
+            .board-page tbody,
+            .board-page tr,
+            .board-page th,
+            .board-page td {
+                display: block !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+                white-space: normal !important;
+            }
+
+            .board-page table {
+                border: 1px solid #ddd !important;
+                border-radius: 14px !important;
+                overflow: hidden !important;
+            }
+
+            .board-page tr {
+                border-bottom: 1px solid #e8e8e8 !important;
+            }
+
+            .board-page tr:last-child {
+                border-bottom: 0 !important;
+            }
+
+            .board-page th,
+            .board-page td {
+                border: 0 !important;
+                text-align: left !important;
+                padding: 9px 12px !important;
+                font-size: 13px !important;
+                line-height: 1.45 !important;
+            }
+
+            .board-page th {
+                background: #f4f4f4 !important;
+            }
+
+            .board-page input[type="text"],
+            .board-page textarea {
+                width: 100% !important;
+                box-sizing: border-box !important;
+                font-size: 14px !important;
+            }
+
+            .board-page textarea {
+                min-height: 220px !important;
+            }
+
+            .board-page .btn-group {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .board-page .btn {
+                width: 100% !important;
+                margin: 0 !important;
+                text-align: center !important;
+                box-sizing: border-box !important;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="board-page board-write-page">
 <th:block th:replace="~{common/header :: header}"></th:block>
 
 <div class="container">

@@ -1,485 +1,471 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>딜러 통계</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>딜러 판매 통계</title>
 
-<!-- =====================================================
-     딜러 공통 CSS
-===================================================== -->
-<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+	<link rel="stylesheet" th:href="@{/css/dealer-common.css}">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- =====================================================
-     Chart.js
-     - 별도 js 파일이 아니라 CDN 방식으로 불러옵니다.
-===================================================== -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		.statistics-page .page-header {
+			margin-bottom: 24px;
+		}
 
-<style>
-/* =====================================================
-   통계 화면 전용 스타일
-===================================================== */
-.statistics-page .page-header {
-	margin-bottom: 24px;
-}
+		.statistics-page .panel {
+			margin-bottom: 22px;
+			padding: 24px;
+			border-radius: 20px;
+		}
 
-.statistics-page .panel {
-	margin-bottom: 22px;
-	padding: 24px;
-	border-radius: 20px;
-}
+		.statistics-page .panel:last-child {
+			margin-bottom: 0;
+		}
 
-.statistics-page .panel:last-child {
-	margin-bottom: 0;
-}
+		.statistics-page .panel-header {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin-bottom: 18px;
+		}
 
-.statistics-page .panel-header {
-	margin-bottom: 18px;
-}
+		.statistics-page .section-title {
+			margin: 0;
+			font-size: 28px;
+			font-weight: 800;
+			line-height: 1.3;
+			letter-spacing: -0.4px;
+		}
 
-.statistics-page .section-title {
-	margin: 0;
-	font-size: 28px;
-	font-weight: 800;
-	line-height: 1.3;
-	letter-spacing: -0.4px;
-}
+		.section-desc {
+			margin: 8px 0 0 0;
+			font-size: 14px;
+			line-height: 1.6;
+			color: #666;
+		}
 
-/* =====================================================
-   상단 요약 카드
-===================================================== */
-.stats-summary-grid {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 16px;
-}
+		.summary-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 16px;
+		}
 
-.stats-summary-card {
-	position: relative;
-	overflow: hidden;
-	min-height: 142px;
-	padding: 20px;
-	border-radius: 18px;
-}
+		.stats-summary-card {
+			position: relative;
+			overflow: hidden;
+			min-height: 160px;
+			padding: 20px;
+			border-radius: 18px;
+		}
 
-.stats-summary-card::after {
-	content: "";
-	position: absolute;
-	right: -30px;
-	bottom: -30px;
-	width: 120px;
-	height: 120px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.05);
-}
+		.stats-summary-card::after {
+			content: "";
+			position: absolute;
+			right: -30px;
+			bottom: -30px;
+			width: 120px;
+			height: 120px;
+			border-radius: 50%;
+			background: rgba(255, 255, 255, 0.05);
+		}
 
-.stats-card-label {
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.8px;
-	text-transform: uppercase;
-	opacity: 0.72;
-	margin-bottom: 8px;
-}
+		.stats-card-label {
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.8px;
+			text-transform: uppercase;
+			opacity: 0.72;
+			margin-bottom: 8px;
+		}
 
-.stats-card-title {
-	font-size: 15px;
-	font-weight: 700;
-	margin-bottom: 12px;
-	line-height: 1.4;
-}
+		.stats-card-title {
+			font-size: 15px;
+			font-weight: 700;
+			margin-bottom: 12px;
+			line-height: 1.4;
+		}
 
-.stats-card-value {
-	font-size: 30px;
-	font-weight: 800;
-	line-height: 1.35;
-	letter-spacing: -0.3px;
-	word-break: keep-all;
-}
+		.stats-card-value {
+			font-size: 30px;
+			font-weight: 800;
+			line-height: 1.35;
+			letter-spacing: -0.3px;
+			word-break: keep-all;
+		}
 
-.amount-text {
-	white-space: nowrap;
-	word-break: keep-all;
-}
+		.stats-card-meta {
+			margin-top: 10px;
+			font-size: 13px;
+			line-height: 1.6;
+			opacity: 0.84;
+		}
 
-.chart-panel .section-title, .table-panel .section-title {
-	margin-bottom: 0;
-}
+		.amount-text {
+			white-space: nowrap;
+			word-break: keep-all;
+		}
 
-/* =====================================================
-   차트 영역
-===================================================== */
-.chart-wrap {
-	position: relative;
-	margin-top: 4px;
-	padding: 6px 4px 0;
-	border-radius: 16px;
-	background: #fff;
-}
+		.section-pill {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 9px 14px;
+			border-radius: 999px;
+			background: #f5f5f5;
+			color: #111;
+			font-size: 13px;
+			font-weight: 800;
+			white-space: nowrap;
+		}
 
-.chart-wrap.chart-md {
-	height: 340px;
-}
+		.chart-wrap {
+			position: relative;
+			padding: 8px 4px 0;
+			border-radius: 16px;
+			background: #fff;
+		}
 
-.chart-wrap.chart-lg {
-	height: 420px;
-}
+		.chart-wrap.chart-lg {
+			height: 420px;
+		}
 
-/* =====================================================
-   월별 그래프 / 차량 그래프 공통 축 라벨 래퍼
-===================================================== */
-.dual-axis-chart-wrap {
-	position: relative;
-	padding-left: 40px;
-	padding-right: 40px;
-}
+		.chart-empty-message {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100%;
+			color: #666;
+			font-size: 15px;
+			font-weight: 700;
+			text-align: center;
+			padding: 20px;
+		}
 
-/* =====================================================
-   좌/우 축 안내 문구
-===================================================== */
-.axis-label {
-	position: absolute;
-	bottom: 44px;
-	font-size: 12px;
-	font-weight: 700;
-	color: #666;
-	line-height: 1;
-	pointer-events: none;
-	z-index: 2;
-	background: #fff;
-	padding: 2px 4px;
-	white-space: nowrap;
-}
+		.dual-axis-chart-wrap {
+			position: relative;
+			padding-left: 40px;
+			padding-right: 40px;
+		}
 
-.axis-label-left {
-	left: 0;
-}
+		.model-donut-chart-wrap {
+			padding: 10px 24px 14px;
+		}
 
-.axis-label-right {
-	right: 0;
-}
+		.axis-label {
+			position: absolute;
+			bottom: 44px;
+			font-size: 12px;
+			font-weight: 700;
+			color: #666;
+			line-height: 1;
+			pointer-events: none;
+			z-index: 2;
+			background: #fff;
+			padding: 2px 4px;
+			white-space: nowrap;
+		}
 
-/* =====================================================
-   데이터 없을 때 차트 안내 문구
-===================================================== */
-.chart-empty-message {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	color: #666;
-	font-size: 15px;
-	font-weight: 700;
-	text-align: center;
-	padding: 20px;
-}
+		.axis-label-left {
+			left: 0;
+		}
 
-/* =====================================================
-   테이블 영역
-===================================================== */
-.table-panel .table-wrap {
-	margin-top: 4px;
-	overflow-x: auto;
-}
+		.axis-label-right {
+			right: 0;
+		}
 
-.stats-table tbody td {
-	font-weight: 500;
-	vertical-align: middle;
-}
+		.detail-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 20px;
+		}
 
-.stats-table .td-month, .stats-table .td-model {
-	font-weight: 700;
-	white-space: nowrap;
-}
+		.table-wrap {
+			margin-top: 4px;
+			overflow-x: auto;
+		}
 
-.stats-table .td-count {
-	font-weight: 700;
-}
+		.stats-table tbody td {
+			font-weight: 500;
+			vertical-align: middle;
+		}
 
-.stats-table .td-amount {
-	font-weight: 800;
-	white-space: nowrap;
-	word-break: keep-all;
-}
+		.stats-table .td-month,
+		.stats-table .td-model {
+			font-weight: 700;
+			white-space: nowrap;
+		}
 
-.empty-message {
-	text-align: center;
-	padding: 24px 12px;
-	color: #666;
-	font-weight: 600;
-}
+		.stats-table .td-count {
+			font-weight: 700;
+		}
 
-/* =====================================================
-   반응형
-===================================================== */
-@media ( max-width : 1200px) {
-	.stats-summary-grid {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
-}
+		.stats-table .td-amount {
+			font-weight: 800;
+			white-space: nowrap;
+			word-break: keep-all;
+		}
 
-@media ( max-width : 1024px) {
-	.statistics-page .section-title {
-		font-size: 24px;
-	}
-}
+		.empty-message {
+			text-align: center;
+			padding: 24px 12px;
+			color: #666;
+			font-weight: 600;
+		}
 
-@media ( max-width : 768px) {
-	.statistics-page .page-header {
-		margin-bottom: 20px;
-	}
-	.statistics-page .panel {
-		padding: 18px 16px;
-		margin-bottom: 18px;
-	}
-	.statistics-page .panel-header {
-		margin-bottom: 14px;
-	}
-	.statistics-page .section-title {
-		font-size: 22px;
-	}
-	.stats-summary-grid {
-		grid-template-columns: 1fr;
-	}
-	.stats-summary-card {
-		min-height: 128px;
-		padding: 18px 16px;
-	}
-	.stats-card-value {
-		font-size: 24px;
-	}
-	.chart-wrap.chart-md {
-		height: 280px;
-	}
-	.chart-wrap.chart-lg {
-		height: 340px;
-	}
-	.dual-axis-chart-wrap {
-		padding-left: 28px;
-		padding-right: 28px;
-	}
-	.axis-label {
-		bottom: 36px;
-		font-size: 11px;
-	}
-	.axis-label-left {
-		left: 0;
-	}
-	.axis-label-right {
-		right: 0;
-	}
-}
-</style>
+		@media (max-width : 1200px) {
+			.summary-grid {
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+			}
+
+			.detail-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		@media (max-width : 1024px) {
+			.statistics-page .section-title {
+				font-size: 24px;
+			}
+		}
+
+		@media (max-width : 768px) {
+			.statistics-page .page-header {
+				margin-bottom: 20px;
+			}
+
+			.statistics-page .panel {
+				padding: 18px 16px;
+				margin-bottom: 18px;
+			}
+
+			.statistics-page .section-title {
+				font-size: 22px;
+			}
+
+			.summary-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.stats-summary-card {
+				min-height: 136px;
+				padding: 18px 16px;
+			}
+
+			.stats-card-value {
+				font-size: 24px;
+			}
+
+			.chart-wrap.chart-lg {
+				height: 340px;
+			}
+
+			.dual-axis-chart-wrap {
+				padding-left: 28px;
+				padding-right: 28px;
+			}
+
+			.axis-label {
+				bottom: 36px;
+				font-size: 11px;
+			}
+		}
+	</style>
 </head>
+
 <body>
 
 	<div class="dealer-layout">
 
-		<!-- =====================================================
-		     상단 고정 헤더
-		     - 현재 페이지: 통계 active
-		===================================================== -->
 		<header class="top-fixed-header">
 			<div class="top-header-left">
 				<a th:href="@{/dealer/main}" class="top-logo">KIA EV Dealer</a>
 
 				<nav class="top-nav">
-					<a th:href="@{/dealer/main}">대시보드</a> <a
-						th:href="@{/dealer/consult/list}">상담관리</a> <a
-						th:href="@{/dealer/sales/list}">판매관리</a> <a
-						th:href="@{/dealer/sales/register}">판매등록</a> <a
-						th:href="@{/dealer/statistics}" class="active">통계</a> <a
-						th:href="@{/dealer/logout}">로그아웃</a>
+					<a th:href="@{/dealer/main}">대시보드</a>
+					<a th:href="@{/dealer/consult/list}">상담관리</a>
+					<a th:href="@{/dealer/sales/list}">판매관리</a>
+					<a th:href="@{/dealer/sales/register}">판매등록</a>
+					<a th:href="@{/dealer/statistics}" class="active">통계</a>
+					<a th:href="@{/dealer/logout}">로그아웃</a>
 				</nav>
 			</div>
 
 			<div class="top-header-right">
 				<div class="top-user-box">
-					<span class="top-user-label">접속 사용자</span> <strong
-						class="top-user-name"
-						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">
-						홍길동 딜러 </strong>
+					<span class="top-user-label">접속 사용자</span>
+					<strong class="top-user-name"
+						th:text="${session.loginDealer != null ? session.loginDealer.dealerName + ' 딜러' : '딜러'}">딜러</strong>
 				</div>
 			</div>
 		</header>
 
-		<!-- =====================================================
-		     메인 컨텐츠
-		     - 기존 통계 기능 유지
-		===================================================== -->
 		<main class="content statistics-page">
 			<div class="dashboard-container">
 
 				<div class="page-header">
-					<h1 class="page-title">딜러 통계</h1>
+					<h1 class="page-title">판매 통계</h1>
 				</div>
 
-				<!-- =====================================================
-				     통계 요약 카드
-				===================================================== -->
 				<section class="panel">
 					<div class="panel-header">
 						<div>
-							<h2 class="section-title">통계 요약</h2>
+							<h2 class="section-title">요약 통계</h2>
+							<p class="section-desc">요구사항 기준으로 판매 현황을 빠르게 파악할 수 있도록 핵심 수치만 먼저 정리했습니다.</p>
 						</div>
 					</div>
 
-					<div class="summary-grid stats-summary-grid">
-						<div class="summary-card summary-card-dark stats-summary-card">
-							<div class="stats-card-label">Consult Count</div>
-							<div class="stats-card-title">전체 상담 건수</div>
-							<div class="stats-card-value"
-								th:text="${dashboard != null ? dashboard.totalConsultCount : 0}">0</div>
-						</div>
-
+					<div class="summary-grid">
 						<div class="summary-card summary-card-dark stats-summary-card">
 							<div class="stats-card-label">Sales Count</div>
-							<div class="stats-card-title">전체 판매 건수</div>
+							<div class="stats-card-title">총 판매 건수</div>
 							<div class="stats-card-value"
 								th:text="${dashboard != null ? dashboard.totalSalesCount : 0}">0</div>
+							<div class="stats-card-meta"
+								th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건'}">2026-04 판매 0건
+							</div>
 						</div>
 
 						<div class="summary-card summary-card-dark stats-summary-card">
-							<div class="stats-card-label">Completed Consult</div>
-							<div class="stats-card-title">완료 상담 건수</div>
-							<div class="stats-card-value"
-								th:text="${dashboard != null ? dashboard.completedConsultCount : 0}">0</div>
-						</div>
-
-						<div class="summary-card summary-card-dark stats-summary-card">
-							<div class="stats-card-label">Total Amount</div>
+							<div class="stats-card-label">Sales Amount</div>
 							<div class="stats-card-title">총 판매 금액</div>
 							<div class="stats-card-value amount-text"
-								th:text="${dashboard != null and dashboard.totalSalesAmount != null ? #numbers.formatInteger(dashboard.totalSalesAmount, 3, 'COMMA') + '원' : '0원'}">0원</div>
+								th:text="${dashboard != null and dashboard.totalSalesAmount != null ? #numbers.formatInteger(dashboard.totalSalesAmount, 3, 'COMMA') + '원' : '0원'}">
+								0원</div>
+							<div class="stats-card-meta"
+								th:text="${currentMonthLabel + ' 판매금액 ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">
+								2026-04 판매금액 0원</div>
+						</div>
+
+						<div class="summary-card summary-card-dark stats-summary-card">
+							<div class="stats-card-label">Average Deal</div>
+							<div class="stats-card-title">평균 판매 금액</div>
+							<div class="stats-card-value amount-text"
+								th:text="${#numbers.formatInteger(averageSalesAmount, 3, 'COMMA') + '원'}">0원</div>
+							<div class="stats-card-meta"
+								th:text="${dashboard != null ? '누적 판매 ' + dashboard.totalSalesCount + '건 기준' : '누적 판매 0건 기준'}">
+								누적 판매 0건 기준</div>
+						</div>
+
+						<div class="summary-card summary-card-dark stats-summary-card">
+							<div class="stats-card-label">Top Model</div>
+							<div class="stats-card-title">베스트셀링 차량</div>
+							<div class="stats-card-value" th:text="${topSellingModelName}">집계된 차량 없음</div>
+							<div class="stats-card-meta"
+								th:text="${topSellingModelCount + '건 / ' + #numbers.formatInteger(topSellingModelAmount, 3, 'COMMA') + '원'}">
+								0건 / 0원</div>
 						</div>
 					</div>
 				</section>
 
-				<!-- =====================================================
-				     상담 상태 그래프
-				===================================================== -->
-				<section class="panel chart-panel">
+				<section class="panel">
 					<div class="panel-header">
 						<div>
-							<h2 class="section-title">상담 상태 그래프</h2>
+							<h2 class="section-title">월별 판매</h2>
+							<p class="section-desc">월별 판매 건수와 금액 흐름을 함께 보면서 판매 추이를 확인할 수 있습니다.</p>
 						</div>
+
+						<div class="section-pill"
+							th:text="${currentMonthLabel + ' 판매 ' + currentMonthSalesCount + '건 / ' + #numbers.formatInteger(currentMonthSalesAmount, 3, 'COMMA') + '원'}">
+							2026-04 판매 0건 / 0원</div>
 					</div>
 
-					<div class="chart-wrap chart-md" id="consultStatusChartWrap">
-						<canvas id="consultStatusChart"></canvas>
-					</div>
-				</section>
-
-				<!-- =====================================================
-				     월별 판매 통계 그래프
-				===================================================== -->
-				<section class="panel chart-panel">
-					<div class="panel-header">
-						<div>
-							<h2 class="section-title">월별 판매 통계</h2>
-						</div>
-					</div>
-
-					<div class="chart-wrap chart-lg dual-axis-chart-wrap"
-						id="monthlyChartWrap">
+					<div class="chart-wrap chart-lg dual-axis-chart-wrap" id="monthlyChartWrap">
 						<div class="axis-label axis-label-left">판매 건수</div>
 						<div class="axis-label axis-label-right">판매 금액(만원)</div>
 						<canvas id="monthlySalesChart"></canvas>
 					</div>
 				</section>
 
-				<!-- =====================================================
-				     차량 종류별 판매 통계 그래프
-				     - 기존 구조 유지
-				     - 판매 건수: 막대
-				     - 판매 금액: 라인
-				     - 라인 점 위에 금액 숫자 표시
-				     - 11개 모델 대응
-				===================================================== -->
-				<section class="panel chart-panel">
+				<section class="panel">
 					<div class="panel-header">
 						<div>
-							<h2 class="section-title">차량 종류별 판매 통계</h2>
+							<h2 class="section-title">차량별 판매</h2>
+							<p class="section-desc">차종별 판매 건수와 금액을 비교해서 어떤 차량이 실제 판매 성과를 이끌고 있는지 확인할 수 있습니다.</p>
 						</div>
+
+						<div class="section-pill"
+							th:text="${'베스트 차량 ' + topSellingModelName + ' / ' + topSellingModelCount + '건'}">베스트 차량 집계된
+							차량 없음 / 0건</div>
 					</div>
 
-					<div class="chart-wrap chart-lg dual-axis-chart-wrap"
-						id="carModelChartWrap">
-						<div class="axis-label axis-label-left">판매 건수</div>
-						<div class="axis-label axis-label-right">판매 금액(만원)</div>
+					<div class="chart-wrap chart-lg model-donut-chart-wrap" id="carModelChartWrap">
 						<canvas id="carModelSalesChart"></canvas>
 					</div>
 				</section>
 
-				<!-- =====================================================
-				     월별 판매 상세 테이블
-				===================================================== -->
-				<section class="panel table-panel">
-					<div class="panel-header">
-						<div>
-							<h2 class="section-title">월별 판매 상세</h2>
+				<div class="detail-grid">
+					<section class="panel">
+						<div class="panel-header">
+							<div>
+								<h2 class="section-title">월별 판매 상세</h2>
+								<p class="section-desc">차트에서 본 월별 흐름을 표로 다시 확인할 수 있습니다.</p>
+							</div>
 						</div>
-					</div>
 
-					<div class="table-wrap">
-						<table class="dealer-table stats-table">
-							<thead>
-								<tr>
-									<th>판매월</th>
-									<th>판매 건수</th>
-									<th>판매 금액</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:if="${#lists.isEmpty(monthlySalesStats)}">
-									<td colspan="3" class="empty-message">월별 판매 데이터가 없습니다.</td>
-								</tr>
+						<div class="table-wrap">
+							<table class="dealer-table stats-table">
+								<thead>
+									<tr>
+										<th>판매월</th>
+										<th>판매 건수</th>
+										<th>판매 금액</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${#lists.isEmpty(monthlySalesStats)}">
+										<td colspan="3" class="empty-message">월별 판매 데이터가 없습니다.</td>
+									</tr>
 
-								<tr th:each="stat : ${monthlySalesStats}">
-									<td class="td-month" th:text="${stat.salesMonth}">2026-04</td>
-									<td class="td-count" th:text="${stat.salesCount}">0</td>
-									<td class="td-amount"
-										th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA')} + '원'">0원</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</section>
-
-				<!-- =====================================================
-				     차량 종류별 판매 상세 테이블
-				===================================================== -->
-				<section class="panel table-panel">
-					<div class="panel-header">
-						<div>
-							<h2 class="section-title">차량 종류별 판매 상세</h2>
+									<tr th:each="stat : ${monthlySalesStats}">
+										<td class="td-month" th:text="${stat.salesMonth}">2026-04</td>
+										<td class="td-count" th:text="${stat.salesCount}">0</td>
+										<td class="td-amount"
+											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
-					</div>
+					</section>
 
-					<div class="table-wrap">
-						<table class="dealer-table stats-table">
-							<thead>
-								<tr>
-									<th>차량 종류</th>
-									<th>판매 건수</th>
-									<th>판매 금액</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:if="${#lists.isEmpty(carModelSalesStats)}">
-									<td colspan="3" class="empty-message">차량 종류별 판매 데이터가 없습니다.</td>
-								</tr>
+					<section class="panel">
+						<div class="panel-header">
+							<div>
+								<h2 class="section-title">차량별 판매 상세</h2>
+								<p class="section-desc">차량 모델 기준 누적 판매 성과를 표 형태로도 함께 제공합니다.</p>
+							</div>
+						</div>
 
-								<tr th:each="stat : ${carModelSalesStats}">
-									<td class="td-model" th:text="${stat.modelName}">EV6</td>
-									<td class="td-count" th:text="${stat.salesCount}">0</td>
-									<td class="td-amount"
-										th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA')} + '원'">0원</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</section>
+						<div class="table-wrap">
+							<table class="dealer-table stats-table">
+								<thead>
+									<tr>
+										<th>차량 모델명</th>
+										<th>판매 건수</th>
+										<th>판매 금액</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:if="${#lists.isEmpty(carModelSalesStats)}">
+										<td colspan="3" class="empty-message">차량별 판매 데이터가 없습니다.</td>
+									</tr>
+
+									<tr th:each="stat : ${carModelSalesStats}">
+										<td class="td-model" th:text="${stat.modelName}">EV6</td>
+										<td class="td-count" th:text="${stat.salesCount}">0</td>
+										<td class="td-amount"
+											th:text="${#numbers.formatInteger(stat.salesAmount, 3, 'COMMA') + '원'}">0원
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+				</div>
 
 			</div>
 
@@ -492,10 +478,6 @@
 	<script th:inline="javascript">
 		/*<![CDATA[*/
 
-		/* =====================================================
-		   금액 표시 함수
-		   - Tooltip에서 원 단위 표시용
-		===================================================== */
 		function formatCurrency(value) {
 			if (value == null || isNaN(value)) {
 				return '0원';
@@ -503,10 +485,6 @@
 			return Number(value).toLocaleString('ko-KR') + '원';
 		}
 
-		/* =====================================================
-		   금액 표시 함수
-		   - 축 / 점 라벨에서 만원 단위 표시용
-		===================================================== */
 		function formatManwon(value) {
 			if (value == null || isNaN(value)) {
 				return '0만원';
@@ -514,38 +492,20 @@
 			return Number(value / 10000).toLocaleString('ko-KR') + '만원';
 		}
 
-		/* =====================================================
-		   숫자 안전 변환
-		   - null / undefined / 문자 등 예외값 방지
-		===================================================== */
 		function toSafeNumber(value) {
 			const num = Number(value);
 			return isNaN(num) ? 0 : num;
 		}
 
-		/* =====================================================
-		   라벨 안전 변환
-		   - null 또는 공백이면 fallbackText 사용
-		===================================================== */
 		function toSafeLabel(value, fallbackText) {
 			if (value == null) {
 				return fallbackText;
 			}
 
 			const text = String(value).trim();
-
-			if (text === '') {
-				return fallbackText;
-			}
-
-			return text;
+			return text === '' ? fallbackText : text;
 		}
 
-		/* =====================================================
-		   차트 데이터 안전 처리
-		   - labels / counts / amounts 길이 보정
-		   - 데이터가 1개뿐일 때 월별 그래프 가운데 배치 보정
-		===================================================== */
 		function makeSafeChartData(labels, counts, amounts, fallbackLabel) {
 			const safeLabels = [];
 			const safeCounts = [];
@@ -554,7 +514,6 @@
 			const labelArray = Array.isArray(labels) ? labels : [];
 			const countArray = Array.isArray(counts) ? counts : [];
 			const amountArray = Array.isArray(amounts) ? amounts : [];
-
 			const maxLength = Math.max(labelArray.length, countArray.length, amountArray.length);
 
 			for (let i = 0; i < maxLength; i++) {
@@ -564,31 +523,22 @@
 			}
 
 			if (safeLabels.length === 1) {
-				const originalLabel = safeLabels[0];
-				const originalCount = safeCounts[0];
-				const originalAmount = safeAmounts[0];
-
-				safeLabels.length = 0;
-				safeCounts.length = 0;
-				safeAmounts.length = 0;
-
-				safeLabels.push('', originalLabel, '');
-				safeCounts.push(0, originalCount, 0);
-				safeAmounts.push(0, originalAmount, 0);
+				safeLabels.unshift('');
+				safeLabels.push('');
+				safeCounts.unshift(0);
+				safeCounts.push(0);
+				safeAmounts.unshift(0);
+				safeAmounts.push(0);
 			}
 
 			return {
-				labels : safeLabels,
-				counts : safeCounts,
-				amounts : safeAmounts
+				labels: safeLabels,
+				counts: safeCounts,
+				amounts: safeAmounts
 			};
 		}
 
-		/* =====================================================
-		   차량 종류별 차트 안전 처리
-		   - 11개 모델 포함 실제 데이터 그대로 사용
-		===================================================== */
-		function makeSafeCarModelChartData(labels, counts, amounts, fallbackLabel) {
+		function makeModelDoughnutData(labels, counts, amounts, fallbackLabel) {
 			const safeLabels = [];
 			const safeCounts = [];
 			const safeAmounts = [];
@@ -596,25 +546,27 @@
 			const labelArray = Array.isArray(labels) ? labels : [];
 			const countArray = Array.isArray(counts) ? counts : [];
 			const amountArray = Array.isArray(amounts) ? amounts : [];
-
 			const maxLength = Math.max(labelArray.length, countArray.length, amountArray.length);
 
 			for (let i = 0; i < maxLength; i++) {
+				const count = toSafeNumber(countArray[i]);
+
+				if (count <= 0) {
+					continue;
+				}
+
 				safeLabels.push(toSafeLabel(labelArray[i], fallbackLabel));
-				safeCounts.push(toSafeNumber(countArray[i]));
+				safeCounts.push(count);
 				safeAmounts.push(toSafeNumber(amountArray[i]));
 			}
 
 			return {
-				labels : safeLabels,
-				counts : safeCounts,
-				amounts : safeAmounts
+				labels: safeLabels,
+				counts: safeCounts,
+				amounts: safeAmounts
 			};
 		}
 
-		/* =====================================================
-		   데이터가 없을 때 빈 안내 문구 출력
-		===================================================== */
 		function showChartEmptyMessage(canvasId, wrapId, message) {
 			const canvas = document.getElementById(canvasId);
 			const wrap = document.getElementById(wrapId);
@@ -626,7 +578,7 @@
 			canvas.style.display = 'none';
 
 			const axisLabels = wrap.querySelectorAll('.axis-label');
-			axisLabels.forEach(function(label) {
+			axisLabels.forEach(function (label) {
 				label.style.display = 'none';
 			});
 
@@ -642,77 +594,241 @@
 			wrap.appendChild(emptyDiv);
 		}
 
-		/* =====================================================
-		   차량 종류별 라인 점 위 금액 표시 플러그인
-		   - 판매 금액(line) 데이터셋에만 적용
-		   - 점 위에 "4,500만원" 형태로 출력
-		===================================================== */
-		const carModelAmountPointLabelPlugin = {
-			id : 'carModelAmountPointLabelPlugin',
-			afterDatasetsDraw(chart, args, pluginOptions) {
-				const targetCanvasId = chart.canvas ? chart.canvas.id : '';
+		function createMixedChart(targetCanvasId, wrapId, labels, counts, amounts, emptyMessage) {
+			const chartCanvas = document.getElementById(targetCanvasId);
 
-				if (targetCanvasId !== 'carModelSalesChart') {
-					return;
-				}
-
-				const ctx = chart.ctx;
-				const datasets = chart.data && chart.data.datasets ? chart.data.datasets : [];
-
-				const amountDatasetIndex = datasets.findIndex(function(dataset) {
-					return dataset && dataset.label === '판매 금액';
-				});
-
-				if (amountDatasetIndex === -1) {
-					return;
-				}
-
-				const meta = chart.getDatasetMeta(amountDatasetIndex);
-				const dataset = datasets[amountDatasetIndex];
-
-				if (!meta || meta.hidden || !dataset || !Array.isArray(dataset.data)) {
-					return;
-				}
-
-				ctx.save();
-				ctx.font = '700 11px Arial, "맑은 고딕", sans-serif';
-				ctx.fillStyle = '#D97706';
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'bottom';
-
-				meta.data.forEach(function(element, index) {
-					const rawValue = dataset.data[index];
-
-					if (rawValue == null || isNaN(rawValue)) {
-						return;
-					}
-
-					const position = element.tooltipPosition();
-					const labelText = formatManwon(rawValue);
-
-					ctx.fillText(labelText, position.x, position.y - 10);
-				});
-
-				ctx.restore();
+			if (!chartCanvas) {
+				return;
 			}
-		};
 
-		Chart.register(carModelAmountPointLabelPlugin);
+			if (!labels || labels.length === 0) {
+				showChartEmptyMessage(targetCanvasId, wrapId, emptyMessage);
+				return;
+			}
 
-		/* =====================================================
-		   상담 상태 차트 데이터
-		===================================================== */
-		const consultStatusLabels = [ '대기', '진행중', '완료' ];
+			const safeData = makeSafeChartData(labels, counts, amounts, '기타');
 
-		const waitingConsultCount = toSafeNumber(/*[[${dashboard != null ? dashboard.waitingConsultCount : 0}]]*/0);
-		const inProgressConsultCount = toSafeNumber(/*[[${dashboard != null ? dashboard.inProgressConsultCount : 0}]]*/0);
-		const completedConsultCount = toSafeNumber(/*[[${dashboard != null ? dashboard.completedConsultCount : 0}]]*/0);
+			new Chart(chartCanvas, {
+				data: {
+					labels: safeData.labels,
+					datasets: [{
+						type: 'bar',
+						label: '판매 건수',
+						data: safeData.counts,
+						backgroundColor: '#60A5FA',
+						borderRadius: 8,
+						maxBarThickness: 40,
+						categoryPercentage: 0.6,
+						barPercentage: 0.82,
+						yAxisID: 'y',
+						order: 2
+					}, {
+						type: 'line',
+						label: '판매 금액',
+						data: safeData.amounts,
+						borderColor: '#F59E0B',
+						backgroundColor: '#F59E0B',
+						borderWidth: 3,
+						pointRadius: 4,
+						pointHoverRadius: 5,
+						pointBackgroundColor: '#F59E0B',
+						pointBorderColor: '#F59E0B',
+						tension: 0.25,
+						fill: false,
+						yAxisID: 'y1',
+						order: 1
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					interaction: {
+						mode: 'index',
+						intersect: false
+					},
+					layout: {
+						padding: {
+							top: 8,
+							right: 6,
+							left: 6,
+							bottom: 0
+						}
+					},
+					scales: {
+						x: {
+							offset: true,
+							grid: {
+								display: false
+							},
+							ticks: {
+								autoSkip: false,
+								maxRotation: 0,
+								minRotation: 0,
+								padding: 8,
+								font: {
+									size: 12,
+									weight: '600'
+								},
+								callback: function (value) {
+									const label = this.getLabelForValue(value);
 
-		const consultStatusData = [ waitingConsultCount, inProgressConsultCount, completedConsultCount ];
+									if (!label) {
+										return '';
+									}
 
-		/* =====================================================
-		   월별 / 차량 종류별 판매 통계 데이터
-		===================================================== */
+									if (label.length > 10) {
+										return label.substring(0, 10) + '...';
+									}
+
+									return label;
+								}
+							}
+						},
+						y: {
+							beginAtZero: true,
+							position: 'left',
+							grid: {
+								color: '#E5E7EB'
+							},
+							ticks: {
+								precision: 0,
+								padding: 6
+							}
+						},
+						y1: {
+							beginAtZero: true,
+							position: 'right',
+							grid: {
+								drawOnChartArea: false
+							},
+							ticks: {
+								padding: 6,
+								callback: function (value) {
+									return formatManwon(value);
+								}
+							}
+						}
+					},
+					plugins: {
+						legend: {
+							position: 'bottom',
+							labels: {
+								padding: 14,
+								font: {
+									size: 12,
+									weight: '600'
+								}
+							}
+						},
+						tooltip: {
+							callbacks: {
+								label: function (context) {
+									if (context.dataset.label === '판매 금액') {
+										return context.dataset.label + ' : ' + formatCurrency(context.raw);
+									}
+
+									return context.dataset.label + ' : ' + context.raw + '건';
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+
+		function getChartColors(length) {
+			const palette = [
+				'#111111',
+				'#2563EB',
+				'#10B981',
+				'#F59E0B',
+				'#EF4444',
+				'#8B5CF6',
+				'#14B8A6',
+				'#64748B'
+			];
+			const colors = [];
+
+			for (let i = 0; i < length; i++) {
+				colors.push(palette[i % palette.length]);
+			}
+
+			return colors;
+		}
+
+		function createModelDoughnutChart(targetCanvasId, wrapId, labels, counts, amounts, emptyMessage) {
+			const chartCanvas = document.getElementById(targetCanvasId);
+
+			if (!chartCanvas) {
+				return;
+			}
+
+			if (!labels || labels.length === 0) {
+				showChartEmptyMessage(targetCanvasId, wrapId, emptyMessage);
+				return;
+			}
+
+			const safeData = makeModelDoughnutData(labels, counts, amounts, '미분류 차량');
+			const totalCount = safeData.counts.reduce(function (sum, value) {
+				return sum + value;
+			}, 0);
+
+			if (totalCount === 0) {
+				showChartEmptyMessage(targetCanvasId, wrapId, emptyMessage);
+				return;
+			}
+
+			new Chart(chartCanvas, {
+				type: 'doughnut',
+				data: {
+					labels: safeData.labels,
+					datasets: [{
+						label: '판매 건수',
+						data: safeData.counts,
+						backgroundColor: getChartColors(safeData.labels.length),
+						borderColor: '#FFFFFF',
+						borderWidth: 3,
+						hoverOffset: 8
+					}]
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					cutout: '58%',
+					layout: {
+						padding: {
+							top: 8,
+							right: 10,
+							left: 10,
+							bottom: 0
+						}
+					},
+					plugins: {
+						legend: {
+							position: 'bottom',
+							labels: {
+								padding: 14,
+								usePointStyle: true,
+								pointStyle: 'circle',
+								font: {
+									size: 12,
+									weight: '600'
+								}
+							}
+						},
+						tooltip: {
+							callbacks: {
+								label: function (context) {
+									const amount = safeData.amounts[context.dataIndex] || 0;
+									return context.label + ' : ' + context.raw + '건 / ' + formatCurrency(amount);
+								}
+							}
+						}
+					}
+				}
+			});
+		}
+
 		const monthlyLabelsRaw = /*[[${monthlyLabels}]]*/[];
 		const monthlyCountsRaw = /*[[${monthlyCounts}]]*/[];
 		const monthlyAmountsRaw = /*[[${monthlyAmounts}]]*/[];
@@ -721,373 +837,51 @@
 		const carModelCountsRaw = /*[[${carModelCounts}]]*/[];
 		const carModelAmountsRaw = /*[[${carModelAmounts}]]*/[];
 
-		const monthlyLabels = (Array.isArray(monthlyLabelsRaw) ? monthlyLabelsRaw : []).map(function(item) {
+		const monthlyLabels = (Array.isArray(monthlyLabelsRaw) ? monthlyLabelsRaw : []).map(function (item) {
 			return toSafeLabel(item, '');
 		});
 
-		const monthlyCounts = (Array.isArray(monthlyCountsRaw) ? monthlyCountsRaw : []).map(function(item) {
+		const monthlyCounts = (Array.isArray(monthlyCountsRaw) ? monthlyCountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const monthlyAmounts = (Array.isArray(monthlyAmountsRaw) ? monthlyAmountsRaw : []).map(function(item) {
+		const monthlyAmounts = (Array.isArray(monthlyAmountsRaw) ? monthlyAmountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const carModelLabels = (Array.isArray(carModelLabelsRaw) ? carModelLabelsRaw : []).map(function(item) {
+		const carModelLabels = (Array.isArray(carModelLabelsRaw) ? carModelLabelsRaw : []).map(function (item) {
 			return toSafeLabel(item, '미분류 차량');
 		});
 
-		const carModelCounts = (Array.isArray(carModelCountsRaw) ? carModelCountsRaw : []).map(function(item) {
+		const carModelCounts = (Array.isArray(carModelCountsRaw) ? carModelCountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		const carModelAmounts = (Array.isArray(carModelAmountsRaw) ? carModelAmountsRaw : []).map(function(item) {
+		const carModelAmounts = (Array.isArray(carModelAmountsRaw) ? carModelAmountsRaw : []).map(function (item) {
 			return toSafeNumber(item);
 		});
 
-		/* =====================================================
-		   상담 상태 도넛 차트
-		===================================================== */
-		const consultCtx = document.getElementById('consultStatusChart');
-		const consultTotal = consultStatusData.reduce(function(sum, value) {
-			return sum + Number(value || 0);
-		}, 0);
+		createMixedChart(
+			'monthlySalesChart',
+			'monthlyChartWrap',
+			monthlyLabels,
+			monthlyCounts,
+			monthlyAmounts,
+			'월별 판매 데이터가 없습니다.'
+		);
 
-		if (consultCtx) {
-			if (consultTotal === 0) {
-				showChartEmptyMessage('consultStatusChart', 'consultStatusChartWrap', '상담 상태 데이터가 없습니다.');
-			} else {
-				new Chart(consultCtx, {
-					type : 'doughnut',
-					data : {
-						labels : consultStatusLabels,
-						datasets : [ {
-							label : '상담 상태',
-							data : consultStatusData,
-							backgroundColor : [ '#60A5FA', '#F59E0B', '#34D399' ],
-							hoverBackgroundColor : [ '#3B82F6', '#D97706', '#10B981' ],
-							borderColor : '#FFFFFF',
-							borderWidth : 2
-						} ]
-					},
-					options : {
-						responsive : true,
-						maintainAspectRatio : false,
-						cutout : '58%',
-						plugins : {
-							legend : {
-								position : 'bottom',
-								labels : {
-									boxWidth : 18,
-									boxHeight : 10,
-									padding : 14,
-									font : {
-										size : 12,
-										weight : '600'
-									}
-								}
-							},
-							tooltip : {
-								callbacks : {
-									label : function(context) {
-										return context.label + ' : ' + context.raw + '건';
-									}
-								}
-							}
-						}
-					}
-				});
-			}
-		}
-
-		/* =====================================================
-		   월별 판매 통계 막대 차트
-		   - 기존 기능 유지
-		===================================================== */
-		const monthlyCtx = document.getElementById('monthlySalesChart');
-
-		if (monthlyCtx) {
-			if (!monthlyLabels || monthlyLabels.length === 0) {
-				showChartEmptyMessage('monthlySalesChart', 'monthlyChartWrap', '월별 판매 데이터가 없습니다.');
-			} else {
-				const safeMonthlyData = makeSafeChartData(monthlyLabels, monthlyCounts, monthlyAmounts, '기타');
-
-				new Chart(monthlyCtx, {
-					type : 'bar',
-					data : {
-						labels : safeMonthlyData.labels,
-						datasets : [ {
-							label : '판매 건수',
-							data : safeMonthlyData.counts,
-							backgroundColor : '#60A5FA',
-							borderRadius : 8,
-							maxBarThickness : 42,
-							categoryPercentage : 0.58,
-							barPercentage : 0.82,
-							yAxisID : 'y'
-						}, {
-							label : '판매 금액',
-							data : safeMonthlyData.amounts,
-							backgroundColor : '#F59E0B',
-							borderRadius : 8,
-							maxBarThickness : 42,
-							categoryPercentage : 0.58,
-							barPercentage : 0.82,
-							yAxisID : 'y1'
-						} ]
-					},
-					options : {
-						responsive : true,
-						maintainAspectRatio : false,
-						interaction : {
-							mode : 'index',
-							intersect : false
-						},
-						layout : {
-							padding : {
-								top : 6,
-								right : 6,
-								left : 6,
-								bottom : 0
-							}
-						},
-						scales : {
-							x : {
-								offset : true,
-								grid : {
-									display : false
-								},
-								ticks : {
-									autoSkip : false,
-									maxRotation : 0,
-									minRotation : 0,
-									padding : 8,
-									font : {
-										size : 12,
-										weight : '600'
-									}
-								}
-							},
-							y : {
-								beginAtZero : true,
-								position : 'left',
-								grid : {
-									color : '#E5E7EB'
-								},
-								title : {
-									display : false
-								},
-								ticks : {
-									precision : 0,
-									padding : 6
-								}
-							},
-							y1 : {
-								beginAtZero : true,
-								position : 'right',
-								grid : {
-									drawOnChartArea : false
-								},
-								title : {
-									display : false
-								},
-								ticks : {
-									padding : 6,
-									callback : function(value) {
-										return formatManwon(value);
-									}
-								}
-							}
-						},
-						plugins : {
-							legend : {
-								position : 'bottom',
-								labels : {
-									padding : 14,
-									font : {
-										size : 12,
-										weight : '600'
-									}
-								}
-							},
-							tooltip : {
-								callbacks : {
-									label : function(context) {
-										if (context.dataset.label === '판매 금액') {
-											return context.dataset.label + ' : ' + formatCurrency(context.raw);
-										}
-										return context.dataset.label + ' : ' + context.raw + '건';
-									}
-								}
-							}
-						}
-					}
-				});
-			}
-		}
-
-		/* =====================================================
-		   차량 종류별 판매 통계 혼합 차트
-		   - 판매 건수: 막대(bar)
-		   - 판매 금액: 라인(line)
-		   - 점 위에 금액 숫자 표시
-		   - 11개 모델 대응
-		===================================================== */
-		const carModelCtx = document.getElementById('carModelSalesChart');
-
-		if (carModelCtx) {
-			if (!carModelLabels || carModelLabels.length === 0) {
-				showChartEmptyMessage('carModelSalesChart', 'carModelChartWrap', '차량 종류별 판매 데이터가 없습니다.');
-			} else {
-				const safeCarModelData = makeSafeCarModelChartData(
-					carModelLabels,
-					carModelCounts,
-					carModelAmounts,
-					'미분류 차량'
-				);
-
-				new Chart(carModelCtx, {
-					data : {
-						labels : safeCarModelData.labels,
-						datasets : [ {
-							type : 'bar',
-							label : '판매 건수',
-							data : safeCarModelData.counts,
-							backgroundColor : '#34D399',
-							borderRadius : 8,
-							maxBarThickness : 34,
-							categoryPercentage : 0.64,
-							barPercentage : 0.84,
-							yAxisID : 'y',
-							order : 2
-						}, {
-							type : 'line',
-							label : '판매 금액',
-							data : safeCarModelData.amounts,
-							borderColor : '#F59E0B',
-							backgroundColor : '#F59E0B',
-							borderWidth : 3,
-							pointRadius : 4,
-							pointHoverRadius : 5,
-							pointBackgroundColor : '#F59E0B',
-							pointBorderColor : '#F59E0B',
-							tension : 0.25,
-							fill : false,
-							yAxisID : 'y1',
-							order : 1
-						} ]
-					},
-					options : {
-						responsive : true,
-						maintainAspectRatio : false,
-						interaction : {
-							mode : 'index',
-							intersect : false
-						},
-						layout : {
-							padding : {
-								top : 28,
-								right : 6,
-								left : 6,
-								bottom : 0
-							}
-						},
-						scales : {
-							x : {
-								offset : true,
-								grid : {
-									display : false
-								},
-								ticks : {
-									autoSkip : false,
-									maxRotation : 0,
-									minRotation : 0,
-									padding : 8,
-									font : {
-										size : 11,
-										weight : '600'
-									},
-									callback : function(value) {
-										const label = this.getLabelForValue(value);
-
-										if (!label) {
-											return '';
-										}
-
-										if (label.length > 9) {
-											return label.substring(0, 9) + '...';
-										}
-
-										return label;
-									}
-								}
-							},
-							y : {
-								beginAtZero : true,
-								position : 'left',
-								grid : {
-									color : '#E5E7EB'
-								},
-								title : {
-									display : false
-								},
-								ticks : {
-									precision : 0,
-									padding : 6
-								}
-							},
-							y1 : {
-								beginAtZero : true,
-								position : 'right',
-								grid : {
-									drawOnChartArea : false
-								},
-								title : {
-									display : false
-								},
-								ticks : {
-									padding : 6,
-									callback : function(value) {
-										return formatManwon(value);
-									}
-								}
-							}
-						},
-						plugins : {
-							legend : {
-								position : 'bottom',
-								labels : {
-									padding : 14,
-									font : {
-										size : 12,
-										weight : '600'
-									}
-								}
-							},
-							tooltip : {
-								callbacks : {
-									title : function(context) {
-										if (!context || context.length === 0) {
-											return '';
-										}
-										return safeCarModelData.labels[context[0].dataIndex] || '';
-									},
-									label : function(context) {
-										if (context.dataset.label === '판매 금액') {
-											return context.dataset.label + ' : ' + formatCurrency(context.raw);
-										}
-										return context.dataset.label + ' : ' + context.raw + '건';
-									}
-								}
-							}
-						}
-					}
-				});
-			}
-		}
+		createModelDoughnutChart(
+			'carModelSalesChart',
+			'carModelChartWrap',
+			carModelLabels,
+			carModelCounts,
+			carModelAmounts,
+			'차량별 판매 데이터가 없습니다.'
+		);
 
 		/*]]>*/
 	</script>
 
 </body>
+
 </html>

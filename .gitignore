@@ -37,3 +37,15 @@ out/
 .vscode/
 
 src/main/resources/application-local.properties
+bootrun-check*.log
+
+### E2E / Playwright ###
+.env.e2e
+node_modules/
+test-results/
+playwright-report/
+.playwright/
+test/
+test-v*/
+e2e/test-v*/
+e2e/playwright-report/
