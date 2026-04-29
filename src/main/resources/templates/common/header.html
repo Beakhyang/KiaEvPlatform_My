@@ -31,7 +31,7 @@
         }
 
         .header-inner {
-            width: 1200px;
+            width: min(1200px, calc(100% - 40px));
             margin: 0 auto;
             height: 100%;
             display: flex;
@@ -156,6 +156,357 @@
 
         .lang-dropdown:hover .lang-content {
             display: block;
+        }
+
+        @media (max-width: 900px) {
+            .header-wrap {
+                height: auto;
+                min-height: 78px;
+            }
+
+            .header-inner {
+                width: 100%;
+                height: auto;
+                min-height: 78px;
+                padding: 12px 16px;
+                gap: 10px 14px;
+                flex-wrap: wrap;
+                align-content: center;
+            }
+
+            .logo a {
+                font-size: 22px;
+            }
+
+            .gnb {
+                order: 3;
+                width: 100%;
+                overflow-x: auto;
+                scrollbar-width: thin;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .gnb ul {
+                display: flex;
+                gap: 20px;
+                width: max-content;
+                min-width: 100%;
+                padding: 7px 0 5px;
+                overflow-x: visible;
+                border-top: 1px solid #edf0f3;
+            }
+
+            .gnb ul li {
+                flex: 0 0 auto;
+                margin: 0;
+            }
+
+            .gnb ul li a {
+                font-size: 14px;
+                padding: 9px 0;
+                white-space: nowrap;
+            }
+
+            .util-menu {
+                order: 1;
+                margin-left: auto;
+                gap: 16px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .util-menu a {
+                margin-left: 0;
+                font-size: 12px;
+            }
+
+            .lang-dropdown {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 900px) {
+            html,
+            body {
+                max-width: 100%;
+                overflow-x: hidden;
+                font-size: 14px;
+            }
+
+            main[style*="width: 1200px"],
+            div[style*="width: 800px"],
+            .container,
+            .promotion-container,
+            .mypage-wrap,
+            .page {
+                width: 100% !important;
+                max-width: none !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+                box-sizing: border-box !important;
+            }
+
+            main[style*="width: 1200px"],
+            div[style*="width: 800px"],
+            .container,
+            .promotion-container,
+            .mypage-wrap,
+            .page,
+            .login-page {
+                padding-top: 190px !important;
+            }
+
+            .login-page {
+                min-height: auto !important;
+                align-items: flex-start !important;
+                padding-left: 24px !important;
+                padding-right: 24px !important;
+                padding-bottom: 60px !important;
+            }
+
+            .login-box,
+            .modal-box {
+                width: 100% !important;
+                max-width: 430px !important;
+                padding: 30px 22px 26px !important;
+                border-radius: 18px !important;
+            }
+
+            .login-title {
+                font-size: 22px !important;
+            }
+
+            .login-type label,
+            .radio-group label {
+                font-size: 15px !important;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 14px !important;
+            }
+
+            .btn,
+            .btn-search,
+            .submit-btn,
+            .cancel-btn,
+            .detail-btn {
+                font-size: 14px !important;
+            }
+
+            .search-wrapper,
+            .form-row,
+            .price-container,
+            .card-footer,
+            .mypage-container,
+            .detail-wrapper {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 16px !important;
+            }
+
+            .form-row label {
+                width: 100% !important;
+                margin: 0 0 8px !important;
+                text-align: left !important;
+            }
+
+            .form-row input,
+            .form-row textarea,
+            .form-row select,
+            .search-input,
+            .filter-select {
+                width: 100% !important;
+                max-width: none !important;
+                box-sizing: border-box !important;
+            }
+
+            .btn-search,
+            .btn-group button,
+            .submit-btn,
+            .cancel-btn {
+                width: 100% !important;
+            }
+
+            .car-grid,
+            .catalog-grid,
+            .car-list {
+                grid-template-columns: 1fr !important;
+            }
+
+            .lineup-grid {
+                flex-direction: column !important;
+            }
+
+            .lineup-card,
+            .car-card {
+                width: 100% !important;
+            }
+
+            .car-content {
+                padding: 18px !important;
+            }
+
+            .car-model-name {
+                font-size: 20px !important;
+                margin-bottom: 14px !important;
+            }
+
+            .spec-item .val {
+                font-size: 14px !important;
+            }
+
+            .price-area span {
+                font-size: 17px !important;
+            }
+
+            .detail-left,
+            .detail-right,
+            .side-menu,
+            .content-area {
+                width: 100% !important;
+                position: static !important;
+            }
+
+            .main-img-box {
+                height: min(68vw, 340px) !important;
+            }
+
+            .page-header h2 {
+                font-size: clamp(30px, 11vw, 42px) !important;
+                word-break: keep-all;
+                overflow-wrap: anywhere;
+            }
+
+            .container h2,
+            main h2,
+            .page-title h2 {
+                font-size: clamp(24px, 6.4vw, 30px) !important;
+                line-height: 1.25 !important;
+                word-break: keep-all;
+                overflow-wrap: anywhere;
+            }
+
+            .page-title {
+                margin-bottom: 26px !important;
+            }
+
+            .page-title p,
+            .content-area,
+            .promotion-description,
+            .welcome-sub,
+            .section-desc {
+                font-size: 14px !important;
+                line-height: 1.55 !important;
+            }
+
+            .page-title,
+            .promotion-title,
+            .welcome-text,
+            .section-title {
+                word-break: keep-all;
+                overflow-wrap: anywhere;
+                line-height: 1.35;
+            }
+
+            .section-title {
+                font-size: 20px !important;
+            }
+
+            .core-grid,
+            .action-btns {
+                grid-template-columns: 1fr !important;
+            }
+
+            .info-item {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .info-name {
+                min-width: 0 !important;
+            }
+
+            .info-data {
+                text-align: left !important;
+            }
+
+            .color-chip-wrapper {
+                justify-content: flex-start !important;
+            }
+
+            .side-menu {
+                min-height: auto !important;
+                padding: 24px 20px !important;
+            }
+
+            .menu-list {
+                display: flex !important;
+                gap: 14px !important;
+                overflow-x: auto !important;
+                margin-top: 18px !important;
+                padding-bottom: 6px !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .menu-list li {
+                flex: 0 0 auto !important;
+                margin-bottom: 0 !important;
+            }
+
+            .menu-list li a {
+                white-space: nowrap !important;
+                font-size: 15px !important;
+            }
+
+            .logout-box {
+                position: static !important;
+                margin-top: 18px !important;
+                text-align: left !important;
+            }
+
+            .main-card {
+                padding: 26px 18px !important;
+                min-height: auto !important;
+            }
+
+            th,
+            td {
+                padding: 8px !important;
+                font-size: 13px !important;
+                line-height: 1.45 !important;
+            }
+
+            table {
+                display: block !important;
+                width: 100% !important;
+                overflow-x: auto !important;
+                white-space: nowrap !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .promotion-card {
+                padding: 20px !important;
+            }
+
+            .promotion-benefit-card {
+                width: 100% !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+                box-sizing: border-box !important;
+            }
+
+            .badge-group {
+                flex-wrap: wrap !important;
+            }
+
+            .detail-btn {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
         }
     </style>
 

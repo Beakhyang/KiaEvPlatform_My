@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>딜러 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('dealer')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>딜러 관리</h1>
+                <p>딜러 계정 생성, 승인 상태 관리, 기본 정보 수정과 비활성화를 처리합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/dealer/new}" class="btn btn-primary">딜러 계정 생성</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form method="get" th:action="@{/admin/dealer/list}" class="filter-bar">
+                <div class="field"><input type="text" name="keyword" th:value="${keyword}" placeholder="사원번호, 이름, 소속 검색"></div>
+                <button type="submit" class="btn btn-primary">검색</button>
+                <a th:href="@{/admin/dealer/list}" class="btn btn-secondary">초기화</a>
+            </form>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(dealerList)}">
+                <thead>
+                <tr>
+                    <th>딜러번호</th>
+                    <th>사원번호</th>
+                    <th>이름</th>
+                    <th>연락처</th>
+                    <th>소속</th>
+                    <th>상태</th>
+                    <th>승인상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="dealer : ${dealerList}">
+                    <td th:text="${dealer.dealerNo}">1</td>
+                    <td th:text="${dealer.dealerEmpNo}">202604D001</td>
+                    <td th:text="${dealer.dealerName}">김기아</td>
+                    <td th:text="${dealer.phone}">010-0000-0000</td>
+                    <td th:text="${dealer.affiliation}">서울본점</td>
+                    <td th:text="${dealer.dealerStatus}">ACTIVE</td>
+                    <td>
+                        <form th:action="@{|/admin/dealer/approval/${dealer.dealerNo}|}" method="post" class="inline-actions">
+                            <select name="approvalStatus">
+                                <option value="WAIT" th:selected="${dealer.approvalStatus == 'WAIT'}">승인대기</option>
+                                <option value="APPROVED" th:selected="${dealer.approvalStatus == 'APPROVED'}">승인완료</option>
+                                <option value="REJECTED" th:selected="${dealer.approvalStatus == 'REJECTED'}">거절</option>
+                            </select>
+                            <button type="submit" class="btn btn-outline">변경</button>
+                        </form>
+                    </td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/dealer/edit/${dealer.dealerNo}|}" class="btn btn-outline">수정</a>
+                        <form th:action="@{|/admin/dealer/delete/${dealer.dealerNo}|}" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('해당 딜러를 비활성화하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(dealerList)}">등록된 딜러가 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

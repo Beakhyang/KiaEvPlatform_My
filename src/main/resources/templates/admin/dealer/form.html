@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isEdit} ? '딜러 정보 수정' : '딜러 계정 생성'">딜러 계정 생성</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('dealer')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1 th:text="${isEdit} ? '딜러 정보 수정' : '딜러 계정 생성'">딜러 계정 생성</h1>
+                <p>신규 생성 시 사원번호는 자동 생성되고 기본 비밀번호는 `1234`로 등록됩니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/dealer/list}" class="btn btn-secondary">목록</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form th:action="@{/admin/dealer/save}" method="post" class="form-grid">
+                <input type="hidden" name="dealerNo" th:value="${dealer.dealerNo}">
+
+                <div class="field">
+                    <label>이름</label>
+                    <input type="text" name="dealerName" th:value="${dealer.dealerName}" required>
+                </div>
+                <div class="field">
+                    <label>생년월일</label>
+                    <input type="date" name="birthDate" th:value="${dealer.birthDate}" required>
+                </div>
+                <div class="field">
+                    <label>연락처</label>
+                    <input type="text" name="phone" th:value="${dealer.phone}" required>
+                </div>
+                <div class="field">
+                    <label>이메일</label>
+                    <input type="email" name="email" th:value="${dealer.email}">
+                </div>
+                <div class="field">
+                    <label>소속</label>
+                    <select name="affiliation" required>
+                        <option value="서울본점" th:selected="${dealer.affiliation == '서울본점'}">서울본점</option>
+                        <option value="인천지점" th:selected="${dealer.affiliation == '인천지점'}">인천지점</option>
+                        <option value="대구지점" th:selected="${dealer.affiliation == '대구지점'}">대구지점</option>
+                        <option value="부산지점" th:selected="${dealer.affiliation == '부산지점'}">부산지점</option>
+                        <option value="제주지점" th:selected="${dealer.affiliation == '제주지점'}">제주지점</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>비밀번호 <span class="muted">(선택)</span></label>
+                    <input type="text" name="dealerPw" placeholder="비워두면 기존 비밀번호 유지 / 신규는 1234">
+                </div>
+                <div class="field">
+                    <label>딜러 상태</label>
+                    <select name="dealerStatus">
+                        <option value="ACTIVE" th:selected="${dealer.dealerStatus == 'ACTIVE'}">ACTIVE</option>
+                        <option value="INACTIVE" th:selected="${dealer.dealerStatus == 'INACTIVE'}">INACTIVE</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>승인 상태</label>
+                    <select name="approvalStatus">
+                        <option value="WAIT" th:selected="${dealer.approvalStatus == 'WAIT'}">WAIT</option>
+                        <option value="APPROVED" th:selected="${dealer.approvalStatus == 'APPROVED'}">APPROVED</option>
+                        <option value="REJECTED" th:selected="${dealer.approvalStatus == 'REJECTED'}">REJECTED</option>
+                    </select>
+                </div>
+
+                <div class="field full form-actions">
+                    <button type="submit" class="btn btn-primary">저장</button>
+                    <a th:href="@{/admin/dealer/list}" class="btn btn-secondary">취소</a>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

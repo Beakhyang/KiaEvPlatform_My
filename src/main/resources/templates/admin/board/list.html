@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('board')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>게시판 관리</h1>
+                <p>공지사항 작성과 사용자 문의 확인, 답변 등록을 관리합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/board/new}" class="btn btn-primary">공지사항 작성</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <form method="get" th:action="@{/admin/board/list}" class="filter-bar">
+                <div class="field">
+                    <select name="boardType">
+                        <option value="">전체 유형</option>
+                        <option value="NOTICE" th:selected="${boardType == 'NOTICE'}">공지사항</option>
+                        <option value="INQUIRY" th:selected="${boardType == 'INQUIRY'}">일반문의</option>
+                        <option value="EV_INQUIRY" th:selected="${boardType == 'EV_INQUIRY'}">전기차문의</option>
+                        <option value="CS_CENTER" th:selected="${boardType == 'CS_CENTER'}">고객센터</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">조회</button>
+                <a th:href="@{/admin/board/list}" class="btn btn-secondary">초기화</a>
+            </form>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(boardList)}">
+                <thead>
+                <tr>
+                    <th>게시번호</th>
+                    <th>유형</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>답변상태</th>
+                    <th>작성일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="board : ${boardList}">
+                    <td th:text="${board.boardNo}">1</td>
+                    <td th:text="${board.boardType == 'NOTICE' ? '공지사항' : (board.boardType == 'INQUIRY' ? '일반문의' : (board.boardType == 'EV_INQUIRY' ? '전기차문의' : (board.boardType == 'CS_CENTER' ? '고객센터' : board.boardType)))}">공지사항</td>
+                    <td>
+                        <div class="stack">
+                            <strong th:text="${board.title}">제목</strong>
+                            <span class="small" th:if="${board.boardType == 'NOTICE'}"
+                                  th:text="${board.isPinned == 'Y' ? '상단 고정 공지' : '일반 공지'}">일반 공지</span>
+                            <span class="small" th:unless="${board.boardType == 'NOTICE'}"
+                                  th:text="${board.answerContent != null and !board.answerContent.isBlank() ? '답변 등록됨' : '답변 대기'}">답변 대기</span>
+                        </div>
+                    </td>
+                    <td th:text="${board.boardType == 'NOTICE' ? 'GM' : '회원 #' + board.memberNo}">GM</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${board.boardType == 'NOTICE' or board.answerContent != null and !board.answerContent.isBlank()} ? ' badge-completed' : ' badge-waiting'"
+                              th:text="${board.boardType == 'NOTICE' ? '공지' : (board.answerContent != null and !board.answerContent.isBlank() ? '답변완료' : '답변대기')}">공지</span>
+                    </td>
+                    <td th:text="${board.createdAt != null ? #temporals.format(board.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/board/detail/${board.boardNo}|}" class="btn btn-outline">상세</a>
+                        <a th:if="${board.boardType == 'NOTICE'}" th:href="@{|/admin/board/edit/${board.boardNo}|}" class="btn btn-outline">수정</a>
+                        <form th:action="@{|/admin/board/delete/${board.boardNo}|}" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('해당 게시글을 삭제 처리하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(boardList)}">조회된 게시글이 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ 챗봇 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('chatbot')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>FAQ 챗봇 관리</h1>
+                <p>사용자 FAQ 챗봇에서 노출되는 질문/답변을 직접 수정하고 노출 순서를 관리합니다.</p>
+            </div>
+            <div class="page-actions">
+                <a th:href="@{/admin/chatbot/faq/new}" class="btn btn-primary">FAQ 등록</a>
+            </div>
+        </div>
+
+        <section class="panel">
+            <table class="data-table" th:if="${not #lists.isEmpty(faqList)}">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>카테고리</th>
+                    <th>질문</th>
+                    <th>노출순서</th>
+                    <th>상태</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="faq : ${faqList}">
+                    <td th:text="${faq.faqNo}">1</td>
+                    <td th:text="${faq.category}">구매 상담</td>
+                    <td>
+                        <div class="stack">
+                            <strong th:text="${faq.question}">차량 추천을 받고 싶어요</strong>
+                            <span class="small" th:text="${faq.answer}">답변 미리보기</span>
+                        </div>
+                    </td>
+                    <td th:text="${faq.displayOrder}">1</td>
+                    <td>
+                        <span class="badge" th:classappend="${faq.activeYn == 'Y'} ? ' badge-active' : ' badge-inactive'"
+                              th:text="${faq.activeYn == 'Y'} ? '노출중' : '비노출'">노출중</span>
+                    </td>
+                    <td class="inline-actions">
+                        <a th:href="@{|/admin/chatbot/faq/edit/${faq.faqNo}|}" class="btn btn-outline">수정</a>
+                        <form th:action="@{|/admin/chatbot/faq/delete/${faq.faqNo}|}" method="post">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('해당 FAQ를 삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(faqList)}">등록된 FAQ가 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -110,7 +110,7 @@ public class BoardService {
 				Sort.Order.desc("noticeYn"),
 
 				// 2순위: 우선순위 (예: 숫자가 클수록 높은 순위라면 desc, 1이 가장 높다면 asc)
-				Sort.Order.desc("priority"),
+				Sort.Order.asc("priority"),
 
 				// 3순위: 최신글 (글 번호 내림차순 DESC)
 				Sort.Order.desc("boardNo"));

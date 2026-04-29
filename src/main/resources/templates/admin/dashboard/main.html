@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 대시보드</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+    <link rel="stylesheet" th:href="@{/css/admin/admin.css}">
+</head>
+<body>
+<div class="admin-shell">
+    <div th:replace="~{admin/fragments/layout :: sidebar('dashboard')}"></div>
+
+    <main class="admin-content">
+        <div class="page-header">
+            <div>
+                <h1>관리자 메인페이지</h1>
+                <p>시스템 전체 현황과 최근 상담 흐름을 한 번에 확인할 수 있습니다.</p>
+            </div>
+        </div>
+
+        <section class="summary-grid">
+            <a th:href="@{/admin/member/list}" class="summary-card summary-link">
+                <span>총 회원 수</span>
+                <strong th:text="${dashboard.memberCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/car/list}" class="summary-card summary-link">
+                <span>등록 차량 수</span>
+                <strong th:text="${dashboard.carCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list}" class="summary-card summary-link">
+                <span>상담 신청 수</span>
+                <strong th:text="${dashboard.consultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list}" class="summary-card summary-link">
+                <span>게시글 수</span>
+                <strong th:text="${dashboard.boardCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/dealer/list}" class="summary-card summary-link">
+                <span>등록 딜러 수</span>
+                <strong th:text="${dashboard.dealerCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/promotion/list}" class="summary-card summary-link">
+                <span>프로모션 수</span>
+                <strong th:text="${dashboard.promotionCount}">0</strong>
+            </a>
+        </section>
+
+        <section class="summary-grid">
+            <a th:href="@{/admin/consult/list(status='대기')}" class="summary-card summary-link">
+                <span>대기 상담</span>
+                <strong th:text="${dashboard.waitingConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list(status='진행중')}" class="summary-card summary-link">
+                <span>진행중 상담</span>
+                <strong th:text="${dashboard.inProgressConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/consult/list(status='완료')}" class="summary-card summary-link">
+                <span>완료 상담</span>
+                <strong th:text="${dashboard.completedConsultCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list(boardType='NOTICE')}" class="summary-card summary-link">
+                <span>공지사항</span>
+                <strong th:text="${dashboard.noticeCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/board/list}" class="summary-card summary-link">
+                <span>문의글</span>
+                <strong th:text="${dashboard.inquiryCount}">0</strong>
+            </a>
+            <a th:href="@{/admin/dealer/list}" class="summary-card summary-link">
+                <span>승인대기 딜러</span>
+                <strong th:text="${dashboard.waitingDealerCount}">0</strong>
+            </a>
+        </section>
+
+        <section class="panel">
+            <div class="page-header" style="margin-bottom: 18px;">
+                <div>
+                    <h1 style="font-size: 24px;">최근 상담 신청</h1>
+                    <p>최신 상담 5건을 빠르게 확인하고 바로 상세 관리로 이동할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <table class="data-table" th:if="${not #lists.isEmpty(dashboard.recentConsults)}">
+                <thead>
+                <tr>
+                    <th>상담번호</th>
+                    <th>회원</th>
+                    <th>차량</th>
+                    <th>상태</th>
+                    <th>배정 딜러</th>
+                    <th>신청일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="consult : ${dashboard.recentConsults}">
+                    <td><a th:href="@{|/admin/consult/detail/${consult.consultNo}|}" th:text="${consult.consultNo}">1</a></td>
+                    <td th:text="${consult.memberName}">홍길동</td>
+                    <td th:text="${consult.carModelName}">EV6</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${consult.statusLabel == '대기'} ? ' badge-waiting' :
+                                              (${consult.statusLabel == '진행중'} ? ' badge-progress' : ' badge-completed')"
+                              th:text="${consult.statusLabel}">대기</span>
+                    </td>
+                    <td th:text="${consult.dealerName}">미배정</td>
+                    <td th:text="${consult.requestDate != null ? #temporals.format(consult.requestDate, 'yyyy-MM-dd HH:mm') : '-'}">2026-04-20 12:00</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="empty" th:if="${#lists.isEmpty(dashboard.recentConsults)}">최근 상담 신청 내역이 없습니다.</div>
+        </section>
+    </main>
+</div>
+</body>
+</html>
